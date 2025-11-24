@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:playserve_mobile/booking/screens/booking_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -109,6 +110,20 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
+
+            // Ini ntar pas digabungin, hapus aja yak
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const BookingPage()),
+                );
+              },
+              child: const Text("Go to Booking Page"),
+            ),
+
+            // sampe sini
           ],
         ),
       ),
