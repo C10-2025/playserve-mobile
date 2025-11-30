@@ -2,9 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:playserve_mobile/matchmaking/widgets/filter_button.dart';
 import 'package:playserve_mobile/matchmaking/widgets/player_card.dart';
+import 'package:playserve_mobile/matchmaking/widgets/sent_request_card.dart';
 
-class DashboardPage extends StatelessWidget {
+class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
+
+  @override
+  State<DashboardPage> createState() => _DashboardPageState();
+}
+
+class _DashboardPageState extends State<DashboardPage> {
+  bool isTopPicks = true;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +37,7 @@ class DashboardPage extends StatelessWidget {
             Align(
               alignment: Alignment.bottomCenter,
               child: Image.asset(
-                'assets/bg_pattern.png',
+                'assets/image/bg_pattern.png',
                 width: MediaQuery.of(context).size.width,
                 fit: BoxFit.fitWidth,
               ),
@@ -55,10 +63,28 @@ class DashboardPage extends StatelessWidget {
 
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        FilterButton("TOP PICKS\nFOR YOU"),
-                        SizedBox(width: 12),
-                        FilterButton("SENT\nREQUESTS"),
+                      children: [
+                        FilterButton(
+                          text: "TOP PICKS\nFOR YOU",
+                          isActive: isTopPicks,
+                          onTap: () {
+                            setState(() {
+                              isTopPicks = true;
+                            });
+                          },
+                        ),
+
+                        const SizedBox(width: 12),
+
+                        FilterButton(
+                          text: "SENT\nREQUESTS",
+                          isActive: !isTopPicks,
+                          onTap: () {
+                            setState(() {
+                              isTopPicks = false;
+                            });
+                          },
+                        ),
                       ],
                     ),
 
@@ -66,12 +92,20 @@ class DashboardPage extends StatelessWidget {
 
                     Expanded(
                       child: ListView(
-                        children: const [
-                          PlayerCard(),
-                          SizedBox(height: 20),
-                          PlayerCard(),
-                          SizedBox(height: 20),
-                          PlayerCard(),
+                        children: [
+                          if (isTopPicks) ...[
+                            const PlayerCard(),
+                            const SizedBox(height: 20),
+                            const PlayerCard(),
+                            const SizedBox(height: 20),
+                            const PlayerCard(),
+                          ] else ...[
+                            const SentRequestCard(),
+                            const SizedBox(height: 20),
+                            const SentRequestCard(),
+                            const SizedBox(height: 20),
+                            const SentRequestCard(),
+                          ]
                         ],
                       ),
                     ),
