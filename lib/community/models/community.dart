@@ -15,11 +15,13 @@ class Community {
 
   factory Community.fromJson(Map<String, dynamic> json) {
     return Community(
-      id: json['id'] as int,
-      name: json['name'] as String,
-      description: (json['description'] ?? '') as String,
-      membersCount: (json['members_count'] ?? 0) as int,
-      isJoined: (json['is_joined'] ?? false) as bool,
+      id: json['id'] is int
+          ? json['id'] as int
+          : int.parse(json['id'].toString()),
+      name: json['name'] as String? ?? '',
+      description: json['description'] as String? ?? '',
+      membersCount: json['members_count'] as int? ?? 0,
+      isJoined: json['is_joined'] as bool? ?? false,
     );
   }
 }
