@@ -1,84 +1,93 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:playserve_mobile/review/models/lapangan.dart';
+import 'package:playserve_mobile/review/models/review_item.dart';
 import 'package:playserve_mobile/review/models/review_card.dart';
 
+// The main widget; list of all reviews
 class ReviewList extends StatelessWidget {
-  final List<Lapangan> reviews;
+  final List<Lapangan> lapangans;
+  final List<ReviewItem> allReviews;
+  final Function(Lapangan) onAddReview;
+  final Function(Lapangan) onViewComments;
 
-  const ReviewList({super.key, required this.reviews});
+  const ReviewList({
+    super.key,
+    required this.lapangans,
+    required this.allReviews,
+    required this.onAddReview,
+    required this.onViewComments,
+  });
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
 
-    return Container(
-      alignment: Alignment.topCenter,
-      padding: EdgeInsets.symmetric(
-        horizontal: width < 500 ? 12 : 20,
-        vertical: 20,
-      ),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 1100),
-        child: Container(
-          padding: EdgeInsets.symmetric(
-            horizontal: width < 500 ? 20 : 48,
-            vertical: 28,
-          ),
-          decoration: BoxDecoration(
-            color: const Color(0xFF1A2B4C),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.4),
-                blurRadius: 28,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              // Header
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text(
-                    "Court Reviews",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  SizedBox(height: 6),
-                  SizedBox(
-                    width: 120,
-                    height: 3,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: Color(0xFFB0D235),
-                        borderRadius: BorderRadius.all(Radius.circular(2)),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+    return Center(
+      child: Container(
+        width: width > 1100 ? 1100 : width,
+        height: MediaQuery.of(context).size.height * 0.90,
 
-              const SizedBox(height: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
 
-              // Scrollable content
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: reviews
-                        .map((lap) => ReviewCard(lapangan: lap))
-                        .toList(),
-                  ),
-                ),
-              )
-            ],
-          ),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1A2B4C),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.35),
+              blurRadius: 22,
+            ),
+          ],
+        ),
+
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ===========================================================
+            // HEADER (like Django review-header)
+            // ===========================================================
+            Text(
+              "Court Reviews",
+              style: TextStyle(
+                fontSize: width < 360 ? 18 : 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+
+            const SizedBox(height: 6),
+
+            Container(
+              height: 3,
+              width: 140,
+              decoration: BoxDecoration(
+                color: const Color(0xFFB0D235),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // ===========================================================
+            // SCROLLABLE REVIEW LIST (like Django review-content)
+            // ===========================================================
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.only(right: 4),
+                itemCount: lapangans.length,
+                itemBuilder: (context, index) {
+                  final lap = lapangans[index];
+
+                  return ReviewCard(
+                    lapangan: lap,
+                    allReviews: allReviews,
+                    onAddReview: () => onAddReview(lap),
+                    onViewComments: () => onViewComments(lap),
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );

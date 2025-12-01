@@ -1,6 +1,5 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:playserve_mobile/review/models/review_preview.dart';
+
 
 // Placeholder to the playing court model at the web
 // TODO: deprecate this
@@ -11,10 +10,6 @@ class Lapangan {
   final int pricePerHour;
   final double avgRating;
   final int reviewCount;
-  final List<ReviewPreview> latestReviews;
-
-  final VoidCallback onAddReview;
-  final VoidCallback onViewComments;
 
   Lapangan({
     required this.imageUrl,
@@ -23,54 +18,30 @@ class Lapangan {
     required this.pricePerHour,
     required this.avgRating,
     required this.reviewCount,
-    required this.latestReviews,
-    required this.onAddReview,
-    required this.onViewComments,
   });
 }
+
+
 
 // To parse this JSON data, do
 //
 //     final playingField = playingFieldFromJson(jsonString);
 // TODO: integrate this
-List<PlayingField> playingFieldFromJson(String str) => List<PlayingField>.from(json.decode(str).map((x) => PlayingField.fromJson(x)));
-String playingFieldToJson(List<PlayingField> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+List<PlayingFieldItem> playingFieldItemFromJson(String str) => List<PlayingFieldItem>.from(json.decode(str).map((x) => PlayingFieldItem.fromJson(x)));
+String playingFieldItemToJson(List<PlayingFieldItem> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
-class PlayingField {
-    Model model;
-    int pk;
-    Fields fields;
-
-    PlayingField({
-        required this.model,
-        required this.pk,
-        required this.fields,
-    });
-
-    factory PlayingField.fromJson(Map<String, dynamic> json) => PlayingField(
-        model: modelValues.map[json["model"]]!,
-        pk: json["pk"],
-        fields: Fields.fromJson(json["fields"]),
-    );
-
-    Map<String, dynamic> toJson() => {
-        "model": modelValues.reverse[model],
-        "pk": pk,
-        "fields": fields.toJson(),
-    };
-}
-
-class Fields {
+class PlayingFieldItem {
+    String id;
     String name;
     String address;
     City city;
-    String latitude;
-    String longitude;
+    double latitude;
+    double longitude;
     int numberOfCourts;
     bool hasLights;
     bool hasBackboard;
     CourtSurface courtSurface;
-    String pricePerHour;
+    int pricePerHour;
     String ownerName;
     String ownerContact;
     String ownerBankAccount;
@@ -78,14 +49,16 @@ class Fields {
     String closingTime;
     String description;
     List<dynamic> amenities;
-    String courtImage;
+    dynamic courtImage;
     String imageUrl;
     dynamic createdBy;
     DateTime createdAt;
     DateTime updatedAt;
     bool isActive;
+    PriceRangeCategory priceRangeCategory;
 
-    Fields({
+    PlayingFieldItem({
+        required this.id,
         required this.name,
         required this.address,
         required this.city,
@@ -109,14 +82,16 @@ class Fields {
         required this.createdAt,
         required this.updatedAt,
         required this.isActive,
+        required this.priceRangeCategory,
     });
 
-    factory Fields.fromJson(Map<String, dynamic> json) => Fields(
+    factory PlayingFieldItem.fromJson(Map<String, dynamic> json) => PlayingFieldItem(
+        id: json["id"],
         name: json["name"],
         address: json["address"],
         city: cityValues.map[json["city"]]!,
-        latitude: json["latitude"],
-        longitude: json["longitude"],
+        latitude: json["latitude"]?.toDouble(),
+        longitude: json["longitude"]?.toDouble(),
         numberOfCourts: json["number_of_courts"],
         hasLights: json["has_lights"],
         hasBackboard: json["has_backboard"],
@@ -135,9 +110,11 @@ class Fields {
         createdAt: DateTime.parse(json["created_at"]),
         updatedAt: DateTime.parse(json["updated_at"]),
         isActive: json["is_active"],
+        priceRangeCategory: priceRangeCategoryValues.map[json["price_range_category"]]!,
     );
 
     Map<String, dynamic> toJson() => {
+        "id": id,
         "name": name,
         "address": address,
         "city": cityValues.reverse[city],
@@ -161,6 +138,7 @@ class Fields {
         "created_at": createdAt.toIso8601String(),
         "updated_at": updatedAt.toIso8601String(),
         "is_active": isActive,
+        "price_range_category": priceRangeCategoryValues.reverse[priceRangeCategory],
     };
 }
 
@@ -188,12 +166,16 @@ final courtSurfaceValues = EnumValues({
     "HARD": CourtSurface.HARD
 });
 
-enum Model {
-    BOOKING_PLAYINGFIELD
+enum PriceRangeCategory {
+    BUDGET,
+    MID,
+    PREMIUM
 }
 
-final modelValues = EnumValues({
-    "booking.playingfield": Model.BOOKING_PLAYINGFIELD
+final priceRangeCategoryValues = EnumValues({
+    "budget": PriceRangeCategory.BUDGET,
+    "mid": PriceRangeCategory.MID,
+    "premium": PriceRangeCategory.PREMIUM
 });
 
 class EnumValues<T> {
