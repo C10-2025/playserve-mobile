@@ -1,11 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:playserve_mobile/matchmaking/models/incoming_request_model.dart';
+import 'package:playserve_mobile/matchmaking/screens/matchmaking_service.dart';
 
 class SentRequestCard extends StatelessWidget {
-  const SentRequestCard({super.key});
+  final IncomingRequestModel req;
+
+  const SentRequestCard({
+    super.key,
+    required this.req,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+    final service = MatchmakingService(request);
+
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 360),
@@ -28,13 +40,13 @@ class SentRequestCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: Color(0xFFC6DA44),
+                        color: const Color(0xFFC6DA44),
                         width: 3,
                       ),
                     ),
                     child: ClipOval(
                       child: Image.asset(
-                        'assets/image/avatar.png',
+                        _mapAvatarToPng(req.senderAvatar),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -47,15 +59,19 @@ class SentRequestCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "sweetiepie",
+                          req.senderUsername,
                           style: GoogleFonts.inter(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
+
                         Text(
-                          "@heyyooww",
+                          req.senderInstagram != null &&
+                                  req.senderInstagram.toString().trim().isNotEmpty
+                              ? "@${req.senderInstagram}"
+                              : "(no instagram)",
                           style: GoogleFonts.inter(
                             fontSize: 14,
                             color: Colors.black54,
@@ -71,9 +87,38 @@ class SentRequestCard extends StatelessWidget {
 
               Row(
                 children: [
+                  // ACCEPT button
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        final response = await service.handleRequest(
+                            req.requestId, "ACCEPT");
+
+                        if (!context.mounted) return;
+
+                        final success = response['success'] == true;
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              success
+                                  ? "Match accepted!"
+                                  : (response['error'] ?? "Failed to accept"),
+                            ),
+                          ),
+                        );
+
+                        // Reload page
+                        if (success) {
+                          Navigator.pushReplacement(
+                            context,
+                            PageRouteBuilder(
+                              pageBuilder: (_, __, ___) => const SentRequestCardPlaceholder(),
+                              transitionDuration: Duration.zero,
+                            ),
+                          );
+                        }
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFC6DA44),
                         padding: const EdgeInsets.symmetric(vertical: 14),
@@ -94,9 +139,37 @@ class SentRequestCard extends StatelessWidget {
 
                   const SizedBox(width: 12),
 
+                  // REJECT Button
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        final response = await service.handleRequest(
+                            req.requestId, "REJECT");
+
+                        if (!context.mounted) return;
+
+                        final success = response['success'] == true;
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              success
+                                  ? "Request rejected"
+                                  : (response['error'] ?? "Failed to reject"),
+                            ),
+                          ),
+                        );
+
+                        if (success) {
+                          Navigator.pushReplacement(
+                            context,
+                            PageRouteBuilder(
+                              pageBuilder: (_, __, ___) => const SentRequestCardPlaceholder(),
+                              transitionDuration: Duration.zero,
+                            ),
+                          );
+                        }
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF001946),
                         padding: const EdgeInsets.symmetric(vertical: 14),
@@ -121,5 +194,25 @@ class SentRequestCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  // Mapping Django SVG to Flutter PNG
+  String _mapAvatarToPng(String avatar) {
+    if (avatar.contains("avatar1")) return "assets/image/avatar1.png";
+    if (avatar.contains("avatar2")) return "assets/image/avatar2.png";
+    if (avatar.contains("avatar3")) return "assets/image/avatar3.png";
+    if (avatar.contains("avatar4")) return "assets/image/avatar4.png";
+    if (avatar.contains("avatar5")) return "assets/image/avatar5.png";
+    return "assets/image/avatar1.png";
+  }
+}
+
+// Dummy replacement widget for refresh
+class SentRequestCardPlaceholder extends StatelessWidget {
+  const SentRequestCardPlaceholder({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container();
   }
 }
