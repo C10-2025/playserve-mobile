@@ -1,30 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
-
-import 'community/screen/discover_communities_page.dart';
+import 'package:provider/provider.dart';
+import 'package:playserve_mobile/screens/register.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const PlayServeApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class PlayServeApp extends StatelessWidget {
+  const PlayServeApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Provider<CookieRequest>(
+    return Provider(
       create: (_) => CookieRequest(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'SoccerID Community',
+        title: 'PlayServe Login',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xff082459),
-          ),
-          useMaterial3: true,
+          colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.indigo)
+              .copyWith(secondary: const Color(0xFFB8D243)),
         ),
-        home: const DiscoverCommunitiesPage(),
+        home: const RegisterStep1Page(),
       ),
     );
   }
