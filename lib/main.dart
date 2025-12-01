@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:playserve_mobile/screens/register.dart';
+import 'package:playserve_mobile/profil/screens/register.dart';
 
 void main() {
   runApp(const PlayServeApp());
