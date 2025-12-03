@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:playserve_mobile/review/models/review_item.dart';
+import 'package:playserve_mobile/review/models/review_item.dart'; // ReviewItemNew
 
 class ViewCommentsModal extends StatelessWidget {
   final String courtName;
   final String address;
   final int pricePerHour;
-  final List<ReviewItem> reviews; // NOTE: view_comments' job is to view the comments of all reviews
+  final List<ReviewItemNew> reviews;
 
   const ViewCommentsModal({
     super.key,
@@ -17,18 +17,23 @@ class ViewCommentsModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double modalWidth = MediaQuery.of(context).size.width * 0.92;
-    final double modalHeight = MediaQuery.of(context).size.height * 0.65;
+    final width = MediaQuery.of(context).size.width;
+
+    // ensure it becomes a double
+    final double modalWidth =
+        (width < 420 ? width * 0.90 : 380).toDouble();
+
+    final double modalHeight =
+        (width < 420 ? MediaQuery.of(context).size.height * 0.70 : 480)
+            .toDouble();
 
     return Stack(
       children: [
-        // Dim background overlay
+        // Dim background
         GestureDetector(
           onTap: () => Navigator.pop(context),
           child: Container(
-            width: double.infinity,
-            height: double.infinity,
-            color: Colors.black.withOpacity(0.4),
+            color: Colors.black54,
           ),
         ),
 
@@ -37,27 +42,28 @@ class ViewCommentsModal extends StatelessWidget {
             color: Colors.transparent,
             child: Container(
               width: modalWidth,
-              constraints: const BoxConstraints(maxWidth: 480),
-              padding: const EdgeInsets.all(16),
+              height: modalHeight,
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
               decoration: BoxDecoration(
                 color: Colors.white,
-                border: Border.all(color: Color(0xFFD6E8C5), width: 2),
                 borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0xFFD6E8C5), width: 2),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.20),
-                    blurRadius: 24,
+                    color: Colors.black.withOpacity(0.18),
+                    blurRadius: 22,
                   ),
                 ],
               ),
+
               child: Column(
-                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Close button
                   Align(
                     alignment: Alignment.topRight,
                     child: IconButton(
-                      icon: const Icon(Icons.close, size: 24),
+                      icon: const Icon(Icons.close),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ),
@@ -66,72 +72,76 @@ class ViewCommentsModal extends StatelessWidget {
                   Text(
                     "Comments for $courtName",
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 15,
                       color: Color(0xFF1A2B4C),
                     ),
                   ),
-
                   const SizedBox(height: 4),
 
-                  // Subtitle
                   Text(
-                    "Address: $address • Price: Rp $pricePerHour",
+                    "$address • Rp $pricePerHour",
                     style: const TextStyle(
                       fontSize: 12,
                       color: Color(0xFF445566),
                     ),
-                    textAlign: TextAlign.center,
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 14),
 
-                  // Scrollable comments
-                  SizedBox(
-                    height: modalHeight,
-                    child: reviews.isNotEmpty
-                        ? ListView.separated(
+                  // Comments list
+                  Expanded(
+                    child: reviews.isEmpty
+                        ? const Center(
+                            child: Text(
+                              "No comments yet for this field.",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          )
+                        : ListView.separated(
+                            padding: EdgeInsets.zero,
                             itemCount: reviews.length,
                             separatorBuilder: (_, __) =>
-                                const SizedBox(height: 10),
-                            itemBuilder: (context, i) {
+                                const SizedBox(height: 8),
+                            itemBuilder: (_, i) {
                               final r = reviews[i];
+                              // Comment item 
                               return Container(
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
                                   color: const Color(0xFFF7F7F7),
-                                  borderRadius: BorderRadius.circular(10),
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    // Username
                                     Text(
                                       r.username,
                                       style: const TextStyle(
-                                        fontSize: 13,
+                                        fontSize: 12,
                                         color: Color(0xFF1A2B4C),
                                       ),
                                     ),
 
-                                    const SizedBox(height: 3),
+                                    const SizedBox(height: 2),
 
-                                    // Stars
                                     Text(
                                       "★" * r.rating +
                                           "☆" * (5 - r.rating),
                                       style: const TextStyle(
+                                        fontSize: 13,
                                         color: Colors.amber,
-                                        fontSize: 14,
                                       ),
                                     ),
 
-                                    const SizedBox(height: 6),
+                                    const SizedBox(height: 4),
 
-                                    // Comment text
                                     Text(
                                       r.comment,
                                       style: const TextStyle(
-                                        fontSize: 13,
+                                        fontSize: 12,
                                         color: Color(0xFF1A2B4C),
                                       ),
                                     ),
@@ -139,16 +149,6 @@ class ViewCommentsModal extends StatelessWidget {
                                 ),
                               );
                             },
-                          )
-                        : const Center(
-                            child: Text(
-                              "No comments yet for this field.",
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.grey,
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
                           ),
                   ),
                 ],

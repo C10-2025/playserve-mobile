@@ -1,32 +1,9 @@
 import 'dart:convert';
-
-
-// Placeholder to the playing court model at the web
-// TODO: deprecate this
-class Lapangan {
-  final String? imageUrl;
-  final String name;
-  final String address;
-  final int pricePerHour;
-  final double avgRating;
-  final int reviewCount;
-
-  Lapangan({
-    required this.imageUrl,
-    required this.name,
-    required this.address,
-    required this.pricePerHour,
-    required this.avgRating,
-    required this.reviewCount,
-  });
-}
-
-
-
 // To parse this JSON data, do
 //
 //     final playingField = playingFieldFromJson(jsonString);
-// TODO: integrate this
+
+// Corresponds to the PlayingField model at Django app
 List<PlayingFieldItem> playingFieldItemFromJson(String str) => List<PlayingFieldItem>.from(json.decode(str).map((x) => PlayingFieldItem.fromJson(x)));
 String playingFieldItemToJson(List<PlayingFieldItem> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
