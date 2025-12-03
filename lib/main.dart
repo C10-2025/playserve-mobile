@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:playserve_mobile/profil/screens/register.dart';
+import 'package:playserve_mobile/booking/screens/booking_page.dart';
+
 // import 'package:playserve_mobile/review/screens/review_page.dart';
 
 void main() {
@@ -23,7 +25,8 @@ class PlayServeApp extends StatelessWidget {
             primarySwatch: Colors.indigo,
           ).copyWith(secondary: const Color(0xFFB8D243)),
         ),
-        home: const RegisterStep1Page(),
+        // home: const RegisterStep1Page(),
+        home: const BookingPage(),
       ),
     );
   }
