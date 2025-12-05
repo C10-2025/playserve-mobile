@@ -13,6 +13,9 @@ dependencies:
   cupertino_icons: ^1.0.8
   provider: ^6.1.5
   pbp_django_auth: ^0.4.0
+  shared_preferences: ^2.3.2
+  google_fonts: ^6.2.1
+  lucide_icons: ^0.257.0
 
 dev_dependencies:
   flutter_test:
@@ -28,3 +31,14 @@ flutter:
     - assets/image/avatar3.png
     - assets/image/avatar4.png
     - assets/image/avatar5.png
+    - assets/image/background.png
+    - assets/image/intro1.png
+    - assets/image/intro2.png
+    - assets/image/logo.png
+    - assets/image/logo2.png
+    - assets/image/login.png
+    - assets/image/map.png
+    - assets/image/match.png
+    - assets/image/review.png
+    - assets/image/community.png
+    - assets/image/booking.png
