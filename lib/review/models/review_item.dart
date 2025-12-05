@@ -1,33 +1,16 @@
 import 'dart:convert';
-
-// Review model. Corresponds to the class Review at the django module
-// TODO: deprecate this
-class ReviewItem {
-  final String username;
-  final int rating;
-  final String comment;
-  final String lapanganName;   // 🆕 FK by lapangan name
-
-  ReviewItem({
-    required this.username,
-    required this.rating,
-    required this.comment,
-    required this.lapanganName,
-  });
-}
-
-
 // To parse this JSON data, do
 //
 //     final reviewItem = reviewItemFromJson(jsonString);
-// TODO: integrate this too, make this have a username and court associated (take it from json func at web)
+
+// Indvidual review item, corresponds to the Review model at Django app
 List<ReviewItemNew> reviewItemNewFromJson(String str) => List<ReviewItemNew>.from(json.decode(str).map((x) => ReviewItemNew.fromJson(x)));
 String reviewItemNewToJson(List<ReviewItemNew> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class ReviewItemNew {
     String username;
     int rating;
-    String comment;
+    String comment; // NOTE: corresponds to komentar in django model
     String fieldName;
 
     ReviewItemNew({

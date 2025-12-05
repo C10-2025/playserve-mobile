@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:playserve_mobile/profil/screens/menu.dart';
+import 'package:playserve_mobile/profil/screens/menu.dart'; // TODO: use this when that module is done
 import 'package:playserve_mobile/profil/screens/register.dart';
-import 'package:playserve_mobile/booking/screens/field_list_screen.dart';
+import 'package:playserve_mobile/review/screens/review_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -109,7 +109,7 @@ class _LoginPageState extends State<LoginPage> {
                             setState(() => _isLoading = true);
 
                             final response = await request.login(
-                              "http://127.0.0.1:8000/auth/login/",
+                              "http://localhost:8000/auth/login/",
                               {'username': username, 'password': password},
                             );
 
@@ -120,11 +120,16 @@ class _LoginPageState extends State<LoginPage> {
                                   response['message'] ?? 'Login success!';
                               String uname = response['username'] ?? username;
 
+                              // Admin?
+                              bool isAdmin = response["is_admin"] ?? false;
+                              request.jsonData["is_admin"] = isAdmin;
+
                               if (context.mounted) {
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const MyHomePage(),
+                                    // TODO: Replace this with MyHomePage() when that module is done
+                                    builder: (context) => const ReviewPage(),
                                   ),
                                 );
                                 ScaffoldMessenger.of(context)

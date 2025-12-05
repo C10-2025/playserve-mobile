@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+// Add review modal, the add review logic is at _addReview() on review_list.dart
 class AddReviewModal extends StatefulWidget {
   final String courtName;
   final Function(int rating, String comment) onSubmit;
