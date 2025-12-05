@@ -3,6 +3,7 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:playserve_mobile/profil/screens/menu.dart';
 import 'package:playserve_mobile/profil/screens/register.dart';
+import 'package:playserve_mobile/booking/screens/field_list_screen.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -195,6 +196,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           child: const Text('LOGIN'),
                         ),
+                  const SizedBox(height: 12.0),
                   const SizedBox(height: 36.0),
 
                   GestureDetector(

@@ -4,9 +4,10 @@ class AvailabilityResponse {
 
   AvailabilityResponse({required this.available, required this.message});
 
-  factory AvailabilityResponse.fromJson(Map<String, dynamic> json) =>
-      AvailabilityResponse(
-        available: json["available"] ?? false,
-        message: json["message"] ?? "",
-      );
+  factory AvailabilityResponse.fromJson(Map<String, dynamic> json) {
+    return AvailabilityResponse(
+      available: json["available"] ?? false,
+      message: json["message"] ?? "",
+    );
+  }
 }
