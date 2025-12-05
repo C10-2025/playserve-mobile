@@ -13,6 +13,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   provider: ^6.1.5
   pbp_django_auth: ^0.4.0
+  google_fonts: ^6.0.0
 
 dev_dependencies:
   flutter_test:
@@ -28,3 +29,5 @@ flutter:
     - assets/image/avatar3.png
     - assets/image/avatar4.png
     - assets/image/avatar5.png
+    - assets/image/bgcommunity.png
+    - assets/image/search.png

@@ -1,6 +1,11 @@
+// lib/screens/menu.dart
+
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+
+// path benar sesuai struktur folder kamu (community/screen)
+import '../community/screen/discover_communities_page.dart';
 
 class MyHomePage extends StatelessWidget {
   const MyHomePage({super.key});
@@ -24,6 +29,7 @@ class MyHomePage extends StatelessWidget {
           ),
         ),
       ),
+
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -39,6 +45,7 @@ class MyHomePage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
+
               const Text(
                 "You are now logged in successfully.",
                 style: TextStyle(
@@ -46,28 +53,68 @@ class MyHomePage extends StatelessWidget {
                   fontSize: 16,
                 ),
               ),
+
               const SizedBox(height: 40),
 
-              // Tombol logout
+              // ===========================================
+              // 🔥 GO TO DISCOVER COMMUNITIES
+              // ===========================================
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const DiscoverCommunitiesPage(),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFB8D243),
+                  foregroundColor: const Color(0xFF0C1446),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 14,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  textStyle: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                child: const Text("DISCOVER COMMUNITIES"),
+              ),
+
+              const SizedBox(height: 20),
+
+              // ===========================================
+              // 🚪 LOGOUT
+              // ===========================================
               ElevatedButton(
                 onPressed: () async {
                   await request.logout("http://127.0.0.1:8000/auth/logout");
+
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text("You have been logged out."),
                       ),
                     );
+
                     Navigator.pop(context);
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFB8D243),
-                  foregroundColor: const Color(0xFF0C1446),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                  backgroundColor: Colors.white.withOpacity(0.12),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 14,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
+                    side: const BorderSide(color: Colors.white54),
                   ),
                   textStyle: const TextStyle(
                     fontWeight: FontWeight.bold,

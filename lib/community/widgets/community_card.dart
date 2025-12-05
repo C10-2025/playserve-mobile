@@ -15,8 +15,11 @@ class CommunityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool joined = community.isJoined;
+
     return InkWell(
-      onTap: onTap,
+      // card hanya bisa di-tap kalau sudah join
+      onTap: joined && onTap != null ? onTap : null,
       borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -66,25 +69,27 @@ class CommunityCard extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: community.isJoined
-                    ? null
-                    : () async {
-                        if (onJoin != null) {
-                          await onJoin!();
-                        }
-                      },
+                onPressed: () async {
+                  if (joined) {
+                    // sudah join → buka detail
+                    if (onTap != null) onTap!();
+                  } else {
+                    // belum join → panggil join
+                    if (onJoin != null) await onJoin!();
+                  }
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor:
-                      community.isJoined ? Colors.grey : const Color(0xFFC1D752),
+                      joined ? Colors.grey[300] : const Color(0xFFC1D752),
                   foregroundColor:
-                      community.isJoined ? Colors.white : const Color(0xFF082459),
+                      joined ? Colors.grey[800] : const Color(0xFF082459),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
                   elevation: 2,
                 ),
                 child: Text(
-                  community.isJoined ? 'JOINED' : 'JOIN NOW',
+                  joined ? 'OPEN COMMUNITY' : 'JOIN NOW',
                   style: const TextStyle(
                     fontWeight: FontWeight.w600,
                   ),

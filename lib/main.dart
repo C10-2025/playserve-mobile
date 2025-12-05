@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';          
 import 'package:pbp_django_auth/pbp_django_auth.dart';
-import 'package:provider/provider.dart';
+import 'package:playserve_mobile/screens/login.dart';
 import 'package:playserve_mobile/screens/register.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(const PlayServeApp());
@@ -18,10 +20,16 @@ class PlayServeApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'PlayServe Login',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.indigo)
-              .copyWith(secondary: const Color(0xFFB8D243)),
+          colorScheme: ColorScheme.fromSwatch(
+            primarySwatch: Colors.indigo,
+          ).copyWith(
+            secondary: const Color(0xFFB8D243),
+          ),
+
+          // 👇 GLOBAL FONT = INTER
+          textTheme: GoogleFonts.interTextTheme(),
         ),
-        home: const RegisterStep1Page(),
+        home: const LoginPage(),
       ),
     );
   }
