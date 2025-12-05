@@ -103,6 +103,7 @@ class _ReviewListState extends State<ReviewList> {
           .map<ReviewItemNew>((d) => ReviewItemNew.fromJson(Map<String, dynamic>.from(d)))
           .toList();
     });
+    _applySorting(); // immediately re-sort reviews after this
   }
 
 
@@ -176,7 +177,6 @@ class _ReviewListState extends State<ReviewList> {
 
         // Refresh reviews from Django and re-sort after posting
         await _refreshReviews();
-        _applySorting(); 
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
