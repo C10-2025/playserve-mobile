@@ -5,7 +5,7 @@ class IncomingRequestModel {
   final String senderRank;
   final String senderLokasi;
   final String senderAvatar;
-  final dynamic senderInstagram;
+  final String? senderInstagram;
   final String timestamp;
 
   IncomingRequestModel({

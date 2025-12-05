@@ -33,3 +33,8 @@ flutter:
     - assets/image/avatar3.png
     - assets/image/avatar4.png
     - assets/image/avatar5.png
+    - assets/image/bronze.png
+    - assets/image/silver.png
+    - assets/image/gold.png
+    - assets/image/platinum.png
+    - assets/image/diamond.png

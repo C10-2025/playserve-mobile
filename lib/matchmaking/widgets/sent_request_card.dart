@@ -2,15 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+
 import 'package:playserve_mobile/matchmaking/models/incoming_request_model.dart';
 import 'package:playserve_mobile/matchmaking/screens/matchmaking_service.dart';
+import 'package:playserve_mobile/matchmaking/screens/active_session_page.dart';
 
 class SentRequestCard extends StatelessWidget {
   final IncomingRequestModel req;
+  final VoidCallback onRemove;
+  final VoidCallback onRefreshRequested;
 
   const SentRequestCard({
     super.key,
     required this.req,
+    required this.onRemove,
+    required this.onRefreshRequested,
   });
 
   @override
@@ -66,7 +72,6 @@ class SentRequestCard extends StatelessWidget {
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
-
                         Text(
                           req.senderInstagram != null &&
                                   req.senderInstagram.toString().trim().isNotEmpty
@@ -87,35 +92,31 @@ class SentRequestCard extends StatelessWidget {
 
               Row(
                 children: [
-                  // ACCEPT button
+
+                  // ACCEPT BUTTON
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () async {
                         final response = await service.handleRequest(
-                            req.requestId, "ACCEPT");
+                          req.requestId,
+                          "ACCEPT",
+                        );
 
                         if (!context.mounted) return;
 
-                        final success = response['success'] == true;
+                        if (response['success'] != true) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(response['error'] ?? "Failed to accept")),
+                          );
+                          return;
+                        }
 
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              success
-                                  ? "Match accepted!"
-                                  : (response['error'] ?? "Failed to accept"),
-                            ),
-                          ),
-                        );
+                        final activeJson = await service.getActiveSession();
 
-                        // Reload page
-                        if (success) {
+                        if (activeJson['has_session'] == true && context.mounted) {
                           Navigator.pushReplacement(
                             context,
-                            PageRouteBuilder(
-                              pageBuilder: (_, __, ___) => const SentRequestCardPlaceholder(),
-                              transitionDuration: Duration.zero,
-                            ),
+                            MaterialPageRoute(builder: (_) => const ActiveSessionPage()),
                           );
                         }
                       },
@@ -139,35 +140,28 @@ class SentRequestCard extends StatelessWidget {
 
                   const SizedBox(width: 12),
 
-                  // REJECT Button
+                  // REJECT BUTTON
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () async {
                         final response = await service.handleRequest(
-                            req.requestId, "REJECT");
+                          req.requestId,
+                          "REJECT",
+                        );
 
                         if (!context.mounted) return;
 
                         final success = response['success'] == true;
 
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              success
-                                  ? "Request rejected"
-                                  : (response['error'] ?? "Failed to reject"),
-                            ),
-                          ),
+                          SnackBar(content: Text(
+                            success ? "Request rejected" : "Failed to reject",
+                          )),
                         );
 
                         if (success) {
-                          Navigator.pushReplacement(
-                            context,
-                            PageRouteBuilder(
-                              pageBuilder: (_, __, ___) => const SentRequestCardPlaceholder(),
-                              transitionDuration: Duration.zero,
-                            ),
-                          );
+                          onRemove();
+                          onRefreshRequested();
                         }
                       },
                       style: ElevatedButton.styleFrom(
@@ -196,7 +190,6 @@ class SentRequestCard extends StatelessWidget {
     );
   }
 
-  // Mapping Django SVG to Flutter PNG
   String _mapAvatarToPng(String avatar) {
     if (avatar.contains("avatar1")) return "assets/image/avatar1.png";
     if (avatar.contains("avatar2")) return "assets/image/avatar2.png";
@@ -204,15 +197,5 @@ class SentRequestCard extends StatelessWidget {
     if (avatar.contains("avatar4")) return "assets/image/avatar4.png";
     if (avatar.contains("avatar5")) return "assets/image/avatar5.png";
     return "assets/image/avatar1.png";
-  }
-}
-
-// Dummy replacement widget for refresh
-class SentRequestCardPlaceholder extends StatelessWidget {
-  const SentRequestCardPlaceholder({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container();
   }
 }

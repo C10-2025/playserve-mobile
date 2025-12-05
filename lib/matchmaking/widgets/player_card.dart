@@ -7,8 +7,15 @@ import 'package:playserve_mobile/matchmaking/screens/matchmaking_service.dart';
 
 class PlayerCard extends StatelessWidget {
   final PlayerModel player;
+  final VoidCallback onRequestSent;
+  final VoidCallback onRefreshRequested;
 
-  const PlayerCard({super.key, required this.player});
+  const PlayerCard({
+    super.key,
+    required this.player,
+    required this.onRequestSent,
+    required this.onRefreshRequested,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -25,35 +32,50 @@ class PlayerCard extends StatelessWidget {
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
           ),
+
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  Container(
-                    width: 56,
-                    height: 56,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: const Color(0xFFC6DA44),
-                        width: 3,
+
+                  // ---------- AVATAR + BADGE STACK ----------
+                  Stack(
+                    children: [
+                      Container(
+                        width: 56,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: const Color(0xFFC6DA44),
+                            width: 3,
+                          ),
+                        ),
+                        child: ClipOval(
+                          child: Image.asset(
+                            _mapAvatarToPng(player.avatar),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
                       ),
-                    ),
-                    child: ClipOval(
-                      child: Image.asset(
-                        // Avatar PNG ada di assets
-                        // Path PNG = "assets/image/avatarX.png"
-                        // Django kasih SVG path: "image/avatar1.svg"
-                        // Jadi kita mapping manual:
-                        _mapAvatarToPng(player.avatar),
-                        fit: BoxFit.cover,
+
+                      // BADGE (BOTTOM RIGHT)
+                      Positioned(
+                        right: -3,
+                        bottom: -3,
+                        child: Image.asset(
+                          _mapRankToBadge(player.rank),
+                          width: 24,
+                          height: 24,
+                        ),
                       ),
-                    ),
+                    ],
                   ),
 
                   const SizedBox(width: 12),
 
+                  // ---------- USER INFO ----------
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,7 +88,6 @@ class PlayerCard extends StatelessWidget {
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
-
                         Text(
                           player.instagram != null &&
                                   player.instagram!.trim().isNotEmpty
@@ -85,13 +106,12 @@ class PlayerCard extends StatelessWidget {
 
               const SizedBox(height: 16),
 
+              // ---------- BUTTON ----------
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () async {
-                    final response =
-                        await service.createRequest(player.id);
-
+                    final response = await service.createRequest(player.id);
                     final success = response['success'] == true;
 
                     if (!context.mounted) return;
@@ -105,6 +125,11 @@ class PlayerCard extends StatelessWidget {
                         ),
                       ),
                     );
+
+                    if (success) {
+                      onRequestSent();
+                      onRefreshRequested();
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFC6DA44),
@@ -130,7 +155,7 @@ class PlayerCard extends StatelessWidget {
     );
   }
 
-  // Mapping avatar svg Django -> png assets Flutter
+  // ---------- AVATAR PNG ----------
   String _mapAvatarToPng(String svgPath) {
     if (svgPath.contains('avatar1')) return 'assets/image/avatar1.png';
     if (svgPath.contains('avatar2')) return 'assets/image/avatar2.png';
@@ -138,5 +163,23 @@ class PlayerCard extends StatelessWidget {
     if (svgPath.contains('avatar4')) return 'assets/image/avatar4.png';
     if (svgPath.contains('avatar5')) return 'assets/image/avatar5.png';
     return 'assets/image/avatar1.png';
+  }
+
+  // ---------- BADGE PNG ----------
+  String _mapRankToBadge(String rank) {
+    switch (rank.toLowerCase()) {
+      case "bronze":
+        return "assets/image/bronze.png";
+      case "silver":
+        return "assets/image/silver.png";
+      case "gold":
+        return "assets/image/gold.png";
+      case "platinum":
+        return "assets/image/platinum.png";
+      case "diamond":
+        return "assets/image/diamond.png";
+      default:
+        return "assets/image/bronze.png";
+    }
   }
 }

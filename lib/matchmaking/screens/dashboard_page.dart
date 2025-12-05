@@ -11,6 +11,7 @@ import 'package:playserve_mobile/matchmaking/screens/matchmaking_service.dart';
 import 'package:playserve_mobile/matchmaking/models/player_model.dart';
 import 'package:playserve_mobile/matchmaking/models/incoming_request_model.dart';
 import 'package:playserve_mobile/matchmaking/models/match_session_model.dart';
+import 'package:playserve_mobile/matchmaking/screens/active_session_page.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -36,27 +37,27 @@ class _DashboardPageState extends State<DashboardPage> {
     final request = context.read<CookieRequest>();
     final service = MatchmakingService(request);
 
-    setState(() {
-      isLoading = true;
-    });
+    setState(() => isLoading = true);
 
-    // Fetch data dari Django
     final availableJson = await service.getAvailableUsers();
     final incomingJson = await service.getIncomingRequests();
 
     setState(() {
-      availablePlayers = availableJson.map((u) => PlayerModel.fromJson(u)).toList();
-      incomingRequests = incomingJson.map((r) => IncomingRequestModel.fromJson(r)).toList();
+      availablePlayers =
+          availableJson.map((u) => PlayerModel.fromJson(u)).toList();
+      incomingRequests =
+          incomingJson.map((r) => IncomingRequestModel.fromJson(r)).toList();
       isLoading = false;
     });
 
-    // Check active match session
     final active = await service.getActiveSession();
     final session = MatchSessionModel.fromJson(active);
 
     if (session.hasSession == true && mounted) {
-      // TODO: Redirect ke ActiveMatchPage() nanti
-      // Navigator.push(context, MaterialPageRoute(builder: (_) => ActiveMatchPage(session: session)));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const ActiveSessionPage()),
+      );
     }
   }
 
@@ -107,28 +108,19 @@ class _DashboardPageState extends State<DashboardPage> {
 
                     const SizedBox(height: 24),
 
-                    // Filter buttons
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         FilterButton(
                           text: "TOP PICKS\nFOR YOU",
                           isActive: isTopPicks,
-                          onTap: () {
-                            setState(() {
-                              isTopPicks = true;
-                            });
-                          },
+                          onTap: () => setState(() => isTopPicks = true),
                         ),
                         const SizedBox(width: 12),
                         FilterButton(
                           text: "SENT\nREQUESTS",
                           isActive: !isTopPicks,
-                          onTap: () {
-                            setState(() {
-                              isTopPicks = false;
-                            });
-                          },
+                          onTap: () => setState(() => isTopPicks = false),
                         ),
                       ],
                     ),
@@ -138,9 +130,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     Expanded(
                       child: isLoading
                           ? const Center(
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                              ),
+                              child: CircularProgressIndicator(color: Colors.white),
                             )
                           : RefreshIndicator(
                               onRefresh: fetchAllData,
@@ -151,16 +141,38 @@ class _DashboardPageState extends State<DashboardPage> {
                                       _emptyMessage("No players available")
                                     else
                                       ...availablePlayers.map((p) => Padding(
-                                            padding: const EdgeInsets.only(bottom: 20),
-                                            child: PlayerCard(player: p),
+                                            padding:
+                                                const EdgeInsets.only(bottom: 20),
+                                            child: PlayerCard(
+                                              player: p,
+                                              onRequestSent: () {
+                                                setState(() {
+                                                  availablePlayers.remove(p);
+                                                });
+                                                fetchAllData();
+                                              },
+                                              onRefreshRequested:
+                                                  fetchAllData,
+                                            ),
                                           )),
                                   ] else ...[
                                     if (incomingRequests.isEmpty)
                                       _emptyMessage("No incoming requests")
                                     else
                                       ...incomingRequests.map((r) => Padding(
-                                            padding: const EdgeInsets.only(bottom: 20),
-                                            child: SentRequestCard(req: r),
+                                            padding:
+                                                const EdgeInsets.only(bottom: 20),
+                                            child: SentRequestCard(
+                                              req: r,
+                                              onRemove: () {
+                                                setState(() {
+                                                  incomingRequests.remove(r);
+                                                });
+                                                fetchAllData();
+                                              },
+                                              onRefreshRequested:
+                                                  fetchAllData,
+                                            ),
                                           )),
                                   ],
                                 ],
@@ -177,7 +189,6 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  // Pesan ketika list kosong
   Widget _emptyMessage(String text) {
     return Center(
       child: Padding(

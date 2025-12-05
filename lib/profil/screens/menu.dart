@@ -82,35 +82,6 @@ class MyHomePage extends StatelessWidget {
               ),
 
               const SizedBox(height: 20),
-              // Button ke Matchmaking Dashboard
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const DashboardPage(),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFC6DA44),
-                  foregroundColor: Colors.black,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 32,
-                    vertical: 14,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  textStyle: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                child: const Text("FIND A MATCH"),
-              ),
-
-              const SizedBox(height: 20),
 
               // Tombol logout
               ElevatedButton(
