@@ -157,7 +157,6 @@ class _ReviewListState extends State<ReviewList> {
   }
 
   // Adds new review from the form in add_review.dart to the django backend
-  // TODO: implement this POST first (naive; no login required), then implement login and integration with login
   Future<void> _addReview(String fieldName, int rating, String comment) async {
     final request = context.read<CookieRequest>();
 

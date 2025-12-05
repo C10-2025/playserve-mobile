@@ -22,8 +22,9 @@ class ViewCommentsModal extends StatelessWidget {
     required this.onRefresh,
   });
 
-  Future<void> _deleteReview(
-      BuildContext context, ReviewItemNew review, CookieRequest request) async {
+  // Deleting procedure
+  Future<void> _deleteReview(BuildContext context, ReviewItemNew review, CookieRequest request) async {
+    // User confirmation prompt dialog
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
@@ -46,6 +47,7 @@ class ViewCommentsModal extends StatelessWidget {
       ),
     );
 
+    // Send delete request to backend if confirmed
     if (confirm != true) return;
 
     const url = "http://localhost:8000/review/delete-review-flutter/";
