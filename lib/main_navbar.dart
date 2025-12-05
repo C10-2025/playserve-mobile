@@ -3,6 +3,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:playserve_mobile/authentication/screens/home_page.dart';
 import 'package:playserve_mobile/community/screen/discover_communities_page.dart';
 import 'package:playserve_mobile/matchmaking/screens/dashboard_page.dart';
+import 'package:playserve_mobile/review/screens/review_page.dart';
 
 class MainNavbar extends StatelessWidget {
   final int currentIndex;
@@ -52,6 +53,7 @@ class MainNavbar extends StatelessWidget {
               index: 4,
               icon: LucideIcons.star,
               // page: const FavoritesPage(),
+              page: const ReviewPage(),
             ),
           ],
         ),
