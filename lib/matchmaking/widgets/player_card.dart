@@ -38,10 +38,12 @@ class PlayerCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
 
-                  // ---------- AVATAR + BADGE STACK ----------
+                  // Avatar + badge
                   Stack(
+                    clipBehavior: Clip.none,
                     children: [
                       Container(
                         width: 56,
@@ -60,41 +62,48 @@ class PlayerCard extends StatelessWidget {
                           ),
                         ),
                       ),
-
-                      // BADGE (BOTTOM RIGHT)
                       Positioned(
-                        right: -3,
-                        bottom: -3,
+                        right: -4,
+                        bottom: -4,
                         child: Image.asset(
                           _mapRankToBadge(player.rank),
-                          width: 24,
-                          height: 24,
+                          width: 28,
+                          height: 28,
                         ),
                       ),
                     ],
                   ),
 
-                  const SizedBox(width: 12),
+                  // SPACING DIBESARKAN
+                  const SizedBox(width: 20),
 
-                  // ---------- USER INFO ----------
+                  // User info dengan padding ekstra
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          player.username,
-                          style: GoogleFonts.inter(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 4),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            player.username,
+                            style: GoogleFonts.inter(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF082459),
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        ClickableInstagramText(username: player.instagram),
-                      ],
+
+                          const SizedBox(height: 2),
+
+                          ClickableInstagramText(username: player.instagram),
+                        ],
+                      ),
                     ),
                   ),
                 ],
               ),
+
 
               const SizedBox(height: 16),
 

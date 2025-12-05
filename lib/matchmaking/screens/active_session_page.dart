@@ -175,7 +175,6 @@ class _OpponentCard extends StatelessWidget {
     required this.onCancel,
   });
 
-  // Map avatar SVG -> PNG asset
   String _avatarToPng(String svg) {
     if (svg.contains("avatar1")) return "assets/image/avatar1.png";
     if (svg.contains("avatar2")) return "assets/image/avatar2.png";
@@ -183,6 +182,23 @@ class _OpponentCard extends StatelessWidget {
     if (svg.contains("avatar4")) return "assets/image/avatar4.png";
     if (svg.contains("avatar5")) return "assets/image/avatar5.png";
     return "assets/image/avatar1.png";
+  }
+
+  String _mapRankToBadge(String rank) {
+    switch (rank.toLowerCase()) {
+      case "bronze":
+        return "assets/image/bronze.png";
+      case "silver":
+        return "assets/image/silver.png";
+      case "gold":
+        return "assets/image/gold.png";
+      case "platinum":
+        return "assets/image/platinum.png";
+      case "diamond":
+        return "assets/image/diamond.png";
+      default:
+        return "assets/image/bronze.png";
+    }
   }
 
   @override
@@ -199,51 +215,70 @@ class _OpponentCard extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Avatar ----------------------------------------------------
-            Container(
-              width: 88,
-              height: 88,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Color(0xFFC6DA44),
-                  width: 3,
+
+            // ---------------- AVATAR + BADGE ----------------
+            Stack(
+              clipBehavior: Clip.none,     // <<< FIX PENTING
+              children: [
+                Container(
+                  width: 88,
+                  height: 88,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: const Color(0xFFC6DA44),
+                      width: 3,
+                    ),
+                  ),
+                  child: ClipOval(
+                    child: Image.asset(
+                      _avatarToPng(player.avatar),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
-              ),
-              child: ClipOval(
-                child: Image.asset(
-                  _avatarToPng(player.avatar),
-                  fit: BoxFit.cover,
+
+                Positioned(
+                  right: -6,
+                  bottom: -6,
+                  child: Image.asset(
+                    _mapRankToBadge(player.rank),
+                    width: 32,
+                    height: 32,
+                  ),
                 ),
-              ),
+              ],
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 18),
 
-            // Username ---------------------------------------------------
+            // Username
             Text(
               player.username,
               style: GoogleFonts.inter(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
-                color: Color(0xFF001946),
+                color: const Color(0xFF082459),
               ),
+              textAlign: TextAlign.center,
             ),
+
+            const SizedBox(height: 4),
 
             ClickableInstagramText(
               username: player.instagram,
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 28),
 
-            // Buttons ----------------------------------------------------
+            // ---------------- Buttons ----------------
             Row(
               children: [
                 Expanded(
                   child: ElevatedButton(
                     onPressed: onWin,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFC6DA44),
+                      backgroundColor: const Color(0xFFC6DA44),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -266,7 +301,7 @@ class _OpponentCard extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: onLose,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF001946),
+                      backgroundColor: const Color(0xFF001946),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -292,7 +327,7 @@ class _OpponentCard extends StatelessWidget {
               child: OutlinedButton(
                 onPressed: onCancel,
                 style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: Color(0xFFC6DA44), width: 2),
+                  side: const BorderSide(color: Color(0xFFC6DA44), width: 2),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
@@ -303,7 +338,7 @@ class _OpponentCard extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFFC6DA44),
+                    color: const Color(0xFFC6DA44),
                   ),
                 ),
               ),

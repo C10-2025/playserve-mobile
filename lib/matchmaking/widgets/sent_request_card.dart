@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
-import 'package:playserve_mobile/matchmaking/widgets/clickable_instagram_text.dart';
 import 'package:provider/provider.dart';
 
 import 'package:playserve_mobile/matchmaking/models/incoming_request_model.dart';
 import 'package:playserve_mobile/matchmaking/screens/matchmaking_service.dart';
 import 'package:playserve_mobile/matchmaking/screens/active_session_page.dart';
+import 'package:playserve_mobile/matchmaking/widgets/clickable_instagram_text.dart';
 
 class SentRequestCard extends StatelessWidget {
   final IncomingRequestModel req;
@@ -35,52 +35,74 @@ class SentRequestCard extends StatelessWidget {
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
           ),
-
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  Container(
-                    width: 56,
-                    height: 56,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: const Color(0xFFC6DA44),
-                        width: 3,
-                      ),
-                    ),
-                    child: ClipOval(
-                      child: Image.asset(
-                        _mapAvatarToPng(req.senderAvatar),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
 
-                  const SizedBox(width: 12),
-
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          req.senderUsername,
-                          style: GoogleFonts.inter(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
+                  // ---------- AVATAR + BADGE (DISAMAKAN DENGAN PLAYER_CARD) ----------
+                  Stack(
+                    clipBehavior: Clip.none, // FIX PALING PENTING
+                    children: [
+                      Container(
+                        width: 56,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: const Color(0xFFC6DA44),
+                            width: 3,
                           ),
-                          overflow: TextOverflow.ellipsis,
                         ),
+                        child: ClipOval(
+                          child: Image.asset(
+                            _mapAvatarToPng(req.senderAvatar),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
 
-                        ClickableInstagramText(
-                          username: req.senderInstagram?.toString(),
+                      Positioned(
+                        right: -4,
+                        bottom: -4,
+                        child: Image.asset(
+                          _mapRankToBadge(req.senderRank),
+                          width: 28,
+                          height: 28,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
 
+                  const SizedBox(width: 20), // diperbesar biar lebih lega
+
+                  // USER INFO
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 4), // konsisten dengan PlayerCard
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            req.senderUsername,
+                            style: GoogleFonts.inter(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF082459),
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+
+                          const SizedBox(height: 2),
+
+                          ClickableInstagramText(
+                            username: req.senderInstagram?.toString(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
 
@@ -88,8 +110,7 @@ class SentRequestCard extends StatelessWidget {
 
               Row(
                 children: [
-
-                  // ACCEPT BUTTON
+                  // ACCEPT --------------------------------------------------
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () async {
@@ -102,14 +123,16 @@ class SentRequestCard extends StatelessWidget {
 
                         if (response['success'] != true) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(response['error'] ?? "Failed to accept")),
+                            SnackBar(
+                              content: Text(response['error'] ?? "Failed to accept"),
+                            ),
                           );
                           return;
                         }
 
                         final activeJson = await service.getActiveSession();
 
-                        if (activeJson['has_session'] == true && context.mounted) {
+                        if (activeJson['has_session'] == true) {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(builder: (_) => const ActiveSessionPage()),
@@ -136,7 +159,7 @@ class SentRequestCard extends StatelessWidget {
 
                   const SizedBox(width: 12),
 
-                  // REJECT BUTTON
+                  // REJECT --------------------------------------------------
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () async {
@@ -150,9 +173,11 @@ class SentRequestCard extends StatelessWidget {
                         final success = response['success'] == true;
 
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(
-                            success ? "Request rejected" : "Failed to reject",
-                          )),
+                          SnackBar(
+                            content: Text(
+                              success ? "Request rejected" : "Failed to reject",
+                            ),
+                          ),
                         );
 
                         if (success) {
@@ -193,5 +218,23 @@ class SentRequestCard extends StatelessWidget {
     if (avatar.contains("avatar4")) return "assets/image/avatar4.png";
     if (avatar.contains("avatar5")) return "assets/image/avatar5.png";
     return "assets/image/avatar1.png";
+  }
+
+  // ---------- BADGE (SAMA DENGAN PLAYER_CARD) ----------
+  String _mapRankToBadge(String rank) {
+    switch (rank.toLowerCase()) {
+      case "bronze":
+        return "assets/image/bronze.png";
+      case "silver":
+        return "assets/image/silver.png";
+      case "gold":
+        return "assets/image/gold.png";
+      case "platinum":
+        return "assets/image/platinum.png";
+      case "diamond":
+        return "assets/image/diamond.png";
+      default:
+        return "assets/image/bronze.png";
+    }
   }
 }

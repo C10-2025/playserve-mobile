@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:playserve_mobile/authentication/screens/home_page.dart';
+import 'package:playserve_mobile/matchmaking/screens/dashboard_page.dart';
 
 class MainNavbar extends StatelessWidget {
   final int currentIndex;
@@ -36,6 +37,7 @@ class MainNavbar extends StatelessWidget {
               index: 2,
               icon: LucideIcons.radar, // 🔁 Ganti 'tennis' (belum ada di 0.2.57)
               // page: const MatchPage(),
+              page: const DashboardPage(),
             ),
             _buildNavItem(
               context,
