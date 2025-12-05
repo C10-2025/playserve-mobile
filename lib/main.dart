@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
-
-// import login page
-import 'package:playserve_mobile/profil/screens/login.dart';
+import 'global_theme.dart';
+import 'package:playserve_mobile/authentication/screens/splash_screen.dart';
 
 void main() {
   runApp(const PlayServeApp());
@@ -19,11 +18,8 @@ class PlayServeApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'PlayServe',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.indigo)
-              .copyWith(secondary: const Color(0xFFB8D243)),
-        ),
-        home: const LoginPage(),
+        theme: globalTheme,
+        home: const SplashScreen(),
       ),
     );
   }
