@@ -7,7 +7,7 @@ class ReviewPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      body: ReviewList(), // <-- No placeholders! ReviewList fetches everything.
+      body: ReviewList(), 
     );
   }
 }

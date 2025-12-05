@@ -91,7 +91,7 @@ class _ReviewListState extends State<ReviewList> {
   }
 
   // Get up to date reviews after an operation, used on refresh
-  Future<void> _fetchReviews() async {
+  Future<void> _refreshReviews() async {
     final request = context.read<CookieRequest>();
 
     final resp = await request.get(_reviewsUrl);
@@ -175,8 +175,9 @@ class _ReviewListState extends State<ReviewList> {
 
       if (response["status"] == "success") {
 
-        // Refresh reviews from Django after posting
-        await _fetchReviews();
+        // Refresh reviews from Django and re-sort after posting
+        await _refreshReviews();
+        _applySorting(); 
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -208,6 +209,8 @@ class _ReviewListState extends State<ReviewList> {
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+
     if (_loading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -356,16 +359,21 @@ class _ReviewListState extends State<ReviewList> {
                             },
 
                             onViewComments: () {
-                              final related = _reviewsForField(field.name);
+                              final relatedReviews = _reviewsForField(field.name);
 
                               showDialog(
                                 context: context,
-                                barrierDismissible: true,
+                                barrierDismissible: false,
                                 builder: (_) => ViewCommentsModal(
                                   courtName: field.name,
                                   address: field.address,
                                   pricePerHour: field.pricePerHour,
-                                  reviews: related,
+                                  reviews: relatedReviews,
+                                  isAdmin: request.jsonData["is_admin"] ?? false,
+                                  onRefresh: () {
+                                    // call refresh of review_list
+                                    _refreshReviews();
+                                  },
                                 ),
                               );
                             },

@@ -118,6 +118,10 @@ class _LoginPageState extends State<LoginPage> {
                               String message = response['message'] ?? 'Login success!';
                               String uname = response['username'] ?? username;
 
+                              // Admin?
+                              bool isAdmin = response["is_admin"] ?? false; 
+                              request.jsonData["is_admin"] = isAdmin;
+
                               if (context.mounted) {
                                 Navigator.pushReplacement(
                                   context,
