@@ -197,10 +197,11 @@ class ReviewCard extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: Image.network(
-        field.imageUrl,
+        field.imageUrl, // NOTE: only works for certain domains which allow direct taking from frontends
         width: size,
         height: size,
         fit: BoxFit.cover,
+        // Fallback for blocked images
         errorBuilder: (context, _, __) {
           return Image.network(
             "https://images.unsplash.com/photo-1547934045-2942d193cb49",
