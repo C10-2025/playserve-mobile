@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:playserve_mobile/matchmaking/widgets/clickable_instagram_text.dart';
 import 'package:provider/provider.dart';
 import 'package:playserve_mobile/matchmaking/models/player_model.dart';
 
@@ -229,14 +230,8 @@ class _OpponentCard extends StatelessWidget {
               ),
             ),
 
-            Text(
-              player.instagram != null && player.instagram!.isNotEmpty
-                  ? "@${player.instagram}"
-                  : "(no instagram)",
-              style: GoogleFonts.inter(
-                fontSize: 15,
-                color: Colors.black54,
-              ),
+            ClickableInstagramText(
+              username: player.instagram,
             ),
 
             const SizedBox(height: 24),

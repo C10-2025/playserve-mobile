@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:playserve_mobile/matchmaking/widgets/clickable_instagram_text.dart';
 import 'package:provider/provider.dart';
 
 import 'package:playserve_mobile/matchmaking/models/incoming_request_model.dart';
@@ -72,19 +73,14 @@ class SentRequestCard extends StatelessWidget {
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
-                        Text(
-                          req.senderInstagram != null &&
-                                  req.senderInstagram.toString().trim().isNotEmpty
-                              ? "@${req.senderInstagram}"
-                              : "(no instagram)",
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
-                            color: Colors.black54,
-                          ),
+
+                        ClickableInstagramText(
+                          username: req.senderInstagram?.toString(),
                         ),
                       ],
                     ),
                   ),
+
                 ],
               ),
 
