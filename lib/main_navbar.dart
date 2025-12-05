@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:playserve_mobile/authentication/screens/home_page.dart';
+import 'package:playserve_mobile/community/screen/discover_communities_page.dart';
 import 'package:playserve_mobile/matchmaking/screens/dashboard_page.dart';
 
 class MainNavbar extends StatelessWidget {
@@ -31,6 +32,7 @@ class MainNavbar extends StatelessWidget {
               index: 1,
               icon: LucideIcons.messageSquare,
               // page: const CommunityPage(),
+              page: const DiscoverCommunitiesPage(),
             ),
             _buildNavItem(
               context,
