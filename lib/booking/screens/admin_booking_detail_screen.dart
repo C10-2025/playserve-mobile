@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:playserve_mobile/booking/models/booking.dart';
 import 'package:playserve_mobile/booking/services/booking_service.dart';
+import 'package:playserve_mobile/booking/theme.dart';
 import 'package:provider/provider.dart';
 import '../config.dart';
 
@@ -30,66 +31,123 @@ class _AdminBookingDetailScreenState extends State<AdminBookingDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Verify Booking')),
-      body: FutureBuilder<Booking>(
-        future: future,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
-          final booking = snapshot.data!;
-          return Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(booking.field.name,
-                    style:
-                        const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                Text('${booking.bookingDate} ${booking.startTime} - ${booking.endTime}'),
-                Text('Booker: ${booking.bookerName} (${booking.bookerPhone})'),
-                Text('Total: Rp ${booking.totalPrice.toInt()}'),
-                const SizedBox(height: 8),
-                if (booking.paymentProofUrl != null)
-                  Image.network(booking.paymentProofUrl!,
-                      height: 180, fit: BoxFit.cover),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: _notes,
-                  decoration: const InputDecoration(
-                    labelText: 'Admin notes (optional)',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const Spacer(),
-                Row(
+      backgroundColor: BookingColors.background,
+      appBar: AppBar(
+        backgroundColor: BookingColors.navbarBlue,
+        foregroundColor: Colors.white,
+        title: const Text('Verify Booking'),
+      ),
+      body: SafeArea(
+        child: FutureBuilder<Booking>(
+          future: future,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator(color: BookingColors.lime));
+            }
+            if (snapshot.hasError) {
+              return Center(
+                child: Text('Error: ${snapshot.error}',
+                    style: BookingTextStyles.bodyLight),
+              );
+            }
+            final booking = snapshot.data!;
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Container(
+                decoration: BookingDecorations.panel,
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: _processing
-                            ? null
-                            : () => _decide('CONFIRM', booking.id),
-                        child: const Text('Confirm Payment'),
+                    Text(booking.field.name,
+                        style: BookingTextStyles.display.copyWith(fontSize: 26)),
+                    const SizedBox(height: 6),
+                    Text('${booking.bookingDate} ${booking.startTime} - ${booking.endTime}',
+                        style:
+                            BookingTextStyles.cardSubtitle.copyWith(color: BookingColors.textLight)),
+                    const SizedBox(height: 16),
+                    Container(
+                      decoration: BookingDecorations.card,
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _row('Booker', '${booking.bookerName} (${booking.bookerPhone})'),
+                          _row('Amount', 'Rp ${booking.totalPrice.toInt()}'),
+                          _row('Status', booking.status),
+                          if (booking.notes != null && booking.notes!.isNotEmpty)
+                            _row('Notes', booking.notes!),
+                        ],
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: _processing
-                            ? null
-                            : () => _decide('REJECT', booking.id),
-                        child: const Text('Reject'),
+                    const SizedBox(height: 16),
+                    if (booking.paymentProofUrl != null)
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.network(
+                          booking.paymentProofUrl!,
+                          height: 220,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _notes,
+                      maxLines: 3,
+                      decoration: InputDecoration(
+                        labelText: 'Admin notes (optional)',
+                        labelStyle: BookingTextStyles.cardSubtitle,
+                        filled: true,
+                        fillColor: BookingColors.white,
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                       ),
                     ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            style: BookingDecorations.primaryButton,
+                            onPressed: _processing ? null : () => _decide('CONFIRM', booking.id),
+                            child: const Text('Confirm Payment'),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: OutlinedButton(
+                            style: BookingDecorations.secondaryButton,
+                            onPressed: _processing ? null : () => _decide('REJECT', booking.id),
+                            child: const Text('Reject'),
+                          ),
+                        ),
+                      ],
+                    )
                   ],
-                )
-              ],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _row(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: BookingTextStyles.cardSubtitle),
+          Flexible(
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              style: BookingTextStyles.body,
             ),
-          );
-        },
+          ),
+        ],
       ),
     );
   }
