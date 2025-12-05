@@ -10,7 +10,7 @@ import 'package:playserve_mobile/review/widgets/review_card.dart';
 import 'package:playserve_mobile/review/widgets/add_review.dart';
 import 'package:playserve_mobile/review/widgets/view_comments.dart';
 
-// TODO: implement sorting, searching, reimplement main using the other branches, and login
+// TODO: implement login
 class ReviewList extends StatefulWidget {
   const ReviewList({super.key});
 
@@ -35,13 +35,14 @@ class _ReviewListState extends State<ReviewList> {
   static const String _fieldsUrl = 'http://localhost:8000/booking/json/';
   static const String _reviewsUrl = 'http://localhost:8000/review/json/';
 
-  // === JSON Fetchers ===
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => _fetchAll());
   }
 
+  // === CookieRequest METHODS ===
+  // JSON fetcher
   Future<void> _fetchAll() async {
     setState(() {
       _loading = true;
@@ -49,7 +50,7 @@ class _ReviewListState extends State<ReviewList> {
     });
 
     try {
-      final request = context.read<CookieRequest>();
+      final request = context.read<CookieRequest>(); 
 
       final resp = await Future.wait([
         request.get(_fieldsUrl),
@@ -68,12 +69,16 @@ class _ReviewListState extends State<ReviewList> {
           : reviewsData;
 
       _fields = parsedFields
-          .map<PlayingFieldItem>((d) => PlayingFieldItem.fromJson(Map<String, dynamic>.from(d)))
+          .map<PlayingFieldItem>(
+            (d) => PlayingFieldItem.fromJson(Map<String, dynamic>.from(d)),
+          )
           .toList();
-      _applySorting(); // Sort the field immediately
+      _applySorting(); // Sort the fields immediately
 
       _reviews = parsedReviews
-          .map<ReviewItemNew>((d) => ReviewItemNew.fromJson(Map<String, dynamic>.from(d)))
+          .map<ReviewItemNew>(
+            (d) => ReviewItemNew.fromJson(Map<String, dynamic>.from(d)),
+          )
           .toList();
 
       setState(() => _loading = false);
@@ -85,7 +90,23 @@ class _ReviewListState extends State<ReviewList> {
     }
   }
 
-  // === HELPERS === 
+  // Get up to date reviews after an operation, used on refresh
+  Future<void> _fetchReviews() async {
+    final request = context.read<CookieRequest>();
+
+    final resp = await request.get(_reviewsUrl);
+
+    final parsed = (resp is String) ? json.decode(resp) : resp;
+
+    setState(() {
+      _reviews = parsed
+          .map<ReviewItemNew>((d) => ReviewItemNew.fromJson(Map<String, dynamic>.from(d)))
+          .toList();
+    });
+  }
+
+
+  // === HELPERS ===
   // Get reviews for a field by name
   List<ReviewItemNew> _reviewsForField(String fieldName) {
     return _reviews.where((r) => r.fieldName == fieldName).toList();
@@ -100,7 +121,7 @@ class _ReviewListState extends State<ReviewList> {
     return total / related.length;
   }
 
-  // Review count TODO: use this later
+  // Review count
   int _computeReviewCount(String fieldName) {
     return _reviews.where((r) => r.fieldName == fieldName).length;
   }
@@ -130,26 +151,60 @@ class _ReviewListState extends State<ReviewList> {
 
     return _fields.where((f) {
       return f.name.toLowerCase().contains(lower) ||
-            f.address.toLowerCase().contains(lower) ||
-            f.city.name.toLowerCase().contains(lower);
+          f.address.toLowerCase().contains(lower) ||
+          f.city.name.toLowerCase().contains(lower);
     }).toList();
   }
 
-  // temp before implementing post with login, adds review locally
-  // TODO: implement this POST with login
-  void _addLocalReview(String fieldName, int rating, String comment) {
-    setState(() {
-      _reviews.insert(
-        0,
-        ReviewItemNew(
-          username: "You",
-          rating: rating,
-          comment: comment,
-          fieldName: fieldName,
-        ),
+  // Adds new review from the form in add_review.dart to the django backend
+  // TODO: implement this POST first (naive; no login required), then implement login and integration with login
+  Future<void> _addReview(String fieldName, int rating, String comment) async {
+    final request = context.read<CookieRequest>();
+
+    try {
+      final url = "http://localhost:8000/review/add-review-flutter/";
+
+      final response = await request.postJson(
+        url,
+        jsonEncode({
+          "field_name": fieldName,
+          "rating": rating,
+          "comment": comment,
+        }),
       );
-    });
+
+      if (response["status"] == "success") {
+
+        // Refresh reviews from Django after posting
+        await _fetchReviews();
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Review successfully submitted!"),
+            ),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Failed to submit review."),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Error occurred: $e"),
+          ),
+        );
+      }
+    }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -210,9 +265,18 @@ class _ReviewListState extends State<ReviewList> {
                     underline: const SizedBox(),
                     style: const TextStyle(color: Colors.black),
                     items: const [
-                      DropdownMenuItem(value: 'none', child: Text("Rating: Default")),
-                      DropdownMenuItem(value: 'avg_desc', child: Text("Rating: High → Low")),
-                      DropdownMenuItem(value: 'avg_asc', child: Text("Rating: Low → High")),
+                      DropdownMenuItem(
+                        value: 'none',
+                        child: Text("Rating: Default"),
+                      ),
+                      DropdownMenuItem(
+                        value: 'avg_desc',
+                        child: Text("Rating: High → Low"),
+                      ),
+                      DropdownMenuItem(
+                        value: 'avg_asc',
+                        child: Text("Rating: Low → High"),
+                      ),
                     ],
                     onChanged: (value) {
                       setState(() {
@@ -233,7 +297,10 @@ class _ReviewListState extends State<ReviewList> {
                       hintStyle: const TextStyle(color: Colors.white70),
                       filled: true,
                       fillColor: Colors.white.withOpacity(0.15),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 10,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide.none,
@@ -259,55 +326,54 @@ class _ReviewListState extends State<ReviewList> {
                 padding: const EdgeInsets.all(20),
 
                 child: _filteredFields.isEmpty
-                ? const Center(
-                    child: Text(
-                      "No courts found.",
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                  )
-                
-                : ListView.builder(
-                    padding: const EdgeInsets.only(right: 8),
-                    itemCount: _filteredFields.length,
-                    itemBuilder: (context, index) {
-                      final field = _filteredFields[index];
+                    ? const Center(
+                        child: Text(
+                          "No courts found.",
+                          style: TextStyle(color: Colors.white, fontSize: 16),
+                        ),
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.only(right: 8),
+                        itemCount: _filteredFields.length,
+                        itemBuilder: (context, index) {
+                          final field = _filteredFields[index];
 
-                      return ReviewCard(
-                        field: field,
-                        allReviews: _reviews,
+                          return ReviewCard(
+                            field: field,
+                            allReviews: _reviews,
 
-                        onAddReview: () {
-                          showDialog(
-                            context: context,
-                            barrierDismissible: true,
-                            builder: (_) => AddReviewModal(
-                              courtName: field.name,
-                              onSubmit: (rating, comment) {
-                                _addLocalReview(field.name, rating, comment);
-                              },
-                            ),
+                            onAddReview: () {
+                              showDialog(
+                                context: context,
+                                barrierDismissible: true,
+                                builder: (_) => AddReviewModal(
+                                  courtName: field.name,
+                                  onSubmit: (rating, comment) async {
+                                    await _addReview(field.name, rating, comment);
+                                  },
+                                ),
+                              );
+                            },
+
+                            onViewComments: () {
+                              final related = _reviewsForField(field.name);
+
+                              showDialog(
+                                context: context,
+                                barrierDismissible: true,
+                                builder: (_) => ViewCommentsModal(
+                                  courtName: field.name,
+                                  address: field.address,
+                                  pricePerHour: field.pricePerHour,
+                                  reviews: related,
+                                ),
+                              );
+                            },
+                            avgRating: _computeAvgRating(field.name),
+                            reviewCount: _computeReviewCount(field.name),
                           );
                         },
-
-                        onViewComments: () {
-                          final related = _reviewsForField(field.name);
-
-                          showDialog(
-                            context: context,
-                            barrierDismissible: true,
-                            builder: (_) => ViewCommentsModal(
-                              courtName: field.name,
-                              address: field.address,
-                              pricePerHour: field.pricePerHour,
-                              reviews: related,
-                            ),
-                          );
-                        },
-                        avgRating: _computeAvgRating(field.name),
-                        reviewCount: _computeReviewCount(field.name),
-                      );
-                    },
-                  ),
+                      ),
               ),
             ),
           ],
@@ -315,5 +381,4 @@ class _ReviewListState extends State<ReviewList> {
       ),
     );
   }
-
 }

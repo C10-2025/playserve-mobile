@@ -10,7 +10,7 @@ String reviewItemNewToJson(List<ReviewItemNew> data) => json.encode(List<dynamic
 class ReviewItemNew {
     String username;
     int rating;
-    String comment;
+    String comment; // NOTE: corresponds to komentar in django model
     String fieldName;
 
     ReviewItemNew({
