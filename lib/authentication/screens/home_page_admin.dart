@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:playserve_mobile/community/screen/discover_communities_page.dart';
 import 'package:playserve_mobile/global_theme.dart'; 
 import 'package:playserve_mobile/main_navbar_admin.dart';
 import 'package:playserve_mobile/profil/screens/delete_profile.dart';
@@ -100,7 +101,10 @@ class HomePageAdmin extends StatelessWidget {
                             imagePath: 'assets/image/community.png',
                             label: 'Community',
                             onTap: () {
-                              Navigator.pushNamed(context, '/admin/community');
+                              Navigator.push(
+                                context, 
+                                MaterialPageRoute(builder: (context) => const DiscoverCommunitiesPage())
+                              );
                             },
                           ),
                         ],

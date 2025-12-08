@@ -10,15 +10,18 @@ import '../models/community.dart';
 import '../widgets/community_card.dart';
 import 'community_detail_page.dart';
 import 'my_communities_page.dart';
+
+// ✅ dua navbar
+import 'package:playserve_mobile/main_navbar.dart';
 import 'package:playserve_mobile/main_navbar_admin.dart';
+
 import 'package:playserve_mobile/header.dart';
 
 class DiscoverCommunitiesPage extends StatefulWidget {
   const DiscoverCommunitiesPage({super.key});
 
   @override
-  State<DiscoverCommunitiesPage> createState() =>
-      _DiscoverCommunitiesPageState();
+  State<DiscoverCommunitiesPage> createState() => _DiscoverCommunitiesPageState();
 }
 
 class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
@@ -26,22 +29,18 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
 
-  // controller untuk modal create community
   final TextEditingController _createNameController = TextEditingController();
   final TextEditingController _createDescController = TextEditingController();
 
   bool _isAdminFlag = false;
 
-  // PENTING: samakan host dengan URL yang dipakai di login (biasanya 127.0.0.1)
-  String get _baseUrl =>
-      kIsWeb ? 'http://127.0.0.1:8000' : 'http://10.0.2.2:8000';
+  String get _baseUrl => kIsWeb ? 'http://127.0.0.1:8000' : 'http://10.0.2.2:8000';
 
   @override
   void initState() {
     super.initState();
     _futureCommunities = _fetchCommunities();
 
-    // 🔹 Setelah widget kebentuk, baru panggil cek admin
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadAdminFlag();
     });
@@ -51,15 +50,16 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
     final request = context.read<CookieRequest>();
     try {
       final resp = await request.get('$_baseUrl/auth/check_admin_status/');
-
-      // resp harusnya: { status: true, is_admin: true/false, username: ... }
       if (!mounted) return;
       setState(() {
         _isAdminFlag = (resp is Map && resp['is_admin'] == true);
       });
     } catch (e) {
-      // kalau gagal, anggap saja bukan admin
       debugPrint('Failed to load admin status: $e');
+      if (!mounted) return;
+      setState(() {
+        _isAdminFlag = false;
+      });
     }
   }
 
@@ -69,6 +69,13 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
     _createNameController.dispose();
     _createDescController.dispose();
     super.dispose();
+  }
+
+  // ✅ navbar conditional
+  Widget _buildBottomNav() {
+    return _isAdminFlag
+        ? const MainNavbarAdmin(currentIndex: 2)
+        : const MainNavbar(currentIndex: 1); // sesuaikan index user kalau perlu
   }
 
   Future<void> _openEditCommunityDialog(Community community) async {
@@ -89,16 +96,12 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
 
               if (name.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Name is required.'),
-                  ),
+                  const SnackBar(content: Text('Name is required.')),
                 );
                 return;
               }
 
-              setStateDialog(() {
-                isSubmitting = true;
-              });
+              setStateDialog(() => isSubmitting = true);
 
               final request = context.read<CookieRequest>();
               final url = '$_baseUrl/community/${community.id}/update/';
@@ -106,10 +109,7 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
               try {
                 final resp = await request.postJson(
                   url,
-                  jsonEncode({
-                    'name': name,
-                    'description': desc,
-                  }),
+                  jsonEncode({'name': name, 'description': desc}),
                 );
 
                 if (!mounted) return;
@@ -117,21 +117,16 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                 if (resp is Map) {
                   final String? code = resp['code'] as String?;
                   final String message =
-                      (resp['message'] as String?) ??
-                          'Community created successfully.';
+                      (resp['message'] as String?) ?? 'Community updated successfully.';
 
                   if (code == 'duplicate_name') {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text(
-                          'Community name already exists. Please use a different name.',
-                        ),
+                        content: Text('Community name already exists. Please use a different name.'),
                         backgroundColor: Colors.red,
                       ),
                     );
-                    setStateDialog(() {
-                      isSubmitting = false;
-                    });
+                    setStateDialog(() => isSubmitting = false);
                     return;
                   }
 
@@ -144,14 +139,12 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Community created.'),
-                    ),
+                    const SnackBar(content: Text('Community updated.')),
                   );
                 }
 
-                Navigator.of(ctx).pop(); // tutup dialog
-                await _refresh(); // reload list
+                Navigator.of(ctx).pop();
+                await _refresh();
               } catch (e) {
                 if (!mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -160,16 +153,12 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                     backgroundColor: Colors.red,
                   ),
                 );
-                setStateDialog(() {
-                  isSubmitting = false;
-                });
+                setStateDialog(() => isSubmitting = false);
               }
             }
 
             return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               title: Text(
                 'Edit Community',
                 style: GoogleFonts.inter(
@@ -196,17 +185,9 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                       controller: nameController,
                       decoration: InputDecoration(
                         hintText: 'Enter community name',
-                        hintStyle: GoogleFonts.inter(
-                          fontSize: 13,
-                          color: const Color(0xFF9CA3AF),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 10,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+                        hintStyle: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF9CA3AF)),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -224,31 +205,18 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                       maxLines: 4,
                       decoration: InputDecoration(
                         hintText: 'Describe the community...',
-                        hintStyle: GoogleFonts.inter(
-                          fontSize: 13,
-                          color: const Color(0xFF9CA3AF),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 10,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+                        hintStyle: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF9CA3AF)),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                       ),
                     ),
                   ],
                 ),
               ),
-              actionsPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               actions: [
                 TextButton(
-                  onPressed: isSubmitting
-                      ? null
-                      : () {
-                          Navigator.of(ctx).pop();
-                        },
+                  onPressed: isSubmitting ? null : () => Navigator.of(ctx).pop(),
                   child: Text(
                     'Cancel',
                     style: GoogleFonts.inter(
@@ -262,13 +230,8 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFC1D752),
                     foregroundColor: const Color(0xFF082459),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 18,
-                      vertical: 10,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   child: isSubmitting
                       ? const SizedBox(
@@ -276,12 +239,7 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                           width: 16,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : Text(
-                          'Save Changes',
-                          style: GoogleFonts.inter(
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
+                      : Text('Save Changes', style: GoogleFonts.inter(fontWeight: FontWeight.w700)),
                 ),
               ],
             );
@@ -297,9 +255,7 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
       barrierDismissible: false,
       builder: (ctx) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
           title: Text(
             'Delete Community',
             style: GoogleFonts.inter(
@@ -310,11 +266,7 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
           ),
           content: Text(
             'Are you sure you want to delete "${community.name}"?',
-            style: GoogleFonts.inter(
-              fontSize: 15,
-              color: const Color(0xFF374151),
-              height: 1.4,
-            ),
+            style: GoogleFonts.inter(fontSize: 15, color: const Color(0xFF374151), height: 1.4),
           ),
           actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
           actions: [
@@ -327,9 +279,7 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                       onPressed: () => Navigator.of(ctx).pop(false),
                       style: TextButton.styleFrom(
                         backgroundColor: const Color(0xFFD1D5DB),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       ),
                       child: Text(
                         'Cancel',
@@ -351,17 +301,12 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red[500],
                         foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         elevation: 2,
                       ),
                       child: Text(
                         'Delete',
-                        style: GoogleFonts.inter(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                        ),
+                        style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700),
                       ),
                     ),
                   ),
@@ -389,10 +334,7 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: Colors.red[400],
-        ),
+        SnackBar(content: Text(message), backgroundColor: Colors.red[400]),
       );
 
       await _refresh();
@@ -409,16 +351,11 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
 
   Future<List<Community>> _fetchCommunities() async {
     final request = context.read<CookieRequest>();
-
-    final url =
-        '$_baseUrl/community/api/list/?q=${Uri.encodeQueryComponent(_searchQuery)}';
-
+    final url = '$_baseUrl/community/api/list/?q=${Uri.encodeQueryComponent(_searchQuery)}';
     final response = await request.get(url);
     final list = response as List<dynamic>;
 
-    return list
-        .map((raw) => Community.fromJson(raw as Map<String, dynamic>))
-        .toList();
+    return list.map((raw) => Community.fromJson(raw as Map<String, dynamic>)).toList();
   }
 
   Future<void> _refresh() async {
@@ -440,57 +377,28 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
         final status = result['status'] as String;
         final name = result['community_name'] ?? community.name;
 
-        final snackBar = SnackBar(
-          content: Text(
-            status == 'joined'
-                ? 'You have joined $name.'
-                : 'Already a member of $name.',
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              status == 'joined' ? 'You have joined $name.' : 'Already a member of $name.',
+            ),
           ),
         );
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
         await _refresh();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Unexpected response from server.'),
-          ),
+          const SnackBar(content: Text('Unexpected response from server.')),
         );
       }
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to join community. Please try again.'),
-        ),
+        const SnackBar(content: Text('Failed to join community. Please try again.')),
       );
     }
   }
 
-  bool get _isAdmin {
-  final request = context.read<CookieRequest>();
-  final data = request.jsonData;
-
-  if (data is Map) {
-    // CASE 1 → flat bentuk: {"username": "...", "is_superuser": true}
-    if (data['is_superuser'] == true || data['is_staff'] == true || data['is_admin'] == true) {
-      return true;
-    }
-
-    // CASE 2 → nested bentuk: {"user": {"is_superuser": true}}
-    final user = data['user'];
-    if (user is Map) {
-      if (user['is_superuser'] == true || user['is_staff'] == true || user['is_admin'] == true) {
-        return true;
-      }
-    }
-  }
-
-  return false;
-}
-
-
-  /// Buka modal dialog untuk create community (mirip Create Community Modal di Django)
   void _openCreateCommunityDialog() {
     _createNameController.clear();
     _createDescController.clear();
@@ -509,16 +417,12 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
 
               if (name.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Name is required.'),
-                  ),
+                  const SnackBar(content: Text('Name is required.')),
                 );
                 return;
               }
 
-              setStateDialog(() {
-                isSubmitting = true;
-              });
+              setStateDialog(() => isSubmitting = true);
 
               final request = context.read<CookieRequest>();
               final url = '$_baseUrl/community/create/';
@@ -526,31 +430,23 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
               try {
                 final resp = await request.postJson(
                   url,
-                  jsonEncode({
-                    'name': name,
-                    'description': desc,
-                  }),
+                  jsonEncode({'name': name, 'description': desc}),
                 );
 
                 if (!mounted) return;
 
                 if (resp is Map) {
                   final code = resp['code'];
-                  final message = resp['message'] as String? ??
-                      'Community created successfully.';
+                  final message = resp['message'] as String? ?? 'Community created successfully.';
 
                   if (code == 'duplicate_name') {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text(
-                          'Community name already exists. Please use a different name.',
-                        ),
+                        content: Text('Community name already exists. Please use a different name.'),
                         backgroundColor: Colors.red,
                       ),
                     );
-                    setStateDialog(() {
-                      isSubmitting = false;
-                    });
+                    setStateDialog(() => isSubmitting = false);
                     return;
                   }
 
@@ -563,9 +459,7 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Community created.'),
-                    ),
+                    const SnackBar(content: Text('Community created.')),
                   );
                 }
 
@@ -579,16 +473,12 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                     backgroundColor: Colors.red,
                   ),
                 );
-                setStateDialog(() {
-                  isSubmitting = false;
-                });
+                setStateDialog(() => isSubmitting = false);
               }
             }
 
             return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               title: Text(
                 'Create New Community',
                 style: GoogleFonts.inter(
@@ -615,17 +505,9 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                       controller: _createNameController,
                       decoration: InputDecoration(
                         hintText: 'Enter community name',
-                        hintStyle: GoogleFonts.inter(
-                          fontSize: 13,
-                          color: const Color(0xFF9CA3AF),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 10,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+                        hintStyle: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF9CA3AF)),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -643,17 +525,9 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                       maxLines: 4,
                       decoration: InputDecoration(
                         hintText: 'Describe the community...',
-                        hintStyle: GoogleFonts.inter(
-                          fontSize: 13,
-                          color: const Color(0xFF9CA3AF),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 10,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+                        hintStyle: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF9CA3AF)),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                       ),
                     ),
                   ],
@@ -671,15 +545,9 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                           borderRadius: BorderRadius.circular(14),
                         ),
                         child: TextButton(
-                          onPressed: isSubmitting
-                              ? null
-                              : () {
-                                  Navigator.of(ctx).pop();
-                                },
+                          onPressed: isSubmitting ? null : () => Navigator.of(ctx).pop(),
                           style: TextButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                           ),
                           child: Text(
                             'Cancel',
@@ -703,9 +571,7 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                         child: TextButton(
                           onPressed: isSubmitting ? null : handleSubmit,
                           style: TextButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                           ),
                           child: isSubmitting
                               ? const SizedBox(
@@ -743,7 +609,7 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
 
     return Scaffold(
       backgroundColor: const Color(0xFF1E3A8A),
-      bottomNavigationBar: const MainNavbarAdmin(currentIndex: 2),
+      bottomNavigationBar: _buildBottomNav(), // ✅ ini kuncinya
       body: Stack(
         children: [
           Positioned.fill(
@@ -756,11 +622,14 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
           SafeArea(
             child: Column(
               children: [
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
-                  child: ProfileHeader(),
-                ),
-                const SizedBox(height: 12),
+                if (!isAdmin) ...[
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+                    child: ProfileHeader(),
+                  ),
+                  const SizedBox(height: 12),
+                ],
+
 
                 // ===== Header atas (judul besar + tombol FIX sampingan) =====
                 Padding(
@@ -788,7 +657,6 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                       ),
                       const SizedBox(height: 16),
 
-                      // FIX sampingan: selalu Row
                       Row(
                         children: [
                           Expanded(
@@ -798,9 +666,7 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                                 onPressed: () {
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(
-                                      builder: (_) => const MyCommunitiesPage(),
-                                    ),
+                                    MaterialPageRoute(builder: (_) => const MyCommunitiesPage()),
                                   );
                                 },
                                 style: ElevatedButton.styleFrom(
@@ -848,7 +714,7 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                   ),
                 ),
 
-                // ===== Container biru: header FIXED, yang scroll cuma grid =====
+                // ===== Container biru: header FIXED, scroll cuma grid =====
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -874,13 +740,10 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                             ),
                             const SizedBox(height: 16),
 
-                            // Search bar FIXED (nggak ikut scroll)
                             Align(
                               alignment: Alignment.center,
                               child: ConstrainedBox(
-                                constraints: BoxConstraints(
-                                  maxWidth: kIsWeb ? 480 : 280,
-                                ),
+                                constraints: BoxConstraints(maxWidth: kIsWeb ? 480 : 280),
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 20),
                                   decoration: BoxDecoration(
@@ -939,7 +802,6 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                             ),
                             const SizedBox(height: 16),
 
-                            // Ini yang SCROLL: Community cards
                             Expanded(
                               child: FutureBuilder<List<Community>>(
                                 future: _futureCommunities,
@@ -953,10 +815,7 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                                       child: Text(
                                         'Error loading communities.\n${snapshot.error}',
                                         textAlign: TextAlign.center,
-                                        style: GoogleFonts.inter(
-                                          color: Colors.white,
-                                          fontSize: 14,
-                                        ),
+                                        style: GoogleFonts.inter(color: Colors.white, fontSize: 14),
                                       ),
                                     );
                                   }
@@ -967,10 +826,7 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                                     return Center(
                                       child: Text(
                                         'No communities found.',
-                                        style: GoogleFonts.inter(
-                                          color: Colors.white70,
-                                          fontSize: 14,
-                                        ),
+                                        style: GoogleFonts.inter(color: Colors.white70, fontSize: 14),
                                       ),
                                     );
                                   }
@@ -998,9 +854,7 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (_) => CommunityDetailPage(
-                                                  communityId: c.id,
-                                                ),
+                                                builder: (_) => CommunityDetailPage(communityId: c.id),
                                               ),
                                             );
                                           },
