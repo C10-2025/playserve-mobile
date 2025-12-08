@@ -4,14 +4,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../models/community.dart';
 import 'community_detail_page.dart';
-import 'discover_communities_page.dart'; // pastikan file ini ada
-import 'package:google_fonts/google_fonts.dart';
-
-// ⬇️ IMPORT NAVBAR & HEADER
+import 'discover_communities_page.dart';
 import 'package:playserve_mobile/main_navbar.dart';
+import 'package:playserve_mobile/main_navbar_admin.dart'; // ✅ add
 import 'package:playserve_mobile/header.dart';
 
 class MyCommunitiesPage extends StatefulWidget {
@@ -23,24 +22,21 @@ class MyCommunitiesPage extends StatefulWidget {
 
 class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
   late Future<List<Community>> _myCommunities;
+
   final TextEditingController _createNameController = TextEditingController();
   final TextEditingController _createDescController = TextEditingController();
 
-  // Versi default subtitle (untuk user biasa)
   final String _subtitle = 'JOINED';
+  bool _isAdminFlag = false;
 
   String get _baseUrl =>
       kIsWeb ? 'http://127.0.0.1:8000' : 'http://10.0.2.2:8000';
-
-  // 🔹 FLAG ADMIN (diisi dari /auth/check_admin_status/)
-  bool _isAdminFlag = false;
 
   @override
   void initState() {
     super.initState();
     _myCommunities = _fetchMyCommunities();
 
-    // 🔹 Setelah widget sudah kebentuk, cek status admin dari backend
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadAdminFlag();
     });
@@ -48,20 +44,22 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
 
   Future<void> _loadAdminFlag() async {
     final request = context.read<CookieRequest>();
-
     try {
       final resp = await request.get('$_baseUrl/auth/check_admin_status/');
-
       if (!mounted) return;
-
       setState(() {
-        // resp seharusnya: { "status": true, "is_admin": bool, "username": ... }
         _isAdminFlag = (resp is Map && resp['is_admin'] == true);
       });
     } catch (e) {
       debugPrint('Failed to load admin status: $e');
-      // kalau gagal, biarkan _isAdminFlag = false (anggap user biasa)
     }
+  }
+
+  // ✅ navbar conditional (tanpa ubah yang lain)
+  Widget _buildBottomNav() {
+    return _isAdminFlag
+        ? const MainNavbarAdmin(currentIndex: 2) // sesuaikan index admin kalau beda
+        : const MainNavbar(currentIndex: 1);
   }
 
   @override
@@ -75,13 +73,11 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
     final request = context.read<CookieRequest>();
     try {
       final response = await request.get('$_baseUrl/community/api/list/');
-
-      if (response != null && response is List) {
-        final communities = response
+      if (response is List) {
+        return response
             .map((e) => Community.fromJson(e as Map<String, dynamic>))
             .where((c) => c.isJoined)
             .toList();
-        return communities;
       }
       return [];
     } catch (e) {
@@ -97,14 +93,13 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
     await _myCommunities;
   }
 
-  /// ⬇️ Dialog CREATE COMMUNITY – DISAMAKAN DENGAN DiscoverCommunitiesPage
   void _openCreateCommunityDialog() {
     _createNameController.clear();
     _createDescController.clear();
 
     showDialog(
       context: context,
-      barrierDismissible: false, // ✅ sama kayak Discover
+      barrierDismissible: false,
       builder: (ctx) {
         bool isSubmitting = false;
 
@@ -116,16 +111,12 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
 
               if (name.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Name is required.'),
-                  ),
+                  const SnackBar(content: Text('Name is required.')),
                 );
                 return;
               }
 
-              setStateDialog(() {
-                isSubmitting = true;
-              });
+              setStateDialog(() => isSubmitting = true);
 
               final request = context.read<CookieRequest>();
               final url = '$_baseUrl/community/create/';
@@ -133,10 +124,7 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
               try {
                 final resp = await request.postJson(
                   url,
-                  jsonEncode({
-                    'name': name,
-                    'description': desc,
-                  }),
+                  jsonEncode({'name': name, 'description': desc}),
                 );
 
                 if (!mounted) return;
@@ -155,9 +143,7 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
                         backgroundColor: Colors.red,
                       ),
                     );
-                    setStateDialog(() {
-                      isSubmitting = false;
-                    });
+                    setStateDialog(() => isSubmitting = false);
                     return;
                   }
 
@@ -170,14 +156,12 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Community created.'),
-                    ),
+                    const SnackBar(content: Text('Community created.')),
                   );
                 }
 
                 Navigator.of(ctx).pop();
-                await _refreshMyCommunities(); // ✅ disesuaikan (bukan _refresh)
+                await _refreshMyCommunities();
               } catch (_) {
                 if (!mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -186,9 +170,7 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
                     backgroundColor: Colors.red,
                   ),
                 );
-                setStateDialog(() {
-                  isSubmitting = false;
-                });
+                setStateDialog(() => isSubmitting = false);
               }
             }
 
@@ -278,16 +260,8 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
                           borderRadius: BorderRadius.circular(14),
                         ),
                         child: TextButton(
-                          onPressed: isSubmitting
-                              ? null
-                              : () {
-                                  Navigator.of(ctx).pop();
-                                },
-                          style: TextButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                          ),
+                          onPressed:
+                              isSubmitting ? null : () => Navigator.pop(ctx),
                           child: Text(
                             'Cancel',
                             style: GoogleFonts.inter(
@@ -309,11 +283,6 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
                         ),
                         child: TextButton(
                           onPressed: isSubmitting ? null : handleSubmit,
-                          style: TextButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                          ),
                           child: isSubmitting
                               ? const SizedBox(
                                   height: 18,
@@ -344,18 +313,69 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
     );
   }
 
-  @override
+  Widget _buildHero(String subtitleText) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+      child: Column(
+        children: [
+          Text(
+            'MY COMMUNITIES',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(
+              fontSize: kIsWeb ? 40 : 30,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 2.0,
+              height: 1.05,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            subtitleText,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(
+              fontSize: kIsWeb ? 18 : 16,
+              fontWeight: FontWeight.w700,
+              color: Colors.white.withOpacity(0.7),
+            ),
+          ),
+          if (_isAdminFlag) ...[
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 46,
+              child: ElevatedButton(
+                onPressed: _openCreateCommunityDialog,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFC1D752),
+                  foregroundColor: const Color(0xFF082459),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  textStyle: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                child: const Text('+ CREATE COMMUNITY'),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+    @override
   Widget build(BuildContext context) {
-    // 🔹 Subtitle dinamis: admin → CREATED BY ME, user biasa → JOINED
+    final isAdmin = _isAdminFlag; // ✅ add
     final subtitleText = _isAdminFlag ? 'CREATED BY ME' : _subtitle;
 
     return Scaffold(
       backgroundColor: const Color(0xFF1E3A8A),
-      // ⬇️ NAVBAR DI BAWAH
-      bottomNavigationBar: const MainNavbar(currentIndex: 1),
+      bottomNavigationBar: _buildBottomNav(), // ✅ ganti ini aja
       body: Stack(
         children: [
-          // 🔵 Background image, sama seperti di Discover
           Positioned.fill(
             child: Image.asset(
               'assets/image/bgcommunity.png',
@@ -363,284 +383,189 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
               alignment: Alignment.topCenter,
             ),
           ),
-
           SafeArea(
             child: Column(
               children: [
-                // HEADER PROFIL
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
-                  child: ProfileHeader(),
-                ),
-                const SizedBox(height: 12),
+                if (!isAdmin) ...[
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+                    child: ProfileHeader(),
+                  ),
+                  const SizedBox(height: 12),
+                ],
 
-                // SISANYA: HERO + PANEL (ISI LAMA DIBUNGKUS EXPANDED)
+                // ✅ Anti overflow: HERO boleh scroll sedikit kalau window pendek
+                Flexible(
+                  flex: 0,
+                  child: SingleChildScrollView(
+                    physics: const ClampingScrollPhysics(),
+                    child: _buildHero(subtitleText),
+                  ),
+                ),
+
                 Expanded(
-                  child: Column(
-                    children: [
-                      // ============ HERO DI ATAS PANEL ============
-                      Padding(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF092B69),
+                        borderRadius: BorderRadius.all(Radius.circular(24)),
+                      ),
+                      child: Padding(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16,
-                          vertical: 32,
+                          vertical: 16,
                         ),
-                        child: Column(
-                          children: [
-                            Text(
-                              'MY COMMUNITIES',
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.inter(
-                                fontSize: kIsWeb ? 40 : 30,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 2.0,
-                                height: 1.05,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              subtitleText,
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.inter(
-                                fontSize: kIsWeb ? 18 : 16,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white.withOpacity(0.7),
-                              ),
-                            ),
-                            if (_isAdminFlag) ...[
-                              const SizedBox(height: 12),
-                              // ⬇️ BUTTON SAMA PERSIS STYLE DENGAN Discover
-                              SizedBox(
-                                height: 46,
-                                child: ElevatedButton(
-                                  onPressed: _openCreateCommunityDialog,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFFC1D752),
-                                    foregroundColor: const Color(0xFF082459),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    textStyle: GoogleFonts.inter(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
-                                      letterSpacing: 0.5,
-                                    ),
-                                  ),
-                                  child: const Text('+ CREATE COMMUNITY'),
+                        child: FutureBuilder<List<Community>>(
+                          future: _myCommunities,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
                                 ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
+                              );
+                            }
 
-                      // ============ PANEL / BOX SAMA KAYAK DISCOVER ============
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(
-                            16,
-                            0,
-                            16,
-                            16,
-                          ), // sama pattern
-                          child: Container(
-                            decoration: const BoxDecoration(
-                              color: Color(0xFF092B69),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(24),
-                              ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 16,
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  const SizedBox(height: 16),
+                            if (snapshot.hasError) {
+                              return Center(
+                                child: Text(
+                                  'Error loading communities.\n${snapshot.error}',
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.inter(color: Colors.white),
+                                ),
+                              );
+                            }
 
-                                  // ====== LIST DI DALAM PANEL ======
-                                  Expanded(
-                                    child: FutureBuilder<List<Community>>(
-                                      future: _myCommunities,
-                                      builder: (context, snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return const Center(
-                                            child: CircularProgressIndicator(
-                                              color: Colors.white,
-                                            ),
-                                          );
-                                        }
+                            final communities = snapshot.data ?? [];
 
-                                        if (snapshot.hasError) {
-                                          return Center(
-                                            child: Text(
-                                              'Error loading communities.\n${snapshot.error}',
-                                              textAlign: TextAlign.center,
-                                              style: GoogleFonts.inter(
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          );
-                                        }
-
-                                        final communities =
-                                            snapshot.data ?? [];
-
-                                        if (communities.isEmpty) {
-                                          // EMPTY STATE di dalam panel
-                                          return Center(
-                                            child: Container(
-                                              margin: const EdgeInsets.all(8),
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                horizontal: 24,
-                                                vertical: 24,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                borderRadius:
-                                                    BorderRadius.circular(20),
-                                                border: Border.all(
-                                                  color: Colors.grey
-                                                      .withOpacity(0.3),
-                                                ),
-                                                boxShadow: const [
-                                                  BoxShadow(
-                                                    color: Colors.black12,
-                                                    blurRadius: 12,
-                                                    offset: Offset(0, 6),
-                                                  ),
-                                                ],
-                                              ),
-                                              child: Column(
-                                                mainAxisSize:
-                                                    MainAxisSize.min,
-                                                children: [
-                                                  const Icon(
-                                                    Icons.group_outlined,
-                                                    size: 56,
-                                                    color: Colors.grey,
-                                                  ),
-                                                  const SizedBox(height: 16),
-                                                  Text(
-                                                    "You haven’t joined any communities",
-                                                    style: GoogleFonts.inter(
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.black87,
-                                                    ),
-                                                    textAlign:
-                                                        TextAlign.center,
-                                                  ),
-                                                  const SizedBox(height: 8),
-                                                  Text(
-                                                    "Find and join communities that match your interests.",
-                                                    style: GoogleFonts.inter(
-                                                      fontSize: 14,
-                                                      color: Colors.grey,
-                                                    ),
-                                                    textAlign:
-                                                        TextAlign.center,
-                                                  ),
-                                                  const SizedBox(height: 24),
-                                                  ElevatedButton(
-                                                    onPressed: () {
-                                                      Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (_) =>
-                                                              const DiscoverCommunitiesPage(),
-                                                        ),
-                                                      );
-                                                    },
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                      backgroundColor:
-                                                          const Color(
-                                                              0xFFC1D752),
-                                                      foregroundColor:
-                                                          const Color(
-                                                              0xFF082459),
-                                                      padding:
-                                                          const EdgeInsets
-                                                              .symmetric(
-                                                        horizontal: 32,
-                                                        vertical: 12,
-                                                      ),
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                      ),
-                                                      elevation: 4,
-                                                    ),
-                                                    child: Text(
-                                                      "Discover Communities",
-                                                      style:
-                                                          GoogleFonts.inter(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          );
-                                        }
-
-                                        return LayoutBuilder(
-                                          builder:
-                                              (context, constraints) {
-                                            // 🔹 Phone & tablet: 2 kolom
-                                            // 🔹 Desktop lebar: 3 kolom
-                                            int crossAxisCount;
-                                            if (constraints.maxWidth >=
-                                                1024) {
-                                              crossAxisCount = 3;
-                                            } else {
-                                              crossAxisCount = 2;
-                                            }
-
-                                            return GridView.builder(
-                                              padding: EdgeInsets.zero,
-                                              itemCount:
-                                                  communities.length,
-                                              gridDelegate:
-                                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                                crossAxisCount:
-                                                    crossAxisCount,
-                                                mainAxisSpacing: 12,
-                                                crossAxisSpacing: 12,
-                                                childAspectRatio: 0.82,
-                                              ),
-                                              itemBuilder:
-                                                  (context, index) {
-                                                final community =
-                                                    communities[index];
-                                                return _buildCommunityCard(
-                                                  context,
-                                                  community,
-                                                );
-                                              },
-                                            );
-                                          },
-                                        );
-                                      },
-                                    ),
+                            if (communities.isEmpty) {
+                              return Center(
+                                child: Container(
+                                  margin: const EdgeInsets.all(8),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 24,
+                                    vertical: 24,
                                   ),
-                                ],
-                              ),
-                            ),
-                          ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color: Colors.grey.withOpacity(0.3),
+                                    ),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: Colors.black12,
+                                        blurRadius: 12,
+                                        offset: Offset(0, 6),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(
+                                        Icons.group_outlined,
+                                        size: 56,
+                                        color: Colors.grey,
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Text(
+                                        "You haven’t joined any communities",
+                                        style: GoogleFonts.inter(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black87,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        "Find and join communities that match your interests.",
+                                        style: GoogleFonts.inter(
+                                          fontSize: 14,
+                                          color: Colors.grey,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      const SizedBox(height: 24),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) =>
+                                                  const DiscoverCommunitiesPage(),
+                                            ),
+                                          );
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor:
+                                              const Color(0xFFC1D752),
+                                          foregroundColor:
+                                              const Color(0xFF082459),
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 32,
+                                            vertical: 12,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          elevation: 4,
+                                        ),
+                                        child: Text(
+                                          "Discover Communities",
+                                          style: GoogleFonts.inter(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }
+
+                            return LayoutBuilder(
+                              builder: (context, constraints) {
+                                int crossAxisCount;
+                                if (constraints.maxWidth >= 1024) {
+                                  crossAxisCount = 3;
+                                } else {
+                                  crossAxisCount = 2;
+                                }
+
+                                return RefreshIndicator(
+                                  onRefresh: _refreshMyCommunities,
+                                  child: GridView.builder(
+                                    physics:
+                                        const AlwaysScrollableScrollPhysics(),
+                                    padding: EdgeInsets.zero,
+                                    itemCount: communities.length,
+                                    gridDelegate:
+                                        SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: crossAxisCount,
+                                      mainAxisSpacing: 12,
+                                      crossAxisSpacing: 12,
+                                      childAspectRatio: 0.82,
+                                    ),
+                                    itemBuilder: (context, index) {
+                                      final community = communities[index];
+                                      return _buildCommunityCard(
+                                        context,
+                                        community,
+                                      );
+                                    },
+                                  ),
+                                );
+                              },
+                            );
+                          },
                         ),
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ],
@@ -650,6 +575,7 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
       ),
     );
   }
+
 
   Widget _buildCommunityCard(BuildContext context, Community community) {
     return Container(
@@ -669,7 +595,6 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Info community
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -703,10 +628,7 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
               ],
             ],
           ),
-
           const SizedBox(height: 12),
-
-          // Tombol OPEN COMMUNITY
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
