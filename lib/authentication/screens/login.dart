@@ -106,7 +106,6 @@ class _LoginPageState extends State<LoginPage> {
                               'password': password,
                             },
                           );
-
                           setState(() => _isLoading = false);
 
                           if (request.loggedIn) {
@@ -117,6 +116,7 @@ class _LoginPageState extends State<LoginPage> {
 
                             if (context.mounted) {
                               // ✅ Cek apakah admin
+                              // MAGIC, Berkaitan dengan perbedaan view login dan get_user, hati2 ketika mengubah
                               final bool isAdmin = userData["is_superuser"] ?? false;
                               request.jsonData["is_admin"] = response["is_admin"];
 

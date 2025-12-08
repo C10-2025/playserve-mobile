@@ -165,7 +165,6 @@ class _ReviewListState extends State<ReviewList> {
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
-    // MAGIC, entah kenapa bisa padahal di login g ditambah apa2 ke json, tapi ini kerja DON'T TOUCH
     final bool isAdmin = request.jsonData['is_admin'] == true;
 
     if (_loading) return const Center(child: CircularProgressIndicator());
