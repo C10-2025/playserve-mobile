@@ -37,7 +37,6 @@ class _ProfileHeaderState extends State<ProfileHeader> {
           avatar = response["avatar"] ?? "image/avatar1.svg";
         });
 
-        // Cache di SharedPreferences
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString("username", username);
         await prefs.setString("rank", rank);
