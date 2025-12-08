@@ -10,7 +10,7 @@ import '../models/community.dart';
 import '../widgets/community_card.dart';
 import 'community_detail_page.dart';
 import 'my_communities_page.dart';
-import 'package:playserve_mobile/main_navbar.dart';
+import 'package:playserve_mobile/main_navbar_admin.dart';
 import 'package:playserve_mobile/header.dart';
 
 class DiscoverCommunitiesPage extends StatefulWidget {
@@ -743,7 +743,7 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
 
     return Scaffold(
       backgroundColor: const Color(0xFF1E3A8A),
-      bottomNavigationBar: const MainNavbar(currentIndex: 1),
+      bottomNavigationBar: const MainNavbarAdmin(currentIndex: 2),
       body: Stack(
         children: [
           Positioned.fill(
@@ -761,11 +761,10 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                   child: ProfileHeader(),
                 ),
                 const SizedBox(height: 12),
+
+                // ===== Header atas (judul besar + tombol FIX sampingan) =====
                 Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 24,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -788,81 +787,68 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      LayoutBuilder(
-                        builder: (context, constraints) {
-                          final isWide = constraints.maxWidth >= 500;
 
-                          final seeMyBtn = SizedBox(
-                            height: 46,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const MyCommunitiesPage(),
+                      // FIX sampingan: selalu Row
+                      Row(
+                        children: [
+                          Expanded(
+                            child: SizedBox(
+                              height: 46,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const MyCommunitiesPage(),
+                                    ),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFFC1D752),
+                                  foregroundColor: const Color(0xFF082459),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFC1D752),
-                                foregroundColor: const Color(0xFF082459),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                                  textStyle: GoogleFonts.inter(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.5,
+                                  ),
                                 ),
-                                textStyle: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: 0.5,
+                                child: const Text('SEE MY COMMUNITIES'),
+                              ),
+                            ),
+                          ),
+                          if (isAdmin) const SizedBox(width: 12),
+                          if (isAdmin)
+                            Expanded(
+                              child: SizedBox(
+                                height: 46,
+                                child: ElevatedButton(
+                                  onPressed: _openCreateCommunityDialog,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFFC1D752),
+                                    foregroundColor: const Color(0xFF082459),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    textStyle: GoogleFonts.inter(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                  child: const Text('+ CREATE COMMUNITY'),
                                 ),
                               ),
-                              child: const Text('SEE MY COMMUNITIES'),
                             ),
-                          );
-
-                          final createBtn = SizedBox(
-                            height: 46,
-                            child: ElevatedButton(
-                              onPressed: _openCreateCommunityDialog,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFC1D752),
-                                foregroundColor: const Color(0xFF082459),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                textStyle: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                              child: const Text('+ CREATE COMMUNITY'),
-                            ),
-                          );
-
-                          if (isWide) {
-                            return Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SizedBox(width: 220, child: seeMyBtn),
-                                if (isAdmin) const SizedBox(width: 12),
-                                if (isAdmin) SizedBox(width: 220, child: createBtn),
-                              ],
-                            );
-                          } else {
-                            return Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                SizedBox(width: 260, child: seeMyBtn),
-                                if (isAdmin) const SizedBox(height: 8),
-                                if (isAdmin) SizedBox(width: 260, child: createBtn),
-                              ],
-                            );
-                          }
-                        },
+                        ],
                       ),
                     ],
                   ),
                 ),
+
+                // ===== Container biru: header FIXED, yang scroll cuma grid =====
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -872,10 +858,7 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                         borderRadius: BorderRadius.all(Radius.circular(24)),
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 16,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
@@ -890,12 +873,13 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                               ),
                             ),
                             const SizedBox(height: 16),
-                            // 🔍 SEARCH BAR – dibikin nggak full width
+
+                            // Search bar FIXED (nggak ikut scroll)
                             Align(
                               alignment: Alignment.center,
                               child: ConstrainedBox(
                                 constraints: BoxConstraints(
-                                  maxWidth: kIsWeb ? 480 : 280, // di HP jadi sekitar 320px, di web max 520px
+                                  maxWidth: kIsWeb ? 480 : 280,
                                 ),
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -935,10 +919,9 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                                       ),
                                       GestureDetector(
                                         onTap: () {
-                                          // ambil teks dari field
                                           _searchQuery = _searchController.text.trim();
-                                          _refresh();                    // panggil ulang API
-                                          FocusScope.of(context).unfocus(); // tutup keyboard biar berasa "submit"
+                                          _refresh();
+                                          FocusScope.of(context).unfocus();
                                         },
                                         child: Padding(
                                           padding: const EdgeInsets.only(right: 4),
@@ -955,15 +938,14 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                               ),
                             ),
                             const SizedBox(height: 16),
+
+                            // Ini yang SCROLL: Community cards
                             Expanded(
                               child: FutureBuilder<List<Community>>(
                                 future: _futureCommunities,
                                 builder: (context, snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.waiting) {
-                                    return const Center(
-                                      child: CircularProgressIndicator(),
-                                    );
+                                  if (snapshot.connectionState == ConnectionState.waiting) {
+                                    return const Center(child: CircularProgressIndicator());
                                   }
 
                                   if (snapshot.hasError) {
@@ -996,9 +978,9 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                                   return RefreshIndicator(
                                     onRefresh: _refresh,
                                     child: GridView.builder(
+                                      physics: const AlwaysScrollableScrollPhysics(),
                                       itemCount: communities.length,
-                                      gridDelegate:
-                                          const SliverGridDelegateWithFixedCrossAxisCount(
+                                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                                         crossAxisCount: 2,
                                         mainAxisSpacing: 12,
                                         crossAxisSpacing: 12,
@@ -1006,18 +988,13 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                                       ),
                                       itemBuilder: (context, index) {
                                         final c = communities[index];
-
-                                        final bool canOpen = c.isJoined || c.isCreator;
+                                        final canOpen = c.isJoined || c.isCreator;
 
                                         return CommunityCard(
                                           community: c,
-                                          showCreatorInfo: isAdmin,
+                                          showCreatorInfo: _isAdminFlag,
                                           onTap: () {
-                                            // ❗ kalau belum join → jangan navigate, langsung return aja
-                                            if (!canOpen) {
-                                              return;
-                                            }
-
+                                            if (!canOpen) return;
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
