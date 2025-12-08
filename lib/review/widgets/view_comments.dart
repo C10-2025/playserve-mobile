@@ -38,7 +38,7 @@ class ViewCommentsModal extends StatelessWidget {
     if (confirm != true) return;
 
     final request = context.read<CookieRequest>();
-    const url = 'http://127.0.0.1:8000/review/delete-review-flutter/';
+    const url = 'https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/review/delete-review-flutter/';
 
     try {
       final response = await request.post(

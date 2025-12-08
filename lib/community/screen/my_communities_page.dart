@@ -30,7 +30,7 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
   bool _isAdminFlag = false;
 
   String get _baseUrl =>
-      kIsWeb ? 'http://127.0.0.1:8000' : 'http://10.0.2.2:8000';
+      kIsWeb ? 'https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id' : 'http://10.0.2.2:8000';
 
   @override
   void initState() {
