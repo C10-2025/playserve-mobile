@@ -29,43 +29,60 @@ class _BookingStep1IdentityScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: BookingColors.background,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Container(
-            decoration: BookingDecorations.panel,
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _progress(step: 1),
-                const SizedBox(height: 24),
-                Text('Your Information', style: BookingTextStyles.title),
-                const SizedBox(height: 12),
-                _input(_name, 'Full name', required: true),
-                const SizedBox(height: 12),
-                _input(_phone, 'Phone number', required: true),
-                const SizedBox(height: 12),
-                _input(_email, 'Email (optional)'),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: BookingDecorations.primaryButton,
-                    onPressed: _next,
-                    child: const Text('Next: Select Time'),
+      body: BookingBackground(
+        child: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Container(
+                      decoration: BookingDecorations.panel,
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _progress(step: 1),
+                          const SizedBox(height: 24),
+                          Text(
+                            'Your Information',
+                            style: BookingTextStyles.title,
+                          ),
+                          const SizedBox(height: 12),
+                          _input(_name, 'Full name', required: true),
+                          const SizedBox(height: 12),
+                          _input(_phone, 'Phone number', required: true),
+                          const SizedBox(height: 12),
+                          _input(_email, 'Email (optional)'),
+                          const SizedBox(height: 20),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              style: BookingDecorations.primaryButton,
+                              onPressed: _next,
+                              child: const Text('Next: Select Time'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                )
-              ],
-            ),
+                ),
+              );
+            },
           ),
         ),
       ),
     );
   }
 
-  Widget _input(TextEditingController c, String label, {bool required = false}) {
+  Widget _input(
+    TextEditingController c,
+    String label, {
+    bool required = false,
+  }) {
     return TextField(
       controller: c,
       decoration: InputDecoration(
@@ -84,32 +101,32 @@ class _BookingStep1IdentityScreenState
 
   Widget _progress({required int step}) {
     Widget circle(int number, bool active) => Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: active ? BookingColors.green600 : Colors.transparent,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: active ? BookingColors.green600 : BookingColors.gray200,
-              width: 2,
-            ),
-          ),
-          alignment: Alignment.center,
-          child: Text(
-            '$number',
-            style: BookingTextStyles.title.copyWith(
-              fontSize: 16,
-              color: active ? Colors.white : BookingColors.gray600,
-            ),
-          ),
-        );
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+        color: active ? BookingColors.lime : Colors.transparent,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: active ? BookingColors.lime : BookingColors.gray200,
+          width: 2,
+        ),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        '$number',
+        style: BookingTextStyles.title.copyWith(
+          fontSize: 16,
+          color: active ? BookingColors.navbarBlue : BookingColors.gray600,
+        ),
+      ),
+    );
 
     Widget connector(bool active) => Expanded(
-          child: Container(
-            height: 2,
-            color: active ? BookingColors.gray200 : BookingColors.gray200,
-          ),
-        );
+      child: Container(
+        height: 2,
+        color: active ? BookingColors.gray200 : BookingColors.gray200,
+      ),
+    );
 
     return Row(
       children: [
@@ -118,9 +135,12 @@ class _BookingStep1IdentityScreenState
             children: [
               circle(1, true),
               const SizedBox(height: 6),
-              Text('Your Info',
-                  style: BookingTextStyles.cardSubtitle
-                      .copyWith(color: BookingColors.textLight)),
+              Text(
+                'Your Info',
+                style: BookingTextStyles.cardSubtitle.copyWith(
+                  color: BookingColors.textLight,
+                ),
+              ),
             ],
           ),
         ),
@@ -130,9 +150,12 @@ class _BookingStep1IdentityScreenState
             children: [
               circle(2, step >= 2),
               const SizedBox(height: 6),
-              Text('Date & Time',
-                  style: BookingTextStyles.cardSubtitle
-                      .copyWith(color: BookingColors.textLight)),
+              Text(
+                'Date & Time',
+                style: BookingTextStyles.cardSubtitle.copyWith(
+                  color: BookingColors.textLight,
+                ),
+              ),
             ],
           ),
         ),
@@ -142,9 +165,12 @@ class _BookingStep1IdentityScreenState
             children: [
               circle(3, step >= 3),
               const SizedBox(height: 6),
-              Text('Payment',
-                  style: BookingTextStyles.cardSubtitle
-                      .copyWith(color: BookingColors.textLight)),
+              Text(
+                'Payment',
+                style: BookingTextStyles.cardSubtitle.copyWith(
+                  color: BookingColors.textLight,
+                ),
+              ),
             ],
           ),
         ),
@@ -154,8 +180,9 @@ class _BookingStep1IdentityScreenState
 
   void _next() {
     if (_name.text.trim().isEmpty || _phone.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Name and phone required')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Name and phone required')));
       return;
     }
     widget.draft.bookerName = _name.text.trim();

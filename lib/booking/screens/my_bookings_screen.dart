@@ -35,8 +35,8 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: BookingColors.background,
-      body: SafeArea(
+      body: BookingBackground(
+        child: SafeArea(
         child: RefreshIndicator(
           onRefresh: _refresh,
           child: SingleChildScrollView(
@@ -89,7 +89,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                         children: [
                           _statsRow(stats),
                           const SizedBox(height: 16),
-                          ...bookings.map((b) => BookingSummaryCard(booking: b)).toList(),
+                          ...bookings.map((b) => BookingSummaryCard(booking: b)),
                         ],
                       );
                     },
@@ -100,7 +100,8 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
           ),
         ),
       ),
-    );
+        ),
+      );
   }
 
   Widget _statsRow(Map<String, int> stats) {
