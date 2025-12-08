@@ -1,41 +1,40 @@
 import 'package:flutter/material.dart';
-import 'package:playserve_mobile/review/widgets/review_list.dart';
-import 'package:playserve_mobile/main_navbar.dart';
+import 'package:provider/provider.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
 
-class ReviewPage extends StatefulWidget {
+import '../widgets/review_list.dart';
+import 'package:playserve_mobile/main_navbar.dart';
+import 'package:playserve_mobile/main_navbar_admin.dart';
+
+class ReviewPage extends StatelessWidget {
   const ReviewPage({super.key});
 
   @override
-  State<ReviewPage> createState() => _ReviewPageState();
-}
-
-class _ReviewPageState extends State<ReviewPage> {
-  @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+    final bool isAdmin = request.jsonData["is_admin"] == true;
+
     return Scaffold(
-      // Use SafeArea to avoid notches
-      body: Stack(
-        children: [
-          // Background
-          Container(
-            decoration: const BoxDecoration(color: Color(0xFF1A2B4C)),
-            child: SafeArea(
-              top: true,
-              child: Column(
-                children: const [
-                  // Top small header / spacing
-                  SizedBox(height: 8),
-                  // Expanded review list
-                  Expanded(child: ReviewList()),
-                ],
-              ),
-            ),
+      backgroundColor: Colors.white,
+
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF0A1F63),
+        elevation: 0,
+        title: const Text(
+          "Court Reviews",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
           ),
-        ],
+        ),
+        centerTitle: true,
       ),
 
-      // Bottom navigation
-      bottomNavigationBar: const MainNavbar(currentIndex: 4),
+      body: const ReviewList(),
+
+      bottomNavigationBar: isAdmin
+          ? const MainNavbarAdmin(currentIndex: 3)
+          : const MainNavbar(currentIndex: 4),
     );
   }
 }

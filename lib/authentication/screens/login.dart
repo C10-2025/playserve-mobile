@@ -141,6 +141,10 @@ class _LoginPageState extends State<LoginPage> {
 
                                   if (context.mounted) {
                                     final bool isAdmin = adminCheck["is_admin"] ?? false;
+                                    // Now redundant with main check_admin refresh, but keep it as 
+                                    // redundancy
+                                    //request.jsonData["is_admin"] = isAdmin; 
+
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
