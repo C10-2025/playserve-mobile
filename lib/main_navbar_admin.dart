@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:playserve_mobile/authentication/screens/home_page_admin.dart';
+import 'package:playserve_mobile/booking/screens/admin_field_list_screen.dart';
+// import 'package:playserve_mobile/booking/screens/admin_pending_bookings_screen.dart';
+import 'package:playserve_mobile/profil/screens/delete_profile.dart';
+import 'package:playserve_mobile/community/screen/discover_communities_page.dart';
+import 'package:playserve_mobile/review/screens/review_page.dart';
 
 class MainNavbarAdmin extends StatelessWidget {
   final int currentIndex;
@@ -11,9 +16,7 @@ class MainNavbarAdmin extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10),
-      decoration: const BoxDecoration(
-        color: Color(0xFF0A1F63),
-      ),
+      decoration: const BoxDecoration(color: Color(0xFF0A1F63)),
       child: SafeArea(
         top: false,
         child: Row(
@@ -28,26 +31,26 @@ class MainNavbarAdmin extends StatelessWidget {
             _buildNavItem(
               context,
               index: 1,
-              icon: LucideIcons.users, // 👥 untuk manage users
-              // page: const ManageUsersPage(),
+              icon: LucideIcons.users,
+              page: const DeleteProfilePage(),
             ),
             _buildNavItem(
               context,
               index: 2,
-              icon: LucideIcons.messageSquare,
-              // page: const CommunityPage(),
+              icon: LucideIcons.calendar,
+              page: const AdminFieldListScreen(),
             ),
             _buildNavItem(
               context,
               index: 3,
-              icon: LucideIcons.calendar, // 🔁 Ganti 'calendarEdit'
-              // page: const BookingPage(),
+              icon: LucideIcons.star,
+              page: const ReviewPage(),
             ),
             _buildNavItem(
               context,
               index: 4,
-              icon: LucideIcons.star,
-              // page: const FavoritesPage(),
+              icon: LucideIcons.messageSquare,
+              page: const DiscoverCommunitiesPage(),
             ),
           ],
         ),
@@ -61,7 +64,7 @@ class MainNavbarAdmin extends StatelessWidget {
     required IconData icon,
     Widget? page,
   }) {
-    final bool isActive = index == currentIndex;
+    final bool isActive = index == currentIndex && currentIndex >= 0;
 
     return GestureDetector(
       onTap: () {
@@ -73,15 +76,21 @@ class MainNavbarAdmin extends StatelessWidget {
               transitionDuration: const Duration(milliseconds: 250),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
-                final offsetAnimation = Tween<Offset>(
-                  begin: const Offset(0.5, 0),
-                  end: Offset.zero,
-                ).animate(CurvedAnimation(
-                  parent: animation,
-                  curve: Curves.easeOutCubic,
-                ));
-                return SlideTransition(position: offsetAnimation, child: child);
-              },
+                    final offsetAnimation =
+                        Tween<Offset>(
+                          begin: const Offset(0.5, 0),
+                          end: Offset.zero,
+                        ).animate(
+                          CurvedAnimation(
+                            parent: animation,
+                            curve: Curves.easeOutCubic,
+                          ),
+                        );
+                    return SlideTransition(
+                      position: offsetAnimation,
+                      child: child,
+                    );
+                  },
             ),
           );
         }

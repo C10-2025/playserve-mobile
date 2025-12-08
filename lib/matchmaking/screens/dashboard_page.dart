@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:playserve_mobile/main_navbar.dart';
 
 import 'package:playserve_mobile/matchmaking/widgets/filter_button.dart';
 import 'package:playserve_mobile/matchmaking/widgets/player_card.dart';
@@ -184,8 +185,10 @@ class _DashboardPageState extends State<DashboardPage> {
               ),
             ),
           ],
+          
         ),
       ),
+      bottomNavigationBar: const MainNavbar(currentIndex: 2),
     );
   }
 

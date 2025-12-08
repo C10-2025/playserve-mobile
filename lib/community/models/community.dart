@@ -5,12 +5,17 @@ class Community {
   final int membersCount;
   final bool isJoined;
 
+  final bool isCreator;          
+  final String? creatorUsername; 
+
   Community({
     required this.id,
     required this.name,
     required this.description,
     required this.membersCount,
     required this.isJoined,
+    this.isCreator = false,
+    this.creatorUsername,
   });
 
   factory Community.fromJson(Map<String, dynamic> json) {
@@ -22,6 +27,9 @@ class Community {
       description: json['description'] as String? ?? '',
       membersCount: json['members_count'] as int? ?? 0,
       isJoined: json['is_joined'] as bool? ?? false,
+
+      isCreator: json['is_creator'] as bool? ?? false,
+      creatorUsername: json['creator_username'] as String?,
     );
   }
 }

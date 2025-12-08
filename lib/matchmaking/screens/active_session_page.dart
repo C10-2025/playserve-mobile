@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:playserve_mobile/matchmaking/screens/dashboard_page.dart';
 import 'package:playserve_mobile/matchmaking/widgets/clickable_instagram_text.dart';
 import 'package:provider/provider.dart';
 import 'package:playserve_mobile/matchmaking/models/player_model.dart';
@@ -68,7 +69,7 @@ class _ActiveSessionPageState extends State<ActiveSessionPage> {
     final result = await request.postJson(
       "http://127.0.0.1:8000/matchmaking/action/finish-session/",
       jsonEncode({
-        "session_id": sessionJson!["session_id"],
+        "session_id": int.parse(sessionJson!["session_id"].toString()),
         "action": action,
       }),
     );
@@ -76,7 +77,14 @@ class _ActiveSessionPageState extends State<ActiveSessionPage> {
     if (!mounted) return;
 
     if (result["success"] == true) {
-      Navigator.pop(context);
+      if (!mounted) return;
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const DashboardPage()),
+        (route) => false,
+      );
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Match updated.")),
       );

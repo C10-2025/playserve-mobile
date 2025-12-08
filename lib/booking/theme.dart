@@ -1,6 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+class BookingBackground extends StatelessWidget {
+  const BookingBackground({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox.expand(
+      child: Container(
+        decoration: const BoxDecoration(
+          color: BookingColors.background, // Blue background as fallback
+          image: DecorationImage(
+            image: AssetImage('assets/image/background.png'),
+            fit: BoxFit.cover, // Cover the entire area
+            opacity: 0.3, // Make it subtle so content is still readable
+          ),
+        ),
+        child: child,
+      ),
+    );
+  }
+}
+
 class BookingColors {
   static const background = Color(0xFF1146A9);
   static const panel = Color(0xFF1A2B4C);
@@ -28,17 +51,18 @@ class BookingColors {
 }
 
 class BookingTextStyles {
-  static TextStyle get display => GoogleFonts.poppins(
-    fontSize: 32,
+  static TextStyle get display => GoogleFonts.inter(
+    fontSize: 28,
     fontWeight: FontWeight.w900,
+    height: 1.3,
     color: Colors.white,
   );
-  static TextStyle get headline => GoogleFonts.poppins(
+  static TextStyle get headline => GoogleFonts.inter(
     fontSize: 24,
     fontWeight: FontWeight.w800,
     color: BookingColors.gray800,
   );
-  static TextStyle get title => GoogleFonts.poppins(
+  static TextStyle get title => GoogleFonts.inter(
     fontSize: 20,
     fontWeight: FontWeight.w700,
     color: BookingColors.gray800,
@@ -58,17 +82,17 @@ class BookingTextStyles {
     fontWeight: FontWeight.w400,
     color: BookingColors.textLight,
   );
-  static TextStyle get button => GoogleFonts.poppins(
+  static TextStyle get button => GoogleFonts.inter(
     fontSize: 16,
     fontWeight: FontWeight.w700,
     color: Colors.white,
   );
-  static TextStyle get price => GoogleFonts.poppins(
+  static TextStyle get price => GoogleFonts.inter(
     fontSize: 24,
     fontWeight: FontWeight.w700,
     color: BookingColors.green600,
   );
-  static TextStyle get cardTitle => GoogleFonts.poppins(
+  static TextStyle get cardTitle => GoogleFonts.inter(
     fontSize: 18,
     fontWeight: FontWeight.w700,
     color: BookingColors.gray800,
@@ -102,20 +126,21 @@ class BookingDecorations {
   );
 
   static ButtonStyle primaryButton = ElevatedButton.styleFrom(
-    backgroundColor: BookingColors.green600,
-    foregroundColor: Colors.white,
+    backgroundColor: BookingColors.lime,
+    foregroundColor: BookingColors
+        .navbarBlue, // Changed from white to dark navy for better contrast
     textStyle: BookingTextStyles.button,
-    padding: const EdgeInsets.symmetric(vertical: 14),
+    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+    minimumSize: const Size(120, 0), // Minimum width to prevent infinite width
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
   );
 
   static ButtonStyle secondaryButton = OutlinedButton.styleFrom(
-    foregroundColor: BookingColors.gray700,
+    foregroundColor: BookingColors.white,
     side: const BorderSide(color: BookingColors.gray200),
     padding: const EdgeInsets.symmetric(vertical: 14),
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     textStyle: BookingTextStyles.button.copyWith(
-      color: BookingColors.gray700,
       fontSize: 14,
     ),
   );

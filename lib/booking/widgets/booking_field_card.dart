@@ -11,8 +11,11 @@ class BookingFieldCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final price = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0)
-        .format(field.pricePerHour);
+    final price = NumberFormat.currency(
+      locale: 'id_ID',
+      symbol: 'Rp ',
+      decimalDigits: 0,
+    ).format(field.pricePerHour);
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -25,54 +28,72 @@ class BookingFieldCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildImage(),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(field.name, style: BookingTextStyles.cardTitle),
-                    const SizedBox(height: 6),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Icon(Icons.location_on_outlined,
-                            size: 16, color: BookingColors.gray600),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            '${field.city}, ${field.address}',
-                            style: BookingTextStyles.cardSubtitle,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(price, style: BookingTextStyles.price),
-                        Text(
-                          'per hour',
-                          style: BookingTextStyles.cardSubtitle.copyWith(
-                            color: BookingColors.gray500,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 14),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        style: BookingDecorations.primaryButton,
-                        onPressed: onTap,
-                        child: const Text('BOOK NOW'),
+              ClipRect(
+                // Clip any content that overflows the card boundaries
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    20,
+                    20,
+                    20,
+                    8,
+                  ), // Small bottom padding to reduce gap but keep cards tight
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        field.name,
+                        style: BookingTextStyles.cardTitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 6),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Icon(
+                            Icons.location_on_outlined,
+                            size: 16,
+                            color: BookingColors.gray600,
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              '${field.city}, ${field.address}',
+                              style: BookingTextStyles.cardSubtitle,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(price, style: BookingTextStyles.price),
+                          Text(
+                            'per hour',
+                            style: BookingTextStyles.cardSubtitle.copyWith(
+                              color: BookingColors.gray500,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 12,
+                      ), // Reduced from 14 to 12 for better spacing
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: BookingDecorations.primaryButton,
+                          onPressed: onTap,
+                          child: const Text('BOOK NOW'),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -82,7 +103,8 @@ class BookingFieldCard extends StatelessWidget {
 
   Widget _buildImage() {
     final badges = <Widget>[];
-    final amenities = field.amenities?.map((e) => e.toString().toLowerCase()).toList() ?? [];
+    final amenities =
+        field.amenities?.map((e) => e.toString().toLowerCase()).toList() ?? [];
     if (amenities.any((a) => a.contains('light'))) {
       badges.add(const _FeatureBadge(label: 'Lights'));
     }
@@ -111,7 +133,12 @@ class BookingFieldCard extends StatelessWidget {
                 child: Image.network(
                   field.imageUrl!,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => const SizedBox(),
+                  errorBuilder: (context, _, __) {
+                    return Image.network(
+                      "https://images.unsplash.com/photo-1547934045-2942d193cb49",
+                      fit: BoxFit.cover,
+                    );
+                  },
                 ),
               ),
             if (badges.isNotEmpty)
@@ -139,10 +166,7 @@ class _FeatureBadge extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: BookingColors.yellow400,
-        borderRadius: BorderRadius.circular(999),
-      ),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(999)),
       child: Text(
         label,
         style: BookingTextStyles.cardSubtitle.copyWith(

@@ -5,16 +5,77 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import '../models/availability.dart';
 import '../models/booking.dart';
 import '../models/playing_field.dart';
+import '../models/paginated_fields_response.dart';
 
 class BookingService {
   BookingService(this.request, {this.baseUrl = 'http://localhost:8000'});
   final CookieRequest request;
   final String baseUrl;
 
-  Future<List<PlayingField>> fetchFields() async {
-    final response = await request.get('$baseUrl/booking/api/fields/');
-    final data = (response is Map && response['data'] != null) ? response['data'] : response;
-    return List<PlayingField>.from((data as List).map((e) => PlayingField.fromJson(e)));
+  Future<List<PlayingField>> fetchFields({
+    String? search,
+    String? city,
+    double? priceMin,
+    double? priceMax,
+    bool? hasLights,
+    bool? hasBackboard,
+    String? sort,
+  }) async {
+    final queryParams = <String, String>{};
+
+    if (search != null && search.isNotEmpty) queryParams['search'] = search;
+    if (city != null && city.isNotEmpty) queryParams['city'] = city;
+    if (priceMin != null) queryParams['price_min'] = priceMin.toString();
+    if (priceMax != null) queryParams['price_max'] = priceMax.toString();
+    if (hasLights == true) queryParams['has_lights'] = 'true';
+    if (hasBackboard == true) queryParams['has_backboard'] = 'true';
+    if (sort != null && sort.isNotEmpty) queryParams['sort'] = sort;
+
+    final queryString = queryParams.isNotEmpty
+        ? '?${queryParams.entries.map((e) => '${e.key}=${Uri.encodeComponent(e.value)}').join('&')}'
+        : '';
+
+    final response = await request.get(
+      '$baseUrl/booking/api/fields/$queryString',
+    );
+    final data = (response is Map && response['data'] != null)
+        ? response['data']
+        : response;
+    return List<PlayingField>.from(
+      (data as List).map((e) => PlayingField.fromJson(e)),
+    );
+  }
+
+  Future<PaginatedFieldsResponse> fetchFieldsPaginated({
+    String? search,
+    String? city,
+    double? priceMin,
+    double? priceMax,
+    bool? hasLights,
+    bool? hasBackboard,
+    String? sort,
+    int page = 1,
+    int pageSize = 20,
+  }) async {
+    final queryParams = <String, String>{};
+
+    if (search != null && search.isNotEmpty) queryParams['search'] = search;
+    if (city != null && city.isNotEmpty) queryParams['city'] = city;
+    if (priceMin != null) queryParams['price_min'] = priceMin.toString();
+    if (priceMax != null) queryParams['price_max'] = priceMax.toString();
+    if (hasLights == true) queryParams['has_lights'] = 'true';
+    if (hasBackboard == true) queryParams['has_backboard'] = 'true';
+    if (sort != null && sort.isNotEmpty) queryParams['sort'] = sort;
+
+    queryParams['page'] = page.toString();
+    queryParams['page_size'] = pageSize.toString();
+
+    final queryString = queryParams.isNotEmpty
+        ? '?${queryParams.entries.map((e) => '${e.key}=${Uri.encodeComponent(e.value)}').join('&')}'
+        : '';
+
+    final response = await request.get('$baseUrl/booking/api/fields/$queryString');
+    return PaginatedFieldsResponse.fromJson(response as Map<String, dynamic>);
   }
 
   Future<AvailabilityResponse> checkAvailability({
@@ -26,7 +87,8 @@ class BookingService {
   }) async {
     final endParam = endTime != null ? '&end_time=$endTime' : '';
     final response = await request.get(
-        '$baseUrl/booking/api/availability/?field_id=$fieldId&date=$date&start_time=$startTime&duration_hours=$durationHours$endParam');
+      '$baseUrl/booking/api/availability/?field_id=$fieldId&date=$date&start_time=$startTime&duration_hours=$durationHours$endParam',
+    );
     return AvailabilityResponse.fromJson(response as Map<String, dynamic>);
   }
 
@@ -52,8 +114,10 @@ class BookingService {
       "booker_email": bookerEmail ?? "",
       "notes": notes ?? "",
     };
-    // Send as JSON string to avoid bodyFields/content-type conflicts inside CookieRequest
-    final response = await request.postJson('$baseUrl/booking/api/book/', jsonEncode(payload));
+    final response = await request.postJson(
+      '$baseUrl/booking/api/book/',
+      jsonEncode(payload),
+    );
     if (response is Map && response['status'] == 'success') {
       return Booking.fromJson(response['data']);
     }
@@ -65,7 +129,9 @@ class BookingService {
 
   Future<List<Booking>> fetchMyBookings() async {
     final response = await request.get('$baseUrl/booking/api/my-bookings/');
-    final data = (response is Map && response['data'] != null) ? response['data'] : response;
+    final data = (response is Map && response['data'] != null)
+        ? response['data']
+        : response;
     return List<Booking>.from((data as List).map((e) => Booking.fromJson(e)));
   }
 
@@ -73,22 +139,28 @@ class BookingService {
     required int bookingId,
     required File file,
   }) async {
-    final uri = Uri.parse('$baseUrl/booking/api/bookings/$bookingId/upload-proof/');
+    final uri = Uri.parse(
+      '$baseUrl/booking/api/bookings/$bookingId/upload-proof/',
+    );
     final req = http.MultipartRequest('POST', uri);
-    // Only send cookie/CSRF; never send content-type
     final cookie = request.headers['Cookie'] ?? request.headers['cookie'];
-    final csrf = request.headers['X-CSRFToken'] ?? request.headers['x-csrftoken'];
+    final csrf =
+        request.headers['X-CSRFToken'] ?? request.headers['x-csrftoken'];
     if (cookie != null && cookie.isNotEmpty) {
       req.headers['Cookie'] = cookie;
     }
     if (csrf != null && csrf.isNotEmpty) {
       req.headers['X-CSRFToken'] = csrf;
     }
-    req.files.add(await http.MultipartFile.fromPath('payment_proof', file.path));
+    req.files.add(
+      await http.MultipartFile.fromPath('payment_proof', file.path),
+    );
     final streamed = await req.send();
     final resp = await http.Response.fromStream(streamed);
     final parsed = jsonDecode(resp.body);
-    if (!(resp.statusCode >= 200 && resp.statusCode < 300 && parsed['status'] == 'success')) {
+    if (!(resp.statusCode >= 200 &&
+        resp.statusCode < 300 &&
+        parsed['status'] == 'success')) {
       throw Exception(parsed['message'] ?? 'Upload failed');
     }
   }
@@ -97,19 +169,30 @@ class BookingService {
   Future<List<PlayingField>> adminFetchFields() async {
     final resp = await request.get('$baseUrl/booking/api/admin/fields/');
     final data = (resp is Map && resp['data'] != null) ? resp['data'] : [];
-    return List<PlayingField>.from((data as List).map((e) => PlayingField.fromJson(e)));
+    return List<PlayingField>.from(
+      (data as List).map((e) => PlayingField.fromJson(e)),
+    );
   }
 
   Future<PlayingField> adminCreateField(Map<String, String> payload) async {
-    final resp = await request.post('$baseUrl/booking/api/admin/fields/create/', payload);
+    final resp = await request.post(
+      '$baseUrl/booking/api/admin/fields/create/',
+      payload,
+    );
     if (resp is Map && resp['status'] == 'success') {
       return PlayingField.fromJson(resp['data']);
     }
     throw Exception('Failed to create field');
   }
 
-  Future<PlayingField> adminUpdateField(int id, Map<String, String> payload) async {
-    final resp = await request.post('$baseUrl/booking/api/admin/fields/$id/update/', payload);
+  Future<PlayingField> adminUpdateField(
+    int id,
+    Map<String, String> payload,
+  ) async {
+    final resp = await request.post(
+      '$baseUrl/booking/api/admin/fields/$id/update/',
+      payload,
+    );
     if (resp is Map && resp['status'] == 'success') {
       return PlayingField.fromJson(resp['data']);
     }
@@ -117,14 +200,19 @@ class BookingService {
   }
 
   Future<void> adminDeleteField(int id) async {
-    final resp = await request.post('$baseUrl/booking/api/admin/fields/$id/delete/', {});
+    final resp = await request.post(
+      '$baseUrl/booking/api/admin/fields/$id/delete/',
+      {},
+    );
     if (!(resp is Map && resp['status'] == 'success')) {
       throw Exception('Failed to delete field');
     }
   }
 
   Future<List<Booking>> adminPendingBookings() async {
-    final resp = await request.get('$baseUrl/booking/api/admin/pending-bookings/');
+    final resp = await request.get(
+      '$baseUrl/booking/api/admin/pending-bookings/',
+    );
     final data = (resp is Map && resp['data'] != null) ? resp['data'] : [];
     return List<Booking>.from((data as List).map((e) => Booking.fromJson(e)));
   }
@@ -137,9 +225,16 @@ class BookingService {
     throw Exception('Failed to load booking');
   }
 
-  Future<Booking> adminVerifyBooking(int id, String decision, {String? notes}) async {
+  Future<Booking> adminVerifyBooking(
+    int id,
+    String decision, {
+    String? notes,
+  }) async {
     final payload = {"decision": decision, "notes": notes ?? ""};
-    final resp = await request.postJson('$baseUrl/booking/api/admin/bookings/$id/verify/', jsonEncode(payload));
+    final resp = await request.postJson(
+      '$baseUrl/booking/api/admin/bookings/$id/verify/',
+      jsonEncode(payload),
+    );
     if (resp is Map && resp['status'] == 'success') {
       return Booking.fromJson(resp['data']);
     }

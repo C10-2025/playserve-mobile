@@ -50,28 +50,17 @@ final ThemeData globalTheme = ThemeData(
       fontWeight: FontWeight.w600,
       color: Colors.grey.shade800,
     ),
-    bodyLarge: GoogleFonts.inter(
-      fontSize: 14,
-      color: Colors.grey.shade600,
-    ),
-    bodyMedium: GoogleFonts.inter(
-      fontSize: 12,
-      color: Colors.grey.shade500,
-    ),
+    bodyLarge: GoogleFonts.inter(fontSize: 14, color: Colors.grey.shade600),
+    bodyMedium: GoogleFonts.inter(fontSize: 12, color: Colors.grey.shade500),
   ),
 
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ButtonStyle(
       textStyle: WidgetStateProperty.all(
-        GoogleFonts.inter(
-          fontWeight: FontWeight.w700,
-          fontSize: 16,
-        ),
+        GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 16),
       ),
       shape: WidgetStateProperty.all(
-        RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       minimumSize: WidgetStateProperty.all(const Size(double.infinity, 55)),
     ),
@@ -80,10 +69,7 @@ final ThemeData globalTheme = ThemeData(
   inputDecorationTheme: InputDecorationTheme(
     filled: true,
     fillColor: Colors.white,
-    hintStyle: const TextStyle(
-      color: greyHint,
-      fontSize: 16,
-    ),
+    hintStyle: const TextStyle(color: greyHint, fontSize: 16),
     prefixIconColor: Colors.white,
     contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
     enabledBorder: OutlineInputBorder(
@@ -112,11 +98,7 @@ class LimeButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
 
-  const LimeButton({
-    super.key,
-    required this.text,
-    required this.onPressed,
-  });
+  const LimeButton({super.key, required this.text, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -124,14 +106,9 @@ class LimeButton extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         backgroundColor: limegreen,
         foregroundColor: blue1,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         minimumSize: const Size(double.infinity, 55),
-        textStyle: GoogleFonts.inter(
-          fontSize: 16,
-          fontWeight: FontWeight.w700,
-        ),
+        textStyle: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700),
       ),
       onPressed: onPressed,
       child: Text(text),
@@ -143,11 +120,7 @@ class BlueButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
 
-  const BlueButton({
-    super.key,
-    required this.text,
-    required this.onPressed,
-  });
+  const BlueButton({super.key, required this.text, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -155,14 +128,9 @@ class BlueButton extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         backgroundColor: blue1,
         foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         minimumSize: const Size(double.infinity, 55),
-        textStyle: GoogleFonts.inter(
-          fontSize: 16,
-          fontWeight: FontWeight.w700,
-        ),
+        textStyle: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700),
       ),
       onPressed: onPressed,
       child: Text(text),
@@ -193,10 +161,7 @@ class RoundedInputField extends StatelessWidget {
       obscureText: obscureText,
       decoration: InputDecoration(
         hintText: hintText,
-        prefixIcon: Icon(
-          icon,
-          color: getIconColor(isWhite: whiteIcon),
-        ),
+        prefixIcon: Icon(icon, color: getIconColor(isWhite: whiteIcon)),
       ),
     );
   }

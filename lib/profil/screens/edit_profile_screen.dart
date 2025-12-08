@@ -62,7 +62,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           _selectedAvatar = response["avatar"] ?? "image/avatar1.svg";
         });
 
-        // 🔹 Simpan ke SharedPreferences (cache)
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('username', response["username"]);
         await prefs.setString('instagram', response["instagram"] ?? "");
@@ -152,7 +151,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Avatar
                     CircleAvatar(
                       radius: 50,
                       backgroundImage: AssetImage(avatarPath),
@@ -187,7 +185,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     const SizedBox(height: 24),
 
-                    // Instagram Field
                     TextField(
                       controller: _instagramController,
                       style: const TextStyle(color: Colors.black),
@@ -204,7 +201,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Location dropdown
                     DropdownButtonFormField<String>(
                       value: _selectedLocation,
                       decoration: InputDecoration(
@@ -229,7 +225,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                     const SizedBox(height: 28),
 
-                    // Save Button
                     _isLoading
                         ? const CircularProgressIndicator(
                             color: Color(0xFFB8D243),
@@ -252,7 +247,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ),
                     const SizedBox(height: 16),
 
-                    // Logout Button
                     _isLoggingOut
                         ? const CircularProgressIndicator(color: blue1)
                         : ElevatedButton(

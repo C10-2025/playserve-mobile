@@ -3,6 +3,7 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:playserve_mobile/booking/models/booking.dart';
 import 'package:playserve_mobile/booking/services/booking_service.dart';
 import 'package:playserve_mobile/booking/theme.dart';
+import 'package:playserve_mobile/main_navbar_admin.dart';
 import 'package:provider/provider.dart';
 import '../config.dart';
 
@@ -130,6 +131,7 @@ class _AdminBookingDetailScreenState extends State<AdminBookingDetailScreen> {
           },
         ),
       ),
+      bottomNavigationBar: const MainNavbarAdmin(currentIndex: -1),
     );
   }
 
