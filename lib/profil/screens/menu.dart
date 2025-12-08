@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:playserve_mobile/booking/screens/field_list_screen.dart';
 
 class MyHomePage extends StatelessWidget {
   const MyHomePage({super.key});
@@ -47,6 +48,34 @@ class MyHomePage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 40),
+
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  icon: const Icon(Icons.sports_tennis, color: Color(0xFFB8D243)),
+                  label: const Text(
+                    "Go to Booking",
+                    style: TextStyle(
+                      color: Color(0xFFB8D243),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const FieldListScreen(),
+                      ),
+                    );
+                  },
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Color(0xFFB8D243)),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
 
               // Tombol logout
               ElevatedButton(

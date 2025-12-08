@@ -27,8 +27,10 @@ class _RegisterStep1PageState extends State<RegisterStep1Page> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF0C1446),
         elevation: 0,
-        title: const Text("Register - Step 1",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: const Text(
+          "Register - Step 1",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -38,7 +40,8 @@ class _RegisterStep1PageState extends State<RegisterStep1Page> {
               color: Colors.white,
               elevation: 8,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
+                borderRadius: BorderRadius.circular(16),
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
@@ -47,9 +50,10 @@ class _RegisterStep1PageState extends State<RegisterStep1Page> {
                     const Text(
                       "Create Account",
                       style: TextStyle(
-                          color: Color(0xFF0C1446),
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold),
+                        color: Color(0xFF0C1446),
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 24),
                     TextField(
@@ -86,9 +90,12 @@ class _RegisterStep1PageState extends State<RegisterStep1Page> {
                               foregroundColor: const Color(0xFF0C1446),
                               minimumSize: const Size(double.infinity, 50),
                               shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12)),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                               textStyle: const TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 16),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
                             ),
                             onPressed: () async {
                               final username = _usernameController.text.trim();
@@ -100,7 +107,8 @@ class _RegisterStep1PageState extends State<RegisterStep1Page> {
                                   password2.isEmpty) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                      content: Text("All fields must be filled.")),
+                                    content: Text("All fields must be filled."),
+                                  ),
                                 );
                                 return;
                               }
@@ -132,7 +140,9 @@ class _RegisterStep1PageState extends State<RegisterStep1Page> {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(
-                                        response["message"] ?? "Registration step 1 failed."),
+                                      response["message"] ??
+                                          "Registration step 1 failed.",
+                                    ),
                                   ),
                                 );
                               }
@@ -168,7 +178,11 @@ class _RegisterStep2PageState extends State<RegisterStep2Page> {
   ];
 
   final List<String> _kotaOptions = const [
-    'Jakarta', 'Bogor', 'Depok', 'Tangerang', 'Bekasi',
+    'Jakarta',
+    'Bogor',
+    'Depok',
+    'Tangerang',
+    'Bekasi',
   ];
 
   String _selectedAvatar = 'image/avatar1.svg';
@@ -185,8 +199,10 @@ class _RegisterStep2PageState extends State<RegisterStep2Page> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF0C1446),
         elevation: 0,
-        title: const Text("Register - Step 2",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: const Text(
+          "Register - Step 2",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -196,7 +212,8 @@ class _RegisterStep2PageState extends State<RegisterStep2Page> {
               color: Colors.white,
               elevation: 8,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20)),
+                borderRadius: BorderRadius.circular(20),
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
@@ -205,9 +222,10 @@ class _RegisterStep2PageState extends State<RegisterStep2Page> {
                     const Text(
                       "YOUR PROFILE",
                       style: TextStyle(
-                          color: Color(0xFF0C1446),
-                          fontSize: 26,
-                          fontWeight: FontWeight.bold),
+                        color: Color(0xFF0C1446),
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 10),
                     const Text(
@@ -219,9 +237,10 @@ class _RegisterStep2PageState extends State<RegisterStep2Page> {
                     const Text(
                       "Choose Your Avatar",
                       style: TextStyle(
-                          color: Color(0xFFB8D243),
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold),
+                        color: Color(0xFFB8D243),
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 12),
                     Wrap(
@@ -259,13 +278,17 @@ class _RegisterStep2PageState extends State<RegisterStep2Page> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 8),
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
                       ),
                       items: _kotaOptions
-                          .map((kota) => DropdownMenuItem(
-                                value: kota,
-                                child: Text(kota),
-                              ))
+                          .map(
+                            (kota) => DropdownMenuItem(
+                              value: kota,
+                              child: Text(kota),
+                            ),
+                          )
                           .toList(),
                       onChanged: (val) =>
                           setState(() => _selectedLocation = val),
@@ -279,29 +302,35 @@ class _RegisterStep2PageState extends State<RegisterStep2Page> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 8),
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 24),
                     _isLoading
                         ? const CircularProgressIndicator(
-                            color: Color(0xFFB8D243))
+                            color: Color(0xFFB8D243),
+                          )
                         : ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFFB8D243),
                               foregroundColor: const Color(0xFF0C1446),
                               minimumSize: const Size(double.infinity, 50),
                               shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12)),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                               textStyle: const TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 16),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
                             ),
                             onPressed: () async {
                               if (_selectedLocation == null) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                      content: Text(
-                                          "Please select a location.")),
+                                    content: Text("Please select a location."),
+                                  ),
                                 );
                                 return;
                               }
@@ -312,8 +341,7 @@ class _RegisterStep2PageState extends State<RegisterStep2Page> {
                                 jsonEncode({
                                   "username": widget.username,
                                   "lokasi": _selectedLocation!,
-                                  "instagram":
-                                      _instagramController.text.trim(),
+                                  "instagram": _instagramController.text.trim(),
                                   "avatar": _selectedAvatar,
                                 }),
                               );
@@ -323,19 +351,24 @@ class _RegisterStep2PageState extends State<RegisterStep2Page> {
                               if (response["status"] == "success") {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                      content: Text(
-                                          "Welcome, ${response['username']}!")),
+                                    content: Text(
+                                      "Welcome, ${response['username']}!",
+                                    ),
+                                  ),
                                 );
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (_) => const LoginPage()),
+                                    builder: (_) => const LoginPage(),
+                                  ),
                                 );
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                      content: Text(
-                                          response["message"] ?? "Step 2 failed.")),
+                                    content: Text(
+                                      response["message"] ?? "Step 2 failed.",
+                                    ),
+                                  ),
                                 );
                               }
                             },

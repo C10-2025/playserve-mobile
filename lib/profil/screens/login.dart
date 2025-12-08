@@ -61,7 +61,9 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16.0, vertical: 12.0),
+                        horizontal: 16.0,
+                        vertical: 12.0,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16.0),
@@ -79,7 +81,9 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16.0, vertical: 12.0),
+                        horizontal: 16.0,
+                        vertical: 12.0,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 32.0),
@@ -96,8 +100,8 @@ class _LoginPageState extends State<LoginPage> {
                             if (username.isEmpty || password.isEmpty) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                    content:
-                                        Text("Please fill in all fields.")),
+                                  content: Text("Please fill in all fields."),
+                                ),
                               );
                               return;
                             }
@@ -106,20 +110,18 @@ class _LoginPageState extends State<LoginPage> {
 
                             final response = await request.login(
                               "http://localhost:8000/auth/login/",
-                              {
-                                'username': username,
-                                'password': password,
-                              },
+                              {'username': username, 'password': password},
                             );
 
                             setState(() => _isLoading = false);
 
                             if (request.loggedIn) {
-                              String message = response['message'] ?? 'Login success!';
+                              String message =
+                                  response['message'] ?? 'Login success!';
                               String uname = response['username'] ?? username;
 
                               // Admin?
-                              bool isAdmin = response["is_admin"] ?? false; 
+                              bool isAdmin = response["is_admin"] ?? false;
                               request.jsonData["is_admin"] = isAdmin;
 
                               if (context.mounted) {
@@ -134,13 +136,13 @@ class _LoginPageState extends State<LoginPage> {
                                   ..hideCurrentSnackBar()
                                   ..showSnackBar(
                                     SnackBar(
-                                      backgroundColor:
-                                          const Color(0xFFB8D243),
+                                      backgroundColor: const Color(0xFFB8D243),
                                       content: Text(
                                         "$message Welcome, $uname.",
                                         style: const TextStyle(
-                                            color: Color(0xFF0C1446),
-                                            fontWeight: FontWeight.bold),
+                                          color: Color(0xFF0C1446),
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
                                   );
@@ -157,25 +159,27 @@ class _LoginPageState extends State<LoginPage> {
                                     title: const Text(
                                       'Login Failed',
                                       style: TextStyle(
-                                          color: Color(0xFF0C1446),
-                                          fontWeight: FontWeight.bold),
+                                        color: Color(0xFF0C1446),
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                     content: Text(
                                       response['message'] ??
                                           'Invalid username or password.',
                                       style: const TextStyle(
-                                          color: Color(0xFF0C1446)),
+                                        color: Color(0xFF0C1446),
+                                      ),
                                     ),
                                     actions: [
                                       TextButton(
                                         child: const Text(
                                           'OK',
                                           style: TextStyle(
-                                              color: Color(0xFFB8D243),
-                                              fontWeight: FontWeight.bold),
+                                            color: Color(0xFFB8D243),
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
-                                        onPressed: () =>
-                                            Navigator.pop(context),
+                                        onPressed: () => Navigator.pop(context),
                                       ),
                                     ],
                                   ),
@@ -197,6 +201,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           child: const Text('LOGIN'),
                         ),
+                  const SizedBox(height: 12.0),
                   const SizedBox(height: 36.0),
 
                   GestureDetector(
