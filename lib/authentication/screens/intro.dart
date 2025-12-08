@@ -17,7 +17,6 @@ class IntroPage1 extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // 🔹 Logo di atas
                 Image.asset(
                   'assets/image/logo2.png',
                   width: 180,
@@ -25,7 +24,6 @@ class IntroPage1 extends StatelessWidget {
                 ),
                 const SizedBox(height: 30),
 
-                // 🎾 Ilustrasi utama
                 Image.asset(
                   'assets/image/intro1.png',
                   width: 240,
@@ -33,7 +31,6 @@ class IntroPage1 extends StatelessWidget {
                 ),
                 const SizedBox(height: 30),
 
-                // 📝 Teks deskripsi
                 Text(
                   "Finding a game has never been this easy or this fast. Simply find a player, book the court, and get playing.",
                   textAlign: TextAlign.center,
@@ -45,7 +42,6 @@ class IntroPage1 extends StatelessWidget {
                 ),
                 const SizedBox(height: 40),
 
-                // 🔘 Tombol Next
                 Align(
                   alignment: Alignment.bottomRight,
                   child: GestureDetector(
@@ -98,7 +94,6 @@ class IntroPage2 extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // 🔹 Logo di atas
                 Image.asset(
                   'assets/image/logo2.png',
                   width: 180,
@@ -106,7 +101,6 @@ class IntroPage2 extends StatelessWidget {
                 ),
                 const SizedBox(height: 30),
 
-                // 🗣️ Ilustrasi utama
                 Image.asset(
                   'assets/image/intro2.png',
                   width: 260,
@@ -114,7 +108,6 @@ class IntroPage2 extends StatelessWidget {
                 ),
                 const SizedBox(height: 30),
 
-                // 📝 Teks deskripsi
                 Text(
                   "Connect with the right players, join conversations exclusive to your favorite courts, and discover local groups to keep the rally going.",
                   textAlign: TextAlign.center,
@@ -126,7 +119,6 @@ class IntroPage2 extends StatelessWidget {
                 ),
                 const SizedBox(height: 40),
 
-                // 🔘 Tombol Next ke Login
                 Align(
                   alignment: Alignment.bottomRight,
                   child: GestureDetector(

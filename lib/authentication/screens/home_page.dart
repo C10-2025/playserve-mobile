@@ -22,7 +22,6 @@ class HomePage extends StatelessWidget {
                   const ProfileHeader(),
                   const SizedBox(height: 24),
 
-                  // 🎾 Slogan section
                   Center(
                     child: Column(
                       children: [
@@ -48,7 +47,6 @@ class HomePage extends StatelessWidget {
 
                   const SizedBox(height: 28),
 
-                  // 🔹 Feature buttons (Match, Booking, Review, Community)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -73,7 +71,6 @@ class HomePage extends StatelessWidget {
 
                   const SizedBox(height: 24),
 
-                  // 🟩 Limegreen box section
                   Container(
                     height: 80,
                     width: double.infinity,
@@ -85,7 +82,6 @@ class HomePage extends StatelessWidget {
 
                   const SizedBox(height: 24),
 
-                  // ⚡ Popular Courts
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -106,7 +102,6 @@ class HomePage extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
 
-                  // Card placeholders
                   for (int i = 0; i < 3; i++)
                     Container(
                       height: 80,
@@ -124,7 +119,6 @@ class HomePage extends StatelessWidget {
           ),
         ),
 
-        // 🔻 Pakai navbar yang udah dibuat
         bottomNavigationBar: const MainNavbar(currentIndex: 0),
       ),
     );

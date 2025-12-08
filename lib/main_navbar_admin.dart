@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:playserve_mobile/authentication/screens/home_page_admin.dart';
+import 'package:playserve_mobile/profil/screens/delete_profile.dart';
 
 class MainNavbarAdmin extends StatelessWidget {
   final int currentIndex;
@@ -28,26 +29,26 @@ class MainNavbarAdmin extends StatelessWidget {
             _buildNavItem(
               context,
               index: 1,
-              icon: LucideIcons.users, // 👥 untuk manage users
-              // page: const ManageUsersPage(),
+              icon: LucideIcons.users,
+              page: const DeleteProfilePage(),
             ),
             _buildNavItem(
               context,
               index: 2,
               icon: LucideIcons.messageSquare,
-              // page: const CommunityPage(),
+             
             ),
             _buildNavItem(
               context,
               index: 3,
-              icon: LucideIcons.calendar, // 🔁 Ganti 'calendarEdit'
-              // page: const BookingPage(),
+              icon: LucideIcons.calendar, 
+             
             ),
             _buildNavItem(
               context,
               index: 4,
               icon: LucideIcons.star,
-              // page: const FavoritesPage(),
+              
             ),
           ],
         ),
