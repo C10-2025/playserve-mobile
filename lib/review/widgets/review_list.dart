@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 
-import 'package:playserve_mobile/review/models/playing_field_item.dart'; // PlayingFieldItem
+import 'package:playserve_mobile/booking/models/playing_field.dart'; // <-- updated model import
 import 'package:playserve_mobile/review/models/review_item.dart'; // ReviewItemNew
 
 import 'package:playserve_mobile/review/widgets/review_card.dart';
@@ -20,7 +20,7 @@ class ReviewList extends StatefulWidget {
 
 class _ReviewListState extends State<ReviewList> {
   // Data Holders (Note that the _fetchAll() function is void due to this field being init first)
-  List<PlayingFieldItem> _fields = [];
+  List<PlayingField> _fields = [];
   List<ReviewItemNew> _reviews = [];
 
   // Loading / error state
@@ -32,8 +32,8 @@ class _ReviewListState extends State<ReviewList> {
   String _searchQuery = "";
 
   // ENDPOINTS
-  static const String _fieldsUrl = 'http://localhost:8000/booking/json/';
-  static const String _reviewsUrl = 'http://localhost:8000/review/json/';
+  static const String _fieldsUrl = 'http://127.0.0.1:8000/booking/json/';
+  static const String _reviewsUrl = 'http://127.0.0.1:8000/review/json/';
 
   @override
   void initState() {
@@ -50,7 +50,7 @@ class _ReviewListState extends State<ReviewList> {
     });
 
     try {
-      final request = context.read<CookieRequest>(); 
+      final request = context.read<CookieRequest>();
 
       final resp = await Future.wait([
         request.get(_fieldsUrl),
@@ -69,8 +69,8 @@ class _ReviewListState extends State<ReviewList> {
           : reviewsData;
 
       _fields = parsedFields
-          .map<PlayingFieldItem>(
-            (d) => PlayingFieldItem.fromJson(Map<String, dynamic>.from(d)),
+          .map<PlayingField>(
+            (d) => PlayingField.fromJson(Map<String, dynamic>.from(d)),
           )
           .toList();
       _applySorting(); // Sort the fields immediately
@@ -100,12 +100,13 @@ class _ReviewListState extends State<ReviewList> {
 
     setState(() {
       _reviews = parsed
-          .map<ReviewItemNew>((d) => ReviewItemNew.fromJson(Map<String, dynamic>.from(d)))
+          .map<ReviewItemNew>(
+            (d) => ReviewItemNew.fromJson(Map<String, dynamic>.from(d)),
+          )
           .toList();
     });
     _applySorting(); // immediately re-sort reviews after this
   }
-
 
   // === HELPERS ===
   // Get reviews for a field by name
@@ -147,13 +148,13 @@ class _ReviewListState extends State<ReviewList> {
   }
 
   // Get filtered list
-  List<PlayingFieldItem> get _filteredFields {
+  List<PlayingField> get _filteredFields {
     final lower = _searchQuery.toLowerCase();
 
     return _fields.where((f) {
       return f.name.toLowerCase().contains(lower) ||
           f.address.toLowerCase().contains(lower) ||
-          f.city.name.toLowerCase().contains(lower);
+          f.city.toLowerCase().contains(lower);
     }).toList();
   }
 
@@ -162,7 +163,7 @@ class _ReviewListState extends State<ReviewList> {
     final request = context.read<CookieRequest>();
 
     try {
-      final url = "http://localhost:8000/review/add-review-flutter/";
+      final url = "http://127.0.0.1:8000/review/add-review-flutter/";
 
       final response = await request.postJson(
         url,
@@ -174,37 +175,29 @@ class _ReviewListState extends State<ReviewList> {
       );
 
       if (response["status"] == "success") {
-
         // Refresh reviews from Django and re-sort after posting
         await _refreshReviews();
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Review successfully submitted!"),
-            ),
+            const SnackBar(content: Text("Review successfully submitted!")),
           );
         }
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Failed to submit review."),
-            ),
+            const SnackBar(content: Text("Failed to submit review.")),
           );
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Error occurred: $e"),
-          ),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Error occurred: $e")));
       }
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -351,14 +344,20 @@ class _ReviewListState extends State<ReviewList> {
                                 builder: (_) => AddReviewModal(
                                   courtName: field.name,
                                   onSubmit: (rating, comment) async {
-                                    await _addReview(field.name, rating, comment);
+                                    await _addReview(
+                                      field.name,
+                                      rating,
+                                      comment,
+                                    );
                                   },
                                 ),
                               );
                             },
 
                             onViewComments: () {
-                              final relatedReviews = _reviewsForField(field.name);
+                              final relatedReviews = _reviewsForField(
+                                field.name,
+                              );
 
                               showDialog(
                                 context: context,
@@ -368,7 +367,8 @@ class _ReviewListState extends State<ReviewList> {
                                   address: field.address,
                                   pricePerHour: field.pricePerHour,
                                   reviews: relatedReviews,
-                                  isAdmin: request.jsonData["is_admin"] ?? false,
+                                  isAdmin:
+                                      request.jsonData["is_admin"] ?? false,
                                   onRefresh: () {
                                     // call refresh of review_list
                                     _refreshReviews();

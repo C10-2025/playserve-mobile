@@ -7,7 +7,7 @@ import 'package:playserve_mobile/review/models/review_item.dart';
 class ViewCommentsModal extends StatelessWidget {
   final String courtName;
   final String address;
-  final int pricePerHour;
+  final double pricePerHour;
   final List<ReviewItemNew> reviews;
   final bool isAdmin;
   final VoidCallback onRefresh;
@@ -50,7 +50,7 @@ class ViewCommentsModal extends StatelessWidget {
     // Send delete request to backend if confirmed
     if (confirm != true) return;
 
-    const url = "http://localhost:8000/review/delete-review-flutter/";
+    const url = "http://127.0.0.1:8000/review/delete-review-flutter/";
 
     // NOTE: best practice is to add a content type header, but json.loads()
     // Work regardless of content type

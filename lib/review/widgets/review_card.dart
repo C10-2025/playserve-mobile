@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:playserve_mobile/review/models/playing_field_item.dart';
+import 'package:playserve_mobile/booking/models/playing_field.dart';
 import 'package:playserve_mobile/review/models/review_item.dart';
 
 class ReviewCard extends StatelessWidget {
-  final PlayingFieldItem field;
+  final PlayingField field;
   final List<ReviewItemNew> allReviews;
   final VoidCallback onAddReview;
   final VoidCallback onViewComments;
@@ -22,8 +22,9 @@ class ReviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final relatedReviews =
-        allReviews.where((r) => r.fieldName == field.name).toList();
+    final relatedReviews = allReviews
+        .where((r) => r.fieldName == field.name)
+        .toList();
     final latest = relatedReviews.take(2).toList();
 
     final width = MediaQuery.of(context).size.width;
@@ -46,7 +47,6 @@ class ReviewCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
           // ================== TOP ROW ==================
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -165,7 +165,8 @@ class ReviewCard extends StatelessWidget {
                         (r) => Padding(
                           padding: const EdgeInsets.only(bottom: 6),
                           child: Text(
-                            "★" * r.rating + "☆" * (5 - r.rating) +
+                            "★" * r.rating +
+                                "☆" * (5 - r.rating) +
                                 " — ${r.username}: ${r.comment}",
                             style: const TextStyle(fontSize: 13),
                           ),
@@ -183,7 +184,7 @@ class ReviewCard extends StatelessWidget {
   Widget _buildImage(bool isSmall) {
     final size = isSmall ? 60.0 : 80.0;
 
-    if (field.imageUrl.isEmpty) {
+    if (field.imageUrl == null || field.imageUrl!.isEmpty) {
       return Container(
         width: size,
         height: size,
@@ -197,7 +198,7 @@ class ReviewCard extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: Image.network(
-        field.imageUrl, // NOTE: only works for certain domains which allow direct taking from frontends
+        field.imageUrl!, // null-safe use
         width: size,
         height: size,
         fit: BoxFit.cover,
