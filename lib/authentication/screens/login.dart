@@ -109,6 +109,7 @@ class _LoginPageState extends State<LoginPage> {
 
                             if (context.mounted) {
                               final bool isAdmin = adminCheck["is_admin"] ?? false;
+                              request.jsonData["is_admin"] = response["is_admin"]; // TODO:check effect
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
