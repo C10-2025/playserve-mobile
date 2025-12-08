@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:playserve_mobile/review/widgets/review_list.dart';
-import 'package:playserve_mobile/main_navbar.dart'; 
+import 'package:playserve_mobile/main_navbar.dart';
 
 class ReviewPage extends StatefulWidget {
   const ReviewPage({super.key});
@@ -18,9 +18,7 @@ class _ReviewPageState extends State<ReviewPage> {
         children: [
           // Background
           Container(
-            decoration: const BoxDecoration(
-              color: Color(0xFF1A2B4C),
-            ),
+            decoration: const BoxDecoration(color: Color(0xFF1A2B4C)),
             child: SafeArea(
               top: true,
               child: Column(

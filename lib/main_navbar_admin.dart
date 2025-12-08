@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:playserve_mobile/authentication/screens/home_page_admin.dart';
 import 'package:playserve_mobile/booking/screens/admin_field_list_screen.dart';
-import 'package:playserve_mobile/booking/screens/admin_pending_bookings_screen.dart';
+// import 'package:playserve_mobile/booking/screens/admin_pending_bookings_screen.dart';
 import 'package:playserve_mobile/profil/screens/delete_profile.dart';
 import 'package:playserve_mobile/community/screen/discover_communities_page.dart';
+import 'package:playserve_mobile/review/screens/review_page.dart';
 
 class MainNavbarAdmin extends StatelessWidget {
   final int currentIndex;
@@ -42,8 +43,8 @@ class MainNavbarAdmin extends StatelessWidget {
             _buildNavItem(
               context,
               index: 3,
-              icon: LucideIcons.creditCard,
-              page: const AdminPendingBookingsScreen(),
+              icon: LucideIcons.star,
+              page: const ReviewPage(),
             ),
             _buildNavItem(
               context,
