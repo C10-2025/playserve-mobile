@@ -363,7 +363,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
   // ✅ navbar conditional (tanpa ubah bagian lain)
   Widget _buildBottomNav() {
     return _isAdminFlag
-        ? const MainNavbarAdmin(currentIndex: 2) // sesuaikan kalau index admin beda
+        ? const MainNavbarAdmin(currentIndex: 4) // sesuaikan kalau index admin beda
         : const MainNavbar(currentIndex: 1);
   }
 

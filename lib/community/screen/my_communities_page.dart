@@ -58,7 +58,7 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
   // ✅ navbar conditional (tanpa ubah yang lain)
   Widget _buildBottomNav() {
     return _isAdminFlag
-        ? const MainNavbarAdmin(currentIndex: 2) // sesuaikan index admin kalau beda
+        ? const MainNavbarAdmin(currentIndex: 4) // sesuaikan index admin kalau beda
         : const MainNavbar(currentIndex: 1);
   }
 
