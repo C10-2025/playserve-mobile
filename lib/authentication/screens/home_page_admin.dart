@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:playserve_mobile/booking/screens/admin_field_list_screen.dart';
+import 'package:playserve_mobile/booking/screens/admin_pending_bookings_screen.dart';
 import 'package:playserve_mobile/community/screen/discover_communities_page.dart';
 import 'package:playserve_mobile/review/screens/review_page.dart';
 import 'package:provider/provider.dart';
@@ -35,6 +36,7 @@ class _HomePageAdminState extends State<HomePageAdmin> {
               children: [
                 const SizedBox(height: 24),
 
+                // --- HEADER SECTION (STACK) ---
                 Stack(
                   alignment: Alignment.center,
                   children: [
@@ -134,6 +136,34 @@ class _HomePageAdminState extends State<HomePageAdmin> {
 
                       const SizedBox(height: 40),
 
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Payment Processes",
+                            style: GoogleFonts.inter(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 18,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const AdminPendingBookingsScreen()),
+                              );
+                            },
+                            icon: const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              size: 18,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 10),
                       // --- LOGOUT BUTTON ---
                       // Logic logout diambil dari snippet EditProfileScreen
                       _isLoggingOut
