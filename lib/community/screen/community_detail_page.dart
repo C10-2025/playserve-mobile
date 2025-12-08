@@ -8,7 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../models/post.dart';
 import 'package:playserve_mobile/main_navbar.dart';
-import 'package:playserve_mobile/main_navbar_admin.dart'; // ✅ add
+import 'package:playserve_mobile/main_navbar_admin.dart'; 
 import 'package:playserve_mobile/header.dart';
 
 class CommunityDetailPage extends StatefulWidget {
@@ -120,7 +120,6 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
     await _loadCommunity();
   }
 
-  // ===== DELETE POST =====
   Future<void> _deletePost(PostModel post) async {
     final request = context.read<CookieRequest>();
     final url = '$_baseUrl/community/api/posts/${post.id}/delete/';
@@ -157,7 +156,8 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
       barrierDismissible: false,
       builder: (ctx) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: Text(
             'Delete Post',
             style: GoogleFonts.inter(
@@ -231,7 +231,6 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
     }
   }
 
-  // ===== DELETE REPLY =====
   Future<void> _deleteReply(dynamic reply) async {
     final request = context.read<CookieRequest>();
     final url = '$_baseUrl/community/api/replies/${reply.id}/delete/';
@@ -268,7 +267,8 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
       barrierDismissible: false,
       builder: (ctx) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: Text(
             'Delete Reply',
             style: GoogleFonts.inter(
@@ -360,10 +360,10 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
     }
   }
 
-  // ✅ navbar conditional (tanpa ubah bagian lain)
   Widget _buildBottomNav() {
     return _isAdminFlag
-        ? const MainNavbarAdmin(currentIndex: 4) // sesuaikan kalau index admin beda
+        ? const MainNavbarAdmin(
+            currentIndex: 2) 
         : const MainNavbar(currentIndex: 1);
   }
 
@@ -440,7 +440,6 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
             ],
           ),
         ),
-
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           margin: const EdgeInsets.only(bottom: 20),
@@ -468,7 +467,6 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                 ),
               ),
               const SizedBox(height: 10),
-
               TextField(
                 controller: _titleController,
                 decoration: InputDecoration(
@@ -481,12 +479,13 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide(color: Colors.grey.shade300),
                   ),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                 ),
               ),
               const SizedBox(height: 8),
-
               TextField(
                 controller: _contentController,
                 minLines: 3,
@@ -501,12 +500,13 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide(color: Colors.grey.shade300),
                   ),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                 ),
               ),
               const SizedBox(height: 10),
-
               Align(
                 alignment: Alignment.centerRight,
                 child: ElevatedButton(
@@ -514,8 +514,10 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFC1D752),
                     foregroundColor: const Color(0xFF111827),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 8,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -533,10 +535,8 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
             ],
           ),
         ),
-
         Divider(color: Colors.grey.shade700, thickness: 1),
         const SizedBox(height: 12),
-
         Text(
           'Community Discussions',
           textAlign: kIsWeb ? TextAlign.left : TextAlign.center,
@@ -651,7 +651,6 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
               ],
             ),
           ),
-
           Container(
             width: double.infinity,
             decoration: BoxDecoration(
@@ -759,7 +758,6 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                     }).toList(),
                   ),
           ),
-
           _ReplyBox(
             onSubmit: (text) => _createReply(post, text),
           ),
@@ -770,11 +768,11 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isAdmin = _isAdminFlag; // ✅ ini yang kurang
+    final isAdmin = _isAdminFlag;
 
     return Scaffold(
       backgroundColor: const Color(0xFF1E3A8A),
-      bottomNavigationBar: _buildBottomNav(), // ✅ ganti ini aja
+      bottomNavigationBar: _buildBottomNav(),
       body: Stack(
         children: [
           Positioned.fill(
@@ -794,7 +792,6 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                   ),
                   const SizedBox(height: 12),
                 ],
-
                 Expanded(
                   child: FutureBuilder<void>(
                     future: _futureLoad,
@@ -822,74 +819,73 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                         child: Center(
                           child: ConstrainedBox(
                             constraints: const BoxConstraints(maxWidth: 900),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Flexible(
-                                  flex: 0,
-                                  child: SingleChildScrollView(
-                                    physics: const ClampingScrollPhysics(),
-                                    child: _buildTopSection(),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: _posts.isEmpty
-                                      ? Center(
-                                          child: Container(
-                                            margin: const EdgeInsets.only(top: 8),
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 24,
-                                              vertical: 32,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius: BorderRadius.circular(20),
-                                              border: Border.all(
-                                                color: Colors.grey.withOpacity(0.3),
-                                              ),
-                                              boxShadow: const [
-                                                BoxShadow(
-                                                  color: Colors.black12,
-                                                  blurRadius: 12,
-                                                  offset: Offset(0, 6),
-                                                ),
-                                              ],
-                                            ),
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Text(
-                                                  'Be the first to start a discussion!',
-                                                  style: GoogleFonts.inter(
-                                                    fontSize: 18,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.black87,
-                                                  ),
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                                const SizedBox(height: 8),
-                                                Text(
-                                                  'No posts yet — share your thoughts using the form above.',
-                                                  style: GoogleFonts.inter(
-                                                    color: Colors.grey.shade600,
-                                                  ),
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                              ],
-                                            ),
+                            child: _posts.isEmpty
+                                ? ListView(
+                                    physics:
+                                        const AlwaysScrollableScrollPhysics(),
+                                    children: [
+                                      _buildTopSection(),
+                                      Center(
+                                        child: Container(
+                                          margin:
+                                              const EdgeInsets.only(top: 8),
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 24,
+                                            vertical: 32,
                                           ),
-                                        )
-                                      : ListView.builder(
-                                          physics: const AlwaysScrollableScrollPhysics(),
-                                          itemCount: _posts.length,
-                                          itemBuilder: (context, index) {
-                                            final post = _posts[index];
-                                            return _buildPostCard(post);
-                                          },
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                            border: Border.all(
+                                              color: Colors.grey
+                                                  .withOpacity(0.3),
+                                            ),
+                                            boxShadow: const [
+                                              BoxShadow(
+                                                color: Colors.black12,
+                                                blurRadius: 12,
+                                                offset: Offset(0, 6),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                'Be the first to start a discussion!',
+                                                style: GoogleFonts.inter(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.black87,
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                              const SizedBox(height: 8),
+                                              Text(
+                                                'No posts yet — share your thoughts using the form above.',
+                                                style: GoogleFonts.inter(
+                                                  color:
+                                                      Colors.grey.shade600,
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                ),
-                              ],
-                            ),
+                                      ),
+                                    ],
+                                  )
+                                : ListView.builder(
+                                    physics:
+                                        const AlwaysScrollableScrollPhysics(),
+                                    itemCount: _posts.length + 1,
+                                    itemBuilder: (context, index) {
+                                      if (index == 0) return _buildTopSection();
+                                      final post = _posts[index - 1];
+                                      return _buildPostCard(post);
+                                    },
+                                  ),
                           ),
                         ),
                       );

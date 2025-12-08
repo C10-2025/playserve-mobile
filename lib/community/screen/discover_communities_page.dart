@@ -11,7 +11,6 @@ import '../widgets/community_card.dart';
 import 'community_detail_page.dart';
 import 'my_communities_page.dart';
 
-// ✅ dua navbar
 import 'package:playserve_mobile/main_navbar.dart';
 import 'package:playserve_mobile/main_navbar_admin.dart';
 
@@ -71,11 +70,10 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
     super.dispose();
   }
 
-  // ✅ navbar conditional
   Widget _buildBottomNav() {
     return _isAdminFlag
-        ? const MainNavbarAdmin(currentIndex: 4)
-        : const MainNavbar(currentIndex: 1); // sesuaikan index user kalau perlu
+        ? const MainNavbarAdmin(currentIndex: 2)
+        : const MainNavbar(currentIndex: 1);
   }
 
   Future<void> _openEditCommunityDialog(Community community) async {
@@ -609,7 +607,7 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
 
     return Scaffold(
       backgroundColor: const Color(0xFF1E3A8A),
-      bottomNavigationBar: _buildBottomNav(), // ✅ ini kuncinya
+      bottomNavigationBar: _buildBottomNav(), 
       body: Stack(
         children: [
           Positioned.fill(
@@ -630,8 +628,6 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                   const SizedBox(height: 12),
                 ],
 
-
-                // ===== Header atas (judul besar + tombol FIX sampingan) =====
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
                   child: Column(
@@ -714,7 +710,6 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                   ),
                 ),
 
-                // ===== Container biru: header FIXED, scroll cuma grid =====
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),

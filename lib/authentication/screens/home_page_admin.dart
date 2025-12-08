@@ -1,17 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:playserve_mobile/booking/screens/admin_field_list_screen.dart';
 import 'package:playserve_mobile/community/screen/discover_communities_page.dart';
+import 'package:playserve_mobile/review/screens/review_page.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:playserve_mobile/global_theme.dart'; 
 import 'package:playserve_mobile/main_navbar_admin.dart';
 import 'package:playserve_mobile/profil/screens/delete_profile.dart';
-import 'package:playserve_mobile/review/screens/review_page.dart';
+import 'package:playserve_mobile/authentication/screens/login.dart';
 
-class HomePageAdmin extends StatelessWidget {
+class HomePageAdmin extends StatefulWidget {
   const HomePageAdmin({super.key});
 
   @override
+  State<HomePageAdmin> createState() => _HomePageAdminState();
+}
+
+class _HomePageAdminState extends State<HomePageAdmin> {
+  bool _isLoggingOut = false;
+
+  @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+
     return GradientBackground( 
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -67,6 +80,7 @@ class HomePageAdmin extends StatelessWidget {
 
                 const SizedBox(height: 28),
 
+                // --- FEATURE BUTTONS ---
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
@@ -118,60 +132,53 @@ class HomePageAdmin extends StatelessWidget {
                         ],
                       ),
 
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 40),
 
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Payment Processes",
-                            style: GoogleFonts.inter(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 18,
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              Navigator.pushNamed(context, '/admin/payments');
-                            },
-                            icon: const Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              size: 18,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 10),
-
-                      for (int i = 0; i < 3; i++)
-                        Container(
-                          height: 80,
-                          margin: const EdgeInsets.only(bottom: 12),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.9),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Center(
-                            child: ListTile(
-                              leading: CircleAvatar(
-                                backgroundColor: blue1.withOpacity(0.1),
-                                child: const Icon(Icons.payment, color: blue1),
+                      // --- LOGOUT BUTTON ---
+                      // Logic logout diambil dari snippet EditProfileScreen
+                      _isLoggingOut
+                          ? const CircularProgressIndicator(color: limegreen)
+                          : ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: limegreen, // Tombol Hijau
+                                foregroundColor: blue1, // Teks Biru Gelap
+                                minimumSize: const Size(double.infinity, 50),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                textStyle: GoogleFonts.inter(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 16,
+                                ),
                               ),
-                              title: Text(
-                                // TODO BOOKING
-                                "Transaction #${1001 + i}",
-                                style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: blue1),
-                              ),
-                              subtitle: Text("Pending confirmation", style: GoogleFonts.inter(fontSize: 12)),
-                              trailing: const Text("\$ 50.00", style: TextStyle(fontWeight: FontWeight.bold)),
-                            ),
-                          ),
-                        ),
+                              onPressed: () async {
+                                setState(() => _isLoggingOut = true);
+                                
+                                // 1. Panggil API Logout Django
+                                try {
+                                  await request.get('http://127.0.0.1:8000/auth/logout/');
+                                } catch (e) {
+                                  debugPrint("Logout API error: $e");
+                                }
 
-                      const SizedBox(height: 80),
+                                // 2. Bersihkan Shared Preferences
+                                final prefs = await SharedPreferences.getInstance();
+                                await prefs.clear();
+
+                                // 3. Navigasi kembali ke Login Page
+                                if (context.mounted) {
+                                  Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const LoginPage()),
+                                    (route) => false,
+                                  );
+                                }
+                              },
+                              child: const Text("LOGOUT"),
+                            ),
+                      
+                      const SizedBox(height: 40),
                     ],
                   ),
                 ),

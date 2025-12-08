@@ -4,20 +4,10 @@ import '../models/community.dart';
 
 class CommunityCard extends StatelessWidget {
   final Community community;
-
-  /// buka detail community
   final VoidCallback? onTap;
-
-  /// join komunitas
   final Future<void> Function()? onJoin;
-
-  /// edit community (hanya untuk creator)
   final VoidCallback? onEdit;
-
-  /// delete community (hanya untuk creator)
   final Future<void> Function()? onDelete;
-
-  /// kalau true → tampilkan "Created by: ..." (mirip Django: hanya admin yg lihat)
   final bool showCreatorInfo;
 
   const CommunityCard({
@@ -34,8 +24,6 @@ class CommunityCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool joined = community.isJoined;
     final bool isCreator = community.isCreator;
-
-    // ⬇️ ini kunci perbaikan
     final bool canOpenFromCard = (joined || isCreator) && onTap != null;
 
     return InkWell(
@@ -81,7 +69,7 @@ class CommunityCard extends StatelessWidget {
               ),
             ),
 
-            // DESKRIPSI (MAX 3 LINE)
+            // DESKRIPSI (
             if (community.description.isNotEmpty) ...[
               const SizedBox(height: 8),
               Text(
@@ -96,8 +84,6 @@ class CommunityCard extends StatelessWidget {
               ),
             ],
 
-            // "Created by: ..." → hanya kalau admin & ada username
-            // dan BUKAN untuk card yang dimiliki creator sendiri (biar nggak redundant)
             if (showCreatorInfo &&
               community.creatorUsername != null &&
               community.creatorUsername!.isNotEmpty) ...[
@@ -117,7 +103,6 @@ class CommunityCard extends StatelessWidget {
             const Spacer(),
             const SizedBox(height: 12),
 
-            // === BAGIAN BAWAH: ACTIONS ===
             if (isCreator)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,

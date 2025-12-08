@@ -10,7 +10,7 @@ import '../models/community.dart';
 import 'community_detail_page.dart';
 import 'discover_communities_page.dart';
 import 'package:playserve_mobile/main_navbar.dart';
-import 'package:playserve_mobile/main_navbar_admin.dart'; // ✅ add
+import 'package:playserve_mobile/main_navbar_admin.dart'; 
 import 'package:playserve_mobile/header.dart';
 
 class MyCommunitiesPage extends StatefulWidget {
@@ -55,10 +55,9 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
     }
   }
 
-  // ✅ navbar conditional (tanpa ubah yang lain)
   Widget _buildBottomNav() {
     return _isAdminFlag
-        ? const MainNavbarAdmin(currentIndex: 4) // sesuaikan index admin kalau beda
+        ? const MainNavbarAdmin(currentIndex: 2) 
         : const MainNavbar(currentIndex: 1);
   }
 
@@ -368,12 +367,12 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
 
     @override
   Widget build(BuildContext context) {
-    final isAdmin = _isAdminFlag; // ✅ add
+    final isAdmin = _isAdminFlag; 
     final subtitleText = _isAdminFlag ? 'CREATED BY ME' : _subtitle;
 
     return Scaffold(
       backgroundColor: const Color(0xFF1E3A8A),
-      bottomNavigationBar: _buildBottomNav(), // ✅ ganti ini aja
+      bottomNavigationBar: _buildBottomNav(), 
       body: Stack(
         children: [
           Positioned.fill(
@@ -393,8 +392,6 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
                   ),
                   const SizedBox(height: 12),
                 ],
-
-                // ✅ Anti overflow: HERO boleh scroll sedikit kalau window pendek
                 Flexible(
                   flex: 0,
                   child: SingleChildScrollView(

@@ -22,181 +22,211 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
+    // Mengambil lebar layar HP agar gambar dipaksa full width
+    final double screenWidth = MediaQuery.of(context).size.width;
 
     return GradientBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        body: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
-            child: Column(
-              children: [
-                const SizedBox(height: 40),
-                Image.asset(
-                  'assets/image/logo2.png',
-                  width: 180,
-                  fit: BoxFit.contain,
+        // PENTING: Agar gambar tidak terdorong naik saat keyboard muncul
+        resizeToAvoidBottomInset: false, 
+        body: Stack(
+          children: [
+            // --- LAYER 1: GAMBAR BACKGROUND BAWAH ---
+            // Posisi di paling bawah stack agar berada di belakang
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: SizedBox(
+                width: screenWidth, // Paksa lebar sesuai layar
+                child: Image.asset(
+                  'assets/image/background.png',
+                  fit: BoxFit.fitWidth, // Memastikan gambar melebar mentok kiri-kanan
+                  alignment: Alignment.bottomCenter,
                 ),
+              ),
+            ),
 
-                Image.asset(
-                  'assets/image/login.png',
-                  width: 260,
-                  fit: BoxFit.contain,
-                ),
-                const SizedBox(height: 24),
+            // --- LAYER 2: KONTEN LOGIN ---
+            // Menggunakan SafeArea & Center agar form ada di tengah
+            SafeArea(
+              child: Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  // Physics ini membuat scroll terasa natural
+                  physics: const BouncingScrollPhysics(), 
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Jarak dari atas (bisa disesuaikan)
+                      const SizedBox(height: 10), 
+                      
+                      Image.asset(
+                        'assets/image/logo2.png',
+                        width: 180,
+                        fit: BoxFit.contain,
+                      ),
+                      
+                      Image.asset(
+                        'assets/image/login.png',
+                        width: 260,
+                        fit: BoxFit.contain,
+                      ),
+                      const SizedBox(height: 24),
 
-                Text(
-                  "Join thousands of players and find your next match by signing up for free.",
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
-                    color: Colors.white,
-                    fontSize: 16,
-                    height: 1.4,
-                  ),
-                ),
-                const SizedBox(height: 40),
+                      Text(
+                        "Join thousands of players and find your next match by signing up for free.",
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.inter(
+                          color: Colors.white,
+                          fontSize: 16,
+                          height: 1.4,
+                        ),
+                      ),
+                      const SizedBox(height: 40),
 
-                RoundedInputField(
-                  controller: _usernameController,
-                  hintText: 'Username',
-                  icon: Icons.person,
-                  whiteIcon: false,
-                ),
-                const SizedBox(height: 16),
+                      // Input Fields
+                      RoundedInputField(
+                        controller: _usernameController,
+                        hintText: 'Username',
+                        icon: Icons.person,
+                        whiteIcon: false,
+                      ),
+                      const SizedBox(height: 16),
 
-                RoundedInputField(
-                  controller: _passwordController,
-                  hintText: 'Password',
-                  icon: Icons.lock,
-                  obscureText: true,
-                  whiteIcon: false,
-                ),
-                const SizedBox(height: 30),
+                      RoundedInputField(
+                        controller: _passwordController,
+                        hintText: 'Password',
+                        icon: Icons.lock,
+                        obscureText: true,
+                        whiteIcon: false,
+                      ),
+                      const SizedBox(height: 30),
 
-                _isLoading
-                    ? const CircularProgressIndicator(color: limegreen)
-                    : LimeButton(
-                        text: "LOG IN",
-                        onPressed: () async {
-                          String username = _usernameController.text.trim();
-                          String password = _passwordController.text.trim();
+                      // Buttons
+                      _isLoading
+                          ? const CircularProgressIndicator(color: limegreen)
+                          : LimeButton(
+                              text: "LOG IN",
+                              onPressed: () async {
+                                String username = _usernameController.text.trim();
+                                String password = _passwordController.text.trim();
 
-                          if (username.isEmpty || password.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("Please fill in all fields."),
-                              ),
-                            );
-                            return;
-                          }
-
-                          setState(() => _isLoading = true);
-
-                          final response = await request.login(
-                            "http://127.0.0.1:8000/auth/login/",
-                            {
-                              'username': username,
-                              'password': password,
-                            },
-                          );
-
-                          setState(() => _isLoading = false);
-
-                          if (request.loggedIn) {
-                            final adminCheck = await request.get(
-                              "http://127.0.0.1:8000/auth/check_admin_status/",
-                            );
-
-                            if (context.mounted) {
-                              final bool isAdmin = adminCheck["is_admin"] ?? false;
-                              request.jsonData["is_admin"] = response["is_admin"]; // TODO:check effect
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => isAdmin
-                                      ? const HomePageAdmin()
-                                      : const HomePage(),
-                                ),
-                              );
-
-                              ScaffoldMessenger.of(context)
-                                ..hideCurrentSnackBar()
-                                ..showSnackBar(
-                                  SnackBar(
-                                    backgroundColor: limegreen,
-                                    content: Text(
-                                      "Welcome, ${response['username'] ?? username}!",
-                                      style: const TextStyle(
-                                        color: blue1,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                if (username.isEmpty || password.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text("Please fill in all fields."),
                                     ),
-                                  ),
+                                  );
+                                  return;
+                                }
+
+                                setState(() => _isLoading = true);
+
+                                final response = await request.login(
+                                  "http://127.0.0.1:8000/auth/login/",
+                                  {
+                                    'username': username,
+                                    'password': password,
+                                  },
                                 );
-                            }
-                          } else {
-                            if (context.mounted) {
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  backgroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  title: const Text(
-                                    'Login Failed',
-                                    style: TextStyle(
-                                        color: blue1,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  content: Text(
-                                    response['message'] ??
-                                        'Invalid username or password.',
-                                    style: const TextStyle(color: blue1),
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.pop(context),
-                                      child: const Text(
-                                        'OK',
-                                        style: TextStyle(
-                                          color: limegreen,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+
+                                setState(() => _isLoading = false);
+
+                                if (request.loggedIn) {
+                                  final adminCheck = await request.get(
+                                    "http://127.0.0.1:8000/auth/check_admin_status/",
+                                  );
+
+                                  if (context.mounted) {
+                                    final bool isAdmin = adminCheck["is_admin"] ?? false;
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => isAdmin
+                                            ? const HomePageAdmin()
+                                            : const HomePage(),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }
-                          }
+                                    );
+
+                                    ScaffoldMessenger.of(context)
+                                      ..hideCurrentSnackBar()
+                                      ..showSnackBar(
+                                        SnackBar(
+                                          backgroundColor: limegreen,
+                                          content: Text(
+                                            "Welcome, ${response['username'] ?? username}!",
+                                            style: const TextStyle(
+                                              color: blue1,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                  }
+                                } else {
+                                  if (context.mounted) {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => AlertDialog(
+                                        backgroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        title: const Text(
+                                          'Login Failed',
+                                          style: TextStyle(
+                                              color: blue1,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        content: Text(
+                                          response['message'] ??
+                                              'Invalid username or password.',
+                                          style: const TextStyle(color: blue1),
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.pop(context),
+                                            child: const Text(
+                                              'OK',
+                                              style: TextStyle(
+                                                color: limegreen,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }
+                                }
+                              },
+                            ),
+                      const SizedBox(height: 16),
+
+                      BlueButton(
+                        text: "SIGN UP",
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const RegisterStep1Page(),
+                            ),
+                          );
                         },
                       ),
-                const SizedBox(height: 16),
-
-                BlueButton(
-                  text: "SIGN UP",
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const RegisterStep1Page(),
-                      ),
-                    );
-                  },
+                      
+                      // Tambahkan jarak di bawah agar konten tidak tertutup gambar
+                      // saat di-scroll mentok bawah
+                      const SizedBox(height: 120), 
+                    ],
+                  ),
                 ),
-
-                const SizedBox(height: 60),
-
-                Image.asset(
-                  'assets/image/background.png',
-                  width: double.infinity,
-                  fit: BoxFit.contain,
-                ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
