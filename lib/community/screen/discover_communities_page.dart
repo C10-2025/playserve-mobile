@@ -4,12 +4,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../models/community.dart';
 import '../widgets/community_card.dart';
 import 'community_detail_page.dart';
 import 'my_communities_page.dart';
-
+import 'package:playserve_mobile/main_navbar_admin.dart';
+import 'package:playserve_mobile/header.dart';
 
 class DiscoverCommunitiesPage extends StatefulWidget {
   const DiscoverCommunitiesPage({super.key});
@@ -24,6 +26,12 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
 
+  // controller untuk modal create community
+  final TextEditingController _createNameController = TextEditingController();
+  final TextEditingController _createDescController = TextEditingController();
+
+  bool _isAdminFlag = false;
+
   // PENTING: samakan host dengan URL yang dipakai di login (biasanya 127.0.0.1)
   String get _baseUrl =>
       kIsWeb ? 'http://127.0.0.1:8000' : 'http://10.0.2.2:8000';
@@ -32,6 +40,371 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
   void initState() {
     super.initState();
     _futureCommunities = _fetchCommunities();
+
+    // 🔹 Setelah widget kebentuk, baru panggil cek admin
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadAdminFlag();
+    });
+  }
+
+  Future<void> _loadAdminFlag() async {
+    final request = context.read<CookieRequest>();
+    try {
+      final resp = await request.get('$_baseUrl/auth/check_admin_status/');
+
+      // resp harusnya: { status: true, is_admin: true/false, username: ... }
+      if (!mounted) return;
+      setState(() {
+        _isAdminFlag = (resp is Map && resp['is_admin'] == true);
+      });
+    } catch (e) {
+      // kalau gagal, anggap saja bukan admin
+      debugPrint('Failed to load admin status: $e');
+    }
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _createNameController.dispose();
+    _createDescController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _openEditCommunityDialog(Community community) async {
+    final nameController = TextEditingController(text: community.name);
+    final descController = TextEditingController(text: community.description);
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        bool isSubmitting = false;
+
+        return StatefulBuilder(
+          builder: (ctx, setStateDialog) {
+            Future<void> handleSave() async {
+              final name = nameController.text.trim();
+              final desc = descController.text.trim();
+
+              if (name.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Name is required.'),
+                  ),
+                );
+                return;
+              }
+
+              setStateDialog(() {
+                isSubmitting = true;
+              });
+
+              final request = context.read<CookieRequest>();
+              final url = '$_baseUrl/community/${community.id}/update/';
+
+              try {
+                final resp = await request.postJson(
+                  url,
+                  jsonEncode({
+                    'name': name,
+                    'description': desc,
+                  }),
+                );
+
+                if (!mounted) return;
+
+                if (resp is Map) {
+                  final String? code = resp['code'] as String?;
+                  final String message =
+                      (resp['message'] as String?) ??
+                          'Community created successfully.';
+
+                  if (code == 'duplicate_name') {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Community name already exists. Please use a different name.',
+                        ),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                    setStateDialog(() {
+                      isSubmitting = false;
+                    });
+                    return;
+                  }
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(message),
+                      backgroundColor: const Color(0xFFC1D752),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Community created.'),
+                    ),
+                  );
+                }
+
+                Navigator.of(ctx).pop(); // tutup dialog
+                await _refresh(); // reload list
+              } catch (e) {
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Failed to update community.'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                setStateDialog(() {
+                  isSubmitting = false;
+                });
+              }
+            }
+
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              title: Text(
+                'Edit Community',
+                style: GoogleFonts.inter(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 18,
+                  color: const Color(0xFF111827),
+                ),
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      'Name',
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF374151),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    TextField(
+                      controller: nameController,
+                      decoration: InputDecoration(
+                        hintText: 'Enter community name',
+                        hintStyle: GoogleFonts.inter(
+                          fontSize: 13,
+                          color: const Color(0xFF9CA3AF),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Description',
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF374151),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    TextField(
+                      controller: descController,
+                      maxLines: 4,
+                      decoration: InputDecoration(
+                        hintText: 'Describe the community...',
+                        hintStyle: GoogleFonts.inter(
+                          fontSize: 13,
+                          color: const Color(0xFF9CA3AF),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actionsPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              actions: [
+                TextButton(
+                  onPressed: isSubmitting
+                      ? null
+                      : () {
+                          Navigator.of(ctx).pop();
+                        },
+                  child: Text(
+                    'Cancel',
+                    style: GoogleFonts.inter(
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF6B7280),
+                    ),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: isSubmitting ? null : handleSave,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFC1D752),
+                    foregroundColor: const Color(0xFF082459),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 10,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: isSubmitting
+                      ? const SizedBox(
+                          height: 16,
+                          width: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(
+                          'Save Changes',
+                          style: GoogleFonts.inter(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _deleteCommunity(Community community) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
+          title: Text(
+            'Delete Community',
+            style: GoogleFonts.inter(
+              fontWeight: FontWeight.w700,
+              fontSize: 20,
+              color: const Color(0xFF111827),
+            ),
+          ),
+          content: Text(
+            'Are you sure you want to delete "${community.name}"?',
+            style: GoogleFonts.inter(
+              fontSize: 15,
+              color: const Color(0xFF374151),
+              height: 1.4,
+            ),
+          ),
+          actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
+          actions: [
+            Row(
+              children: [
+                Expanded(
+                  child: SizedBox(
+                    height: 46,
+                    child: TextButton(
+                      onPressed: () => Navigator.of(ctx).pop(false),
+                      style: TextButton.styleFrom(
+                        backgroundColor: const Color(0xFFD1D5DB),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      child: Text(
+                        'Cancel',
+                        style: GoogleFonts.inter(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF111827),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: SizedBox(
+                    height: 46,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.of(ctx).pop(true),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red[500],
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        elevation: 2,
+                      ),
+                      child: Text(
+                        'Delete',
+                        style: GoogleFonts.inter(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true) return;
+
+    final request = context.read<CookieRequest>();
+    final url = '$_baseUrl/community/${community.id}/delete/';
+
+    try {
+      final resp = await request.postJson(url, jsonEncode({}));
+
+      if (!mounted) return;
+
+      String message = 'Community deleted.';
+      if (resp is Map && resp['message'] is String) {
+        message = resp['message'] as String;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.red[400],
+        ),
+      );
+
+      await _refresh();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to delete community.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   Future<List<Community>> _fetchCommunities() async {
@@ -59,7 +432,6 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
     final joinUrl = '$_baseUrl/community/join/${community.id}/';
 
     try {
-      // CookieRequest akan otomatis kirim session + csrftoken
       final result = await request.postJson(joinUrl, jsonEncode({}));
 
       if (!mounted) return;
@@ -79,7 +451,6 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
 
         await _refresh();
       } else {
-        // fallback kalau response bukan JSON yang diharapkan
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Unexpected response from server.'),
@@ -96,270 +467,564 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
     }
   }
 
-  @override
-Widget build(BuildContext context) {
-  return Scaffold(
-  backgroundColor: const Color(0xFF1E3A8A), // Tailwind blue-900
+  bool get _isAdmin {
+  final request = context.read<CookieRequest>();
+  final data = request.jsonData;
 
-    body: Stack(
-      children: [
-        // 🔵 Background hero
-        Positioned.fill(
-          child: Image.asset(
-            'assets/image/bgcommunity.png',
-            fit: BoxFit.fitWidth,
-            alignment: Alignment.topCenter,
-          ),
-        ),
+  if (data is Map) {
+    // CASE 1 → flat bentuk: {"username": "...", "is_superuser": true}
+    if (data['is_superuser'] == true || data['is_staff'] == true || data['is_admin'] == true) {
+      return true;
+    }
 
-        SafeArea(
-          child: Column(
-            children: [
-              // ====== HERO: FIND YOUR COMMUNITY + BUTTON ======
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
+    // CASE 2 → nested bentuk: {"user": {"is_superuser": true}}
+    final user = data['user'];
+    if (user is Map) {
+      if (user['is_superuser'] == true || user['is_staff'] == true || user['is_admin'] == true) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+
+  /// Buka modal dialog untuk create community (mirip Create Community Modal di Django)
+  void _openCreateCommunityDialog() {
+    _createNameController.clear();
+    _createDescController.clear();
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        bool isSubmitting = false;
+
+        return StatefulBuilder(
+          builder: (ctx, setStateDialog) {
+            Future<void> handleSubmit() async {
+              final name = _createNameController.text.trim();
+              final desc = _createDescController.text.trim();
+
+              if (name.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Name is required.'),
+                  ),
+                );
+                return;
+              }
+
+              setStateDialog(() {
+                isSubmitting = true;
+              });
+
+              final request = context.read<CookieRequest>();
+              final url = '$_baseUrl/community/create/';
+
+              try {
+                final resp = await request.postJson(
+                  url,
+                  jsonEncode({
+                    'name': name,
+                    'description': desc,
+                  }),
+                );
+
+                if (!mounted) return;
+
+                if (resp is Map) {
+                  final code = resp['code'];
+                  final message = resp['message'] as String? ??
+                      'Community created successfully.';
+
+                  if (code == 'duplicate_name') {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Community name already exists. Please use a different name.',
+                        ),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                    setStateDialog(() {
+                      isSubmitting = false;
+                    });
+                    return;
+                  }
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(message),
+                      backgroundColor: const Color(0xFFC1D752),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Community created.'),
+                    ),
+                  );
+                }
+
+                Navigator.of(ctx).pop();
+                await _refresh();
+              } catch (e) {
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Failed to create community.'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                setStateDialog(() {
+                  isSubmitting = false;
+                });
+              }
+            }
+
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              title: Text(
+                'Create New Community',
+                style: GoogleFonts.inter(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 18,
+                  color: const Color(0xFF111827),
+                ),
+              ),
+              content: SingleChildScrollView(
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                    'FIND YOUR COMMUNITY',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: kIsWeb ? 42 : 30, // bigger = bolder impression
-                      fontWeight: FontWeight.w900, // strongest weight
-                      color: Colors.white,
-                      letterSpacing: 2.0, // increases bold visual
-                      height: 1.05,
-                      shadows: [
-                        Shadow(
-                          offset: Offset(0, 0),
-                          blurRadius: 1.8,
-                          color: Colors.white.withOpacity(0.35),
-                        ),
-                      ],
+                      'Name',
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF374151),
+                      ),
                     ),
-                  ),
-
-                    const SizedBox(height: 16),
-
-                    // 🔘 SEE MY COMMUNITIES (center, tidak full width)
-                    Align(
-                      alignment: Alignment.center,
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(
-                          minWidth: 180,
-                          maxWidth: 260,
+                    const SizedBox(height: 4),
+                    TextField(
+                      controller: _createNameController,
+                      decoration: InputDecoration(
+                        hintText: 'Enter community name',
+                        hintStyle: GoogleFonts.inter(
+                          fontSize: 13,
+                          color: const Color(0xFF9CA3AF),
                         ),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => MyCommunitiesPage(),
-                              ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFC1D752),
-                            foregroundColor: const Color(0xFF082459),
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 14,
-                              horizontal: 24,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            textStyle: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                          child: const Text('SEE MY COMMUNITIES'),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Description',
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF374151),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    TextField(
+                      controller: _createDescController,
+                      maxLines: 4,
+                      decoration: InputDecoration(
+                        hintText: 'Describe the community...',
+                        hintStyle: GoogleFonts.inter(
+                          fontSize: 13,
+                          color: const Color(0xFF9CA3AF),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
-              
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF092B69),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(24), // rounded semua sisi, kayak card
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 16,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          // 🏷 TITLE DALAM PANEL
-                          const Text(
-                            'Discover Communities',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                              letterSpacing: 0.8,
+              actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              actions: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        height: 46,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFD1D5DB),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: TextButton(
+                          onPressed: isSubmitting
+                              ? null
+                              : () {
+                                  Navigator.of(ctx).pop();
+                                },
+                          style: TextButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
                             ),
                           ),
-                          const SizedBox(height: 16),
-
-                          // 🔍 SEARCH BAR: center + width dibatasi
-                          Align(
-                            alignment: Alignment.center,
-                            child: ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxWidth: kIsWeb ? 600 : 320, // web lebar, mobile lebih sempit
-                              ),
-                              child: TextField(
-                                controller: _searchController,
-                                style: const TextStyle(
-                                  color: Color(0xFF111827),
-                                  fontSize: 14,
-                                ),
-                                decoration: InputDecoration(
-                                  hintText: 'Search for a community...',
-                                  hintStyle: const TextStyle(
-                                    color: Color(0xFF6B7280),
-                                    fontSize: 14,
+                          child: Text(
+                            'Cancel',
+                            style: GoogleFonts.inter(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF111827),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Container(
+                        height: 46,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFC1D752),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: TextButton(
+                          onPressed: isSubmitting ? null : handleSubmit,
+                          style: TextButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                          child: isSubmitting
+                              ? const SizedBox(
+                                  height: 18,
+                                  width: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
                                   ),
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  suffixIcon: Padding(
-                                    padding: const EdgeInsets.only(right: 16),
-                                    child: Image.asset(
-                                      'assets/image/search.png',
-                                      width: 18,
-                                      height: 18,
+                                )
+                              : Text(
+                                  'Create',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    color: const Color(0xFF111827),
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isAdmin = _isAdminFlag;
+
+    return Scaffold(
+      backgroundColor: const Color(0xFF1E3A8A),
+      bottomNavigationBar: const MainNavbarAdmin(currentIndex: 2),
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              'assets/image/bgcommunity.png',
+              fit: BoxFit.fitWidth,
+              alignment: Alignment.topCenter,
+            ),
+          ),
+          SafeArea(
+            child: Column(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+                  child: ProfileHeader(),
+                ),
+                const SizedBox(height: 12),
+
+                // ===== Header atas (judul besar + tombol FIX sampingan) =====
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        'FIND YOUR COMMUNITY',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.inter(
+                          fontSize: kIsWeb ? 42 : 30,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.white,
+                          height: 1.3,
+                          letterSpacing: 2.0,
+                          shadows: [
+                            Shadow(
+                              offset: const Offset(0, 0),
+                              blurRadius: 1.8,
+                              color: Colors.white.withOpacity(0.35),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // FIX sampingan: selalu Row
+                      Row(
+                        children: [
+                          Expanded(
+                            child: SizedBox(
+                              height: 46,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const MyCommunitiesPage(),
+                                    ),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFFC1D752),
+                                  foregroundColor: const Color(0xFF082459),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  textStyle: GoogleFonts.inter(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                                child: const Text('SEE MY COMMUNITIES'),
+                              ),
+                            ),
+                          ),
+                          if (isAdmin) const SizedBox(width: 12),
+                          if (isAdmin)
+                            Expanded(
+                              child: SizedBox(
+                                height: 46,
+                                child: ElevatedButton(
+                                  onPressed: _openCreateCommunityDialog,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFFC1D752),
+                                    foregroundColor: const Color(0xFF082459),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    textStyle: GoogleFonts.inter(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: 0.5,
                                     ),
                                   ),
-                                  suffixIconConstraints: const BoxConstraints(
-                                    minWidth: 32,
-                                    minHeight: 32,
-                                  ),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 20,
-                                    vertical: 14,
-                                  ),
-                                  border: OutlineInputBorder(
+                                  child: const Text('+ CREATE COMMUNITY'),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                // ===== Container biru: header FIXED, yang scroll cuma grid =====
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF092B69),
+                        borderRadius: BorderRadius.all(Radius.circular(24)),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              'Discover Communities',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.inter(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                                letterSpacing: 0.8,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+
+                            // Search bar FIXED (nggak ikut scroll)
+                            Align(
+                              alignment: Alignment.center,
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxWidth: kIsWeb ? 480 : 280,
+                                ),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
                                     borderRadius: BorderRadius.circular(999),
-                                    borderSide: BorderSide.none,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        blurRadius: 6,
+                                        offset: const Offset(0, 3),
+                                      ),
+                                    ],
                                   ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(999),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(999),
-                                    borderSide: BorderSide.none,
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: TextField(
+                                          controller: _searchController,
+                                          style: GoogleFonts.inter(
+                                            color: const Color(0xFF111827),
+                                            fontSize: 14,
+                                          ),
+                                          decoration: InputDecoration(
+                                            hintText: 'Search for a community...',
+                                            hintStyle: GoogleFonts.inter(
+                                              color: const Color(0xFF6B7280),
+                                              fontSize: 14,
+                                            ),
+                                            border: InputBorder.none,
+                                          ),
+                                          onSubmitted: (value) {
+                                            _searchQuery = value;
+                                            _refresh();
+                                          },
+                                        ),
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          _searchQuery = _searchController.text.trim();
+                                          _refresh();
+                                          FocusScope.of(context).unfocus();
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(right: 4),
+                                          child: Image.asset(
+                                            'assets/image/search.png',
+                                            width: 18,
+                                            height: 18,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                onSubmitted: (value) {
-                                  _searchQuery = value;
-                                  _refresh();
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+
+                            // Ini yang SCROLL: Community cards
+                            Expanded(
+                              child: FutureBuilder<List<Community>>(
+                                future: _futureCommunities,
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState == ConnectionState.waiting) {
+                                    return const Center(child: CircularProgressIndicator());
+                                  }
+
+                                  if (snapshot.hasError) {
+                                    return Center(
+                                      child: Text(
+                                        'Error loading communities.\n${snapshot.error}',
+                                        textAlign: TextAlign.center,
+                                        style: GoogleFonts.inter(
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    );
+                                  }
+
+                                  final communities = snapshot.data ?? [];
+
+                                  if (communities.isEmpty) {
+                                    return Center(
+                                      child: Text(
+                                        'No communities found.',
+                                        style: GoogleFonts.inter(
+                                          color: Colors.white70,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    );
+                                  }
+
+                                  return RefreshIndicator(
+                                    onRefresh: _refresh,
+                                    child: GridView.builder(
+                                      physics: const AlwaysScrollableScrollPhysics(),
+                                      itemCount: communities.length,
+                                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 2,
+                                        mainAxisSpacing: 12,
+                                        crossAxisSpacing: 12,
+                                        childAspectRatio: 0.82,
+                                      ),
+                                      itemBuilder: (context, index) {
+                                        final c = communities[index];
+                                        final canOpen = c.isJoined || c.isCreator;
+
+                                        return CommunityCard(
+                                          community: c,
+                                          showCreatorInfo: _isAdminFlag,
+                                          onTap: () {
+                                            if (!canOpen) return;
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => CommunityDetailPage(
+                                                  communityId: c.id,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          onJoin: () => _joinCommunity(c),
+                                          onEdit: () => _openEditCommunityDialog(c),
+                                          onDelete: () => _deleteCommunity(c),
+                                        );
+                                      },
+                                    ),
+                                  );
                                 },
                               ),
                             ),
-                          ),
-
-                          const SizedBox(height: 16),
-
-                          // GRID DI BAWAH SEARCH
-                          Expanded(
-                            child: FutureBuilder<List<Community>>(
-                              future: _futureCommunities,
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState == ConnectionState.waiting) {
-                                  return const Center(child: CircularProgressIndicator());
-                                }
-
-                                if (snapshot.hasError) {
-                                  return Center(
-                                    child: Text(
-                                      'Error loading communities.\n${snapshot.error}',
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(color: Colors.white),
-                                    ),
-                                  );
-                                }
-
-                                final communities = snapshot.data ?? [];
-
-                                if (communities.isEmpty) {
-                                  return const Center(
-                                    child: Text(
-                                      'No communities found.',
-                                      style: TextStyle(color: Colors.white70),
-                                    ),
-                                  );
-                                }
-
-                                return RefreshIndicator(
-                                  onRefresh: _refresh,
-                                  child: GridView.builder(
-                                    itemCount: communities.length,
-                                    gridDelegate:
-                                        const SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 2,
-                                      mainAxisSpacing: 12,
-                                      crossAxisSpacing: 12,
-                                      childAspectRatio: 0.82,
-                                    ),
-                                    itemBuilder: (context, index) {
-                                      final c = communities[index];
-                                      return CommunityCard(
-                                        community: c,
-                                        onTap: () {
-                                          if (!c.isJoined) {
-                                            // Hanya info kecil, tidak navigate
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              const SnackBar(
-                                                content: Text('Join this community first to see its posts.'),
-                                                duration: Duration(seconds: 2),
-                                              ),
-                                            );
-                                            return;
-                                          }
-
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (_) => CommunityDetailPage(
-                                                communityId: c.id,
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                        onJoin: () => _joinCommunity(c),
-                                      );
-
-                                    },
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
 }

@@ -5,6 +5,7 @@ import 'package:playserve_mobile/booking/screens/admin_field_form_screen.dart';
 import 'package:playserve_mobile/booking/services/booking_service.dart';
 import 'package:playserve_mobile/booking/theme.dart';
 import 'package:playserve_mobile/booking/widgets/admin_field_tile.dart';
+import 'package:playserve_mobile/main_navbar_admin.dart';
 import 'package:provider/provider.dart';
 import '../config.dart';
 
@@ -109,6 +110,7 @@ class _AdminFieldListScreenState extends State<AdminFieldListScreen> {
           ),
         ),
       ),
+      bottomNavigationBar: const MainNavbarAdmin(currentIndex: 2),
     );
   }
 }

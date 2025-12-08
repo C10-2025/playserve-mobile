@@ -3,6 +3,7 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:playserve_mobile/booking/models/playing_field.dart';
 import 'package:playserve_mobile/booking/services/booking_service.dart';
 import 'package:playserve_mobile/booking/theme.dart';
+import 'package:playserve_mobile/main_navbar_admin.dart';
 import 'package:provider/provider.dart';
 import '../config.dart';
 
@@ -47,7 +48,10 @@ class _AdminFieldFormScreenState extends State<AdminFieldFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final service = BookingService(context.read<CookieRequest>(), baseUrl: kBaseUrl);
+    final service = BookingService(
+      context.read<CookieRequest>(),
+      baseUrl: kBaseUrl,
+    );
     final isEdit = widget.field != null;
     return Scaffold(
       backgroundColor: BookingColors.background,
@@ -67,8 +71,10 @@ class _AdminFieldFormScreenState extends State<AdminFieldFormScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(isEdit ? 'Edit Court' : 'Add New Court',
-                      style: BookingTextStyles.display.copyWith(fontSize: 26)),
+                  Text(
+                    isEdit ? 'Edit Court' : 'Add New Court',
+                    style: BookingTextStyles.display.copyWith(fontSize: 26),
+                  ),
                   const SizedBox(height: 20),
                   _section(
                     title: 'Basic Information',
@@ -82,15 +88,20 @@ class _AdminFieldFormScreenState extends State<AdminFieldFormScreen> {
                     title: 'Court Details',
                     children: [
                       _textField(_surface, 'Court Surface'),
-                      _textField(_price, 'Price per hour',
-                          keyboardType: TextInputType.number),
+                      _textField(
+                        _price,
+                        'Price per hour',
+                        keyboardType: TextInputType.number,
+                      ),
                       Row(
                         children: [
                           Expanded(
-                              child: _textField(_opening, 'Opening time (HH:MM)')),
+                            child: _textField(_opening, 'Opening time (HH:MM)'),
+                          ),
                           const SizedBox(width: 12),
                           Expanded(
-                              child: _textField(_closing, 'Closing time (HH:MM)')),
+                            child: _textField(_closing, 'Closing time (HH:MM)'),
+                          ),
                         ],
                       ),
                     ],
@@ -127,7 +138,10 @@ class _AdminFieldFormScreenState extends State<AdminFieldFormScreen> {
                               };
                               try {
                                 if (isEdit) {
-                                  await service.adminUpdateField(widget.field!.id, payload);
+                                  await service.adminUpdateField(
+                                    widget.field!.id,
+                                    payload,
+                                  );
                                 } else {
                                   await service.adminCreateField(payload);
                                 }
@@ -145,7 +159,10 @@ class _AdminFieldFormScreenState extends State<AdminFieldFormScreen> {
                           ? const SizedBox(
                               width: 20,
                               height: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
                             )
                           : Text(isEdit ? 'Save' : 'Create'),
                     ),
@@ -157,46 +174,35 @@ class _AdminFieldFormScreenState extends State<AdminFieldFormScreen> {
                           : () async {
                               setState(() => _saving = true);
                               try {
-                                await service.adminDeleteField(widget.field!.id);
+                                await service.adminDeleteField(
+                                  widget.field!.id,
+                                );
                                 if (mounted) Navigator.pop(context);
                               } catch (e) {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(SnackBar(content: Text('Delete failed: $e')));
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Delete failed: $e')),
+                                );
                               } finally {
                                 setState(() => _saving = false);
                               }
                             },
                       child: const Text('Deactivate'),
-                    )
+                    ),
                 ],
               ),
             ),
           ),
         ),
       ),
+      bottomNavigationBar: const MainNavbarAdmin(currentIndex: -1),
     );
   }
 
-  Widget _section({required String title, required List<Widget> children}) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Container(
-        decoration: BookingDecorations.card,
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title, style: BookingTextStyles.title.copyWith(fontSize: 18)),
-            const SizedBox(height: 12),
-            ...children.expand((w) => [w, const SizedBox(height: 12)]).toList()..removeLast(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _textField(TextEditingController c, String label,
-      {TextInputType keyboardType = TextInputType.text}) {
+  Widget _textField(
+    TextEditingController c,
+    String label, {
+    TextInputType keyboardType = TextInputType.text,
+  }) {
     return TextFormField(
       controller: c,
       keyboardType: keyboardType,
@@ -214,4 +220,24 @@ class _AdminFieldFormScreenState extends State<AdminFieldFormScreen> {
       ),
     );
   }
+
+  Widget _section({required String title, required List<Widget> children}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Container(
+        decoration: BookingDecorations.card,
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: BookingTextStyles.title.copyWith(fontSize: 18)),
+            const SizedBox(height: 12),
+            ...children.expand((w) => [w, const SizedBox(height: 12)]).toList()
+              ..removeLast(),
+          ],
+        ),
+      ),
+    );
+  }
+
 }

@@ -4,6 +4,7 @@ import 'package:playserve_mobile/booking/models/playing_field.dart';
 import 'package:playserve_mobile/booking/screens/field_detail_screen.dart';
 import 'package:playserve_mobile/booking/screens/my_bookings_screen.dart';
 import 'package:playserve_mobile/booking/widgets/booking_field_card.dart';
+import 'package:playserve_mobile/main_navbar.dart';
 import 'package:provider/provider.dart';
 import 'package:playserve_mobile/booking/theme.dart';
 import '../services/booking_service.dart';
@@ -264,6 +265,7 @@ class _FieldListScreenState extends State<FieldListScreen> {
           ),
         ),
       ),
+      bottomNavigationBar: const MainNavbar(currentIndex: 3),
     );
   }
 

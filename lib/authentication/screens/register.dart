@@ -31,8 +31,6 @@ class _RegisterStep1PageState extends State<RegisterStep1Page> {
             child: Column(
               children: [
                 const SizedBox(height: 40),
-
-                // 🔹 Logo PlayServe
                 Image.asset(
                   'assets/image/logo2.png',
                   width: 180,
@@ -50,7 +48,6 @@ class _RegisterStep1PageState extends State<RegisterStep1Page> {
                 ),
                 const SizedBox(height: 30),
 
-                // 🧾 Username Field
                 RoundedInputField(
                   controller: _usernameController,
                   hintText: "Username",
@@ -59,7 +56,6 @@ class _RegisterStep1PageState extends State<RegisterStep1Page> {
                 ),
                 const SizedBox(height: 16),
 
-                // 🔒 Password Field
                 RoundedInputField(
                   controller: _passwordController,
                   hintText: "Password",
@@ -69,7 +65,6 @@ class _RegisterStep1PageState extends State<RegisterStep1Page> {
                 ),
                 const SizedBox(height: 16),
 
-                // ✅ Confirm Password Field
                 RoundedInputField(
                   controller: _confirmController,
                   hintText: "Confirm Password",
@@ -79,7 +74,6 @@ class _RegisterStep1PageState extends State<RegisterStep1Page> {
                 ),
                 const SizedBox(height: 30),
 
-                // 🟩 Tombol Next Step
                 _isLoading
                     ? const CircularProgressIndicator(color: limegreen)
                     : LimeButton(
@@ -136,7 +130,6 @@ class _RegisterStep1PageState extends State<RegisterStep1Page> {
                       ),
                 const SizedBox(height: 16),
 
-                // 🔵 Back to Login
                 BlueButton(
                   text: "BACK TO LOGIN",
                   onPressed: () {
@@ -199,7 +192,6 @@ class _RegisterStep2PageState extends State<RegisterStep2Page> {
               children: [
                 const SizedBox(height: 40),
 
-                // 🔹 Logo PlayServe
                 Image.asset(
                   'assets/image/logo2.png',
                   width: 180,
@@ -217,7 +209,6 @@ class _RegisterStep2PageState extends State<RegisterStep2Page> {
                 ),
                 const SizedBox(height: 30),
 
-                // 🧍 Pilihan Avatar
                 Text(
                   "Choose Your Avatar",
                   style: Theme.of(context).textTheme.titleLarge!.copyWith(
@@ -254,7 +245,6 @@ class _RegisterStep2PageState extends State<RegisterStep2Page> {
                 ),
                 const SizedBox(height: 30),
 
-                // 📍 Dropdown lokasi
                 DropdownButtonFormField<String>(
                   dropdownColor: Colors.white,
                   value: _selectedLocation,
@@ -276,7 +266,6 @@ class _RegisterStep2PageState extends State<RegisterStep2Page> {
                 ),
                 const SizedBox(height: 16),
 
-                // 📸 Instagram (optional)
                 RoundedInputField(
                   controller: _instagramController,
                   hintText: "Instagram (optional)",
@@ -285,7 +274,6 @@ class _RegisterStep2PageState extends State<RegisterStep2Page> {
                 ),
                 const SizedBox(height: 30),
 
-                // 🟩 Tombol Submit
                 _isLoading
                     ? const CircularProgressIndicator(color: limegreen)
                     : LimeButton(

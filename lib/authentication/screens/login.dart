@@ -32,15 +32,12 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               children: [
                 const SizedBox(height: 40),
-
-                // 🎾 LOGO PlayServe
                 Image.asset(
                   'assets/image/logo2.png',
                   width: 180,
                   fit: BoxFit.contain,
                 ),
 
-                // 👥 Gambar pemain tenis di bawah logo
                 Image.asset(
                   'assets/image/login.png',
                   width: 260,
@@ -48,7 +45,6 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 24),
 
-                // 📝 Deskripsi singkat
                 Text(
                   "Join thousands of players and find your next match by signing up for free.",
                   textAlign: TextAlign.center,
@@ -60,16 +56,14 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 40),
 
-                // 🧾 Username
                 RoundedInputField(
                   controller: _usernameController,
                   hintText: 'Username',
                   icon: Icons.person,
-                  whiteIcon: false, // warna navy
+                  whiteIcon: false,
                 ),
                 const SizedBox(height: 16),
 
-                // 🔒 Password
                 RoundedInputField(
                   controller: _passwordController,
                   hintText: 'Password',
@@ -79,7 +73,6 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 30),
 
-                // 🟩 Tombol LOGIN
                 _isLoading
                     ? const CircularProgressIndicator(color: limegreen)
                     : LimeButton(
@@ -110,15 +103,12 @@ class _LoginPageState extends State<LoginPage> {
                           setState(() => _isLoading = false);
 
                           if (request.loggedIn) {
-                            // 🧩 Ambil data user untuk cek apakah admin
-                            final userData = await request.get(
-                              "http://127.0.0.1:8000/auth/get_user/",
+                            final adminCheck = await request.get(
+                              "http://127.0.0.1:8000/auth/check_admin_status/",
                             );
 
                             if (context.mounted) {
-                              // ✅ Cek apakah admin
-                              final bool isAdmin = userData["is_superuser"] ?? false;
-
+                              final bool isAdmin = adminCheck["is_admin"] ?? false;
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
@@ -184,7 +174,6 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                 const SizedBox(height: 16),
 
-                // 🔵 Tombol SIGN UP
                 BlueButton(
                   text: "SIGN UP",
                   onPressed: () {
@@ -199,7 +188,6 @@ class _LoginPageState extends State<LoginPage> {
 
                 const SizedBox(height: 60),
 
-                // 🏟️ Gambar lapangan di bawah layar
                 Image.asset(
                   'assets/image/background.png',
                   width: double.infinity,
