@@ -1,3 +1,5 @@
+// lib/models/community.dart
+
 class Community {
   final int id;
   final String name;
@@ -5,12 +7,18 @@ class Community {
   final int membersCount;
   final bool isJoined;
 
+  // ➕ tambahan biar bisa tiru Django:
+  final bool isCreator;          // request.user == community.creator ?
+  final String? creatorUsername; // untuk "Created by: ..."
+
   Community({
     required this.id,
     required this.name,
     required this.description,
     required this.membersCount,
     required this.isJoined,
+    this.isCreator = false,
+    this.creatorUsername,
   });
 
   factory Community.fromJson(Map<String, dynamic> json) {
@@ -22,6 +30,10 @@ class Community {
       description: json['description'] as String? ?? '',
       membersCount: json['members_count'] as int? ?? 0,
       isJoined: json['is_joined'] as bool? ?? false,
+
+      // sesuaikan key dengan API-mu
+      isCreator: json['is_creator'] as bool? ?? false,
+      creatorUsername: json['creator_username'] as String?,
     );
   }
 }
