@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:playserve_mobile/booking/screens/admin_field_list_screen.dart';
 import 'package:playserve_mobile/community/screen/discover_communities_page.dart';
 import 'package:playserve_mobile/global_theme.dart'; 
 import 'package:playserve_mobile/main_navbar_admin.dart';
 import 'package:playserve_mobile/profil/screens/delete_profile.dart';
+import 'package:playserve_mobile/review/screens/review_page.dart';
 
 class HomePageAdmin extends StatelessWidget {
   const HomePageAdmin({super.key});
@@ -87,14 +89,20 @@ class HomePageAdmin extends StatelessWidget {
                             imagePath: 'assets/image/booking.png',
                             label: 'Booking',
                             onTap: () {
-                              Navigator.pushNamed(context, '/admin/bookings');
+                              Navigator.push(
+                                context, 
+                                MaterialPageRoute(builder: (context) => const AdminFieldListScreen())
+                              );
                             },
                           ),
                           _FeatureButton(
                             imagePath: 'assets/image/review.png',
                             label: 'Review',
                             onTap: () {
-                              Navigator.pushNamed(context, '/admin/reviews');
+                              Navigator.push(
+                                context, 
+                                MaterialPageRoute(builder: (context) => const ReviewPage())
+                              );
                             },
                           ),
                           _FeatureButton(

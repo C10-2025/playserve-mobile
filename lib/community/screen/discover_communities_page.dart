@@ -74,7 +74,7 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
   // ✅ navbar conditional
   Widget _buildBottomNav() {
     return _isAdminFlag
-        ? const MainNavbarAdmin(currentIndex: 2)
+        ? const MainNavbarAdmin(currentIndex: 4)
         : const MainNavbar(currentIndex: 1); // sesuaikan index user kalau perlu
   }
 
