@@ -22,25 +22,24 @@ class ReviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final relatedReviews = allReviews
-        .where((r) => r.fieldName == field.name)
-        .toList();
+    final relatedReviews =
+        allReviews.where((r) => r.fieldName == field.name).toList();
     final latest = relatedReviews.take(2).toList();
 
     final width = MediaQuery.of(context).size.width;
-    final isSmall = width < 380;
+    final isSmall = width < 360;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 26),
-      margin: const EdgeInsets.only(bottom: 26),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.12),
-            blurRadius: 12,
-            offset: const Offset(0, 3),
+            color: Colors.black.withOpacity(0.09),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -52,44 +51,33 @@ class ReviewCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildImage(isSmall),
-
-              const SizedBox(width: 14),
-
+              const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Field Name
                     Text(
                       field.name,
                       style: TextStyle(
-                        fontSize: isSmall ? 15 : 18,
+                        fontSize: isSmall ? 14 : 16,
                         fontWeight: FontWeight.w700,
                         color: const Color(0xFF1A2B4C),
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                     ),
-
-                    const SizedBox(height: 6),
-
+                    const SizedBox(height: 4),
                     Text(
-                      "${field.address} • Rp ${field.pricePerHour}",
+                      '${field.address} • Rp ${field.pricePerHour.toStringAsFixed(0)}',
                       style: TextStyle(
-                        fontSize: isSmall ? 12 : 14,
+                        fontSize: isSmall ? 11 : 12,
                         color: const Color(0xFF445566),
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                     ),
-
-                    const SizedBox(height: 6),
-
+                    const SizedBox(height: 4),
                     Text(
-                      "Avg rating: ${avgRating.toStringAsFixed(1)} • Reviews: $reviewCount",
+                      '★ ${avgRating.toStringAsFixed(1)} • $reviewCount reviews',
                       style: TextStyle(
-                        fontSize: isSmall ? 11 : 13,
-                        color: const Color(0xFF333333),
+                        fontSize: isSmall ? 11 : 12,
+                        color: const Color(0xFF1A2B4C),
                       ),
                     ),
                   ],
@@ -98,7 +86,7 @@ class ReviewCard extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
 
           // ================== BUTTONS ==================
           Row(
@@ -112,6 +100,9 @@ class ReviewCard extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
+                    ),
+                    textStyle: const TextStyle(
+                      fontWeight: FontWeight.bold,   
                     ),
                   ),
                   child: const Text("Add Review"),
@@ -130,6 +121,9 @@ class ReviewCard extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
+                    textStyle: const TextStyle(
+                      fontWeight: FontWeight.bold,   
+                    ),
                   ),
                   child: const Text("View Comments"),
                 ),
@@ -137,41 +131,48 @@ class ReviewCard extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 20),
-
-          // ================== PREVIEW ==================
+          const SizedBox(height: 12),
+          // ================== PREVIEW AREA ==================
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: const Color(0xFFF7F7F7),
-              borderRadius: BorderRadius.circular(10),
+              color: const Color(0xFFF4F4F4),
+              borderRadius: BorderRadius.circular(8),
             ),
             child: latest.isEmpty
                 ? const Text(
                     "No reviews yet.",
-                    style: TextStyle(color: Color(0xFF777777)),
+                    style: TextStyle(
+                      color: Color(0xFF1A2B4C),
+                      fontSize: 12,
+                    ),
                   )
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
                         "Latest reviews:",
-                        style: TextStyle(fontSize: 14),
-                      ),
-                      const SizedBox(height: 8),
-
-                      ...latest.map(
-                        (r) => Padding(
-                          padding: const EdgeInsets.only(bottom: 6),
-                          child: Text(
-                            "★" * r.rating +
-                                "☆" * (5 - r.rating) +
-                                " — ${r.username}: ${r.comment}",
-                            style: const TextStyle(fontSize: 13),
-                          ),
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Color(0xFF1A2B4C),
                         ),
                       ),
+                      const SizedBox(height: 6),
+                      ...latest.map((r) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 4),
+                          child: Text(
+                            "${"★" * r.rating}${"☆" * (5 - r.rating)} — ${r.username}: ${r.comment}",
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF1A2B4C),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        );
+                      }).toList(),
                     ],
                   ),
           ),
@@ -180,37 +181,23 @@ class ReviewCard extends StatelessWidget {
     );
   }
 
-  // ================== IMAGE BUILDER ==================
-  Widget _buildImage(bool isSmall) {
-    final size = isSmall ? 60.0 : 80.0;
-
-    if (field.imageUrl == null || field.imageUrl!.isEmpty) {
-      return Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          color: Colors.grey.shade200,
-          borderRadius: BorderRadius.circular(10),
-        ),
-      );
-    }
+  // ================== IMAGE ==================
+  Widget _buildImage(bool small) {
+    final size = small ? 54.0 : 66.0;
 
     return ClipRRect(
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: BorderRadius.circular(8),
       child: Image.network(
-        field.imageUrl!, // null-safe use
+        field.imageUrl ?? "",
         width: size,
         height: size,
         fit: BoxFit.cover,
-        // Fallback for blocked images
-        errorBuilder: (context, _, __) {
-          return Image.network(
-            "https://images.unsplash.com/photo-1547934045-2942d193cb49",
-            width: size,
-            height: size,
-            fit: BoxFit.cover,
-          );
-        },
+        errorBuilder: (_, __, ___) => Image.network(
+          "https://images.unsplash.com/photo-1547934045-2942d193cb49",
+          width: size,
+          height: size,
+          fit: BoxFit.cover,
+        ),
       ),
     );
   }

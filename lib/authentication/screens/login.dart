@@ -118,6 +118,7 @@ class _LoginPageState extends State<LoginPage> {
                             if (context.mounted) {
                               // ✅ Cek apakah admin
                               final bool isAdmin = userData["is_superuser"] ?? false;
+                              request.jsonData["is_admin"] = response["is_admin"];
 
                               Navigator.pushReplacement(
                                 context,
