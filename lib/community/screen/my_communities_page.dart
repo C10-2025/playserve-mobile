@@ -243,7 +243,7 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
                   children: [
                     Expanded(
                       child: Container(
-                        height: 46,
+                        height: MediaQuery.of(context).size.width < 420 ? 38 : 46,
                         decoration: BoxDecoration(
                           color: const Color(0xFFD1D5DB),
                           borderRadius: BorderRadius.circular(14),
@@ -265,7 +265,7 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Container(
-                        height: 46,
+                        height: MediaQuery.of(context).size.width < 420 ? 38 : 46,
                         decoration: BoxDecoration(
                           color: const Color(0xFFC1D752),
                           borderRadius: BorderRadius.circular(14),
@@ -331,7 +331,7 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
           if (_isAdminFlag) ...[
             const SizedBox(height: 12),
             SizedBox(
-              height: 46,
+              height: MediaQuery.of(context).size.width < 420 ? 38 : 46,
               child: ElevatedButton(
                 onPressed: _openCreateCommunityDialog,
                 style: ElevatedButton.styleFrom(
