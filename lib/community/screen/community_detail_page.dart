@@ -349,7 +349,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
   Widget _buildBottomNav() {
     return _isAdminFlag
         ? const MainNavbarAdmin(
-            currentIndex: 2) 
+            currentIndex: 4) 
         : const MainNavbar(currentIndex: 1);
   }
 
