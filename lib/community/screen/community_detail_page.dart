@@ -26,22 +26,26 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
   String? _description;
   int _membersCount = 0;
   List<PostModel> _posts = [];
-  bool _isAdminFlag = false;
+  
 
   final _titleController = TextEditingController();
   final _contentController = TextEditingController();
 
-  String get _baseUrl =>
-      kIsWeb ? 'https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id' : 'http://10.0.2.2:8000';
+  static const String apiBase = 'https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id';
+  String get _baseUrl => apiBase;
+
+  bool get _isAdminFlag {
+  final request = context.read<CookieRequest>();
+  return request.jsonData["is_admin"] == true;
+}
+
+
 
   @override
   void initState() {
     super.initState();
     _futureLoad = _loadCommunity();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadAdminFlag();
-    });
   }
 
   Future<void> _loadCommunity() async {
@@ -339,24 +343,6 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
 
     if (confirmed == true) {
       await _deleteReply(reply);
-    }
-  }
-
-  Future<void> _loadAdminFlag() async {
-    final request = context.read<CookieRequest>();
-    try {
-      final resp = await request.get('$_baseUrl/auth/check_admin_status/');
-      if (!mounted) return;
-
-      setState(() {
-        _isAdminFlag = (resp is Map && resp['is_admin'] == true);
-      });
-    } catch (e) {
-      debugPrint('Failed to load admin status: $e');
-      if (!mounted) return;
-      setState(() {
-        _isAdminFlag = false;
-      });
     }
   }
 

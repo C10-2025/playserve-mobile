@@ -24,13 +24,12 @@ class CommunityCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool joined = community.isJoined;
     final bool isCreator = community.isCreator;
-    final bool canOpenFromCard = (joined || isCreator) && onTap != null;
 
     return InkWell(
-    onTap: onTap,
+      onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(14), // 🔽 sedikit lebih kecil
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -42,78 +41,87 @@ class CommunityCard extends StatelessWidget {
             ),
           ],
         ),
-
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // NAMA COMMUNITY
-            Text(
-              community.name,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.inter(
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-                color: const Color(0xFF111827),
-                height: 1.1,
+            // ================= TOP (FLEXIBLE) =================
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // NAME
+                  Text(
+                    community.name,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w800,
+                      color: const Color(0xFF111827),
+                      height: 1.1,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+
+                  // MEMBERS
+                  Text(
+                    '${community.membersCount} members',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+
+                  // DESCRIPTION
+                  if (community.description.isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      community.description,
+                      maxLines: 2, // 🔽 dari 3 → 2
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: Colors.grey[800],
+                        height: 1.3,
+                      ),
+                    ),
+                  ],
+
+                  // CREATED BY
+                  if (showCreatorInfo &&
+                      community.creatorUsername != null &&
+                      community.creatorUsername!.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      'Created by: ${community.creatorUsername}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        fontSize: 10,
+                        fontStyle: FontStyle.italic,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ),
-            const SizedBox(height: 4),
 
-            // JUMLAH MEMBER
-            Text(
-              '${community.membersCount} members',
-              style: GoogleFonts.inter(
-                fontSize: 13,
-                color: Colors.grey[600],
-              ),
-            ),
+            const SizedBox(height: 10),
 
-            // DESKRIPSI (
-            if (community.description.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Text(
-                community.description,
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.inter(
-                  fontSize: 13,
-                  color: Colors.grey[800],
-                  height: 1.3,
-                ),
-              ),
-            ],
-
-            if (showCreatorInfo &&
-              community.creatorUsername != null &&
-              community.creatorUsername!.isNotEmpty) ...[
-
-
-              const SizedBox(height: 6),
-              Text(
-                'Created by: ${community.creatorUsername}',
-                style: GoogleFonts.inter(
-                  fontSize: 11,
-                  fontStyle: FontStyle.italic,
-                  color: Colors.grey[600],
-                ),
-              ),
-            ],
-
-            const Spacer(),
-            const SizedBox(height: 12),
-
+            // ================= BOTTOM (FIXED) =================
             if (isCreator)
               Column(
+                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Badge "You are the creator"
+                  // BADGE
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
+                        horizontal: 8,
+                        vertical: 2,
                       ),
                       decoration: BoxDecoration(
                         color: const Color(0xFFC1D752),
@@ -121,28 +129,26 @@ class CommunityCard extends StatelessWidget {
                       ),
                       child: Text(
                         'You are the creator',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.inter(
-                          fontSize: 11,
+                          fontSize: 10,
                           fontWeight: FontWeight.w600,
                           color: const Color(0xFF111827),
                         ),
                       ),
                     ),
                   ),
+                  const SizedBox(height: 6),
 
-                  const SizedBox(height: 8),
-
-                  // Tombol OPEN COMMUNITY full width
+                  // OPEN
                   if (onTap != null)
                     SizedBox(
                       width: double.infinity,
                       child: OutlinedButton(
                         onPressed: onTap,
                         style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 8,
-                            horizontal: 12,
-                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 6),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -162,10 +168,9 @@ class CommunityCard extends StatelessWidget {
                         ),
                       ),
                     ),
+                  const SizedBox(height: 6),
 
-                  const SizedBox(height: 8),
-
-                  // Edit + Delete
+                  // EDIT + DELETE
                   Row(
                     children: [
                       Expanded(
@@ -174,103 +179,77 @@ class CommunityCard extends StatelessWidget {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFFC1D752),
                             foregroundColor: const Color(0xFF111827),
-                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            padding:
+                                const EdgeInsets.symmetric(vertical: 6),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
                             textStyle: GoogleFonts.inter(
-                              fontSize: 13,
+                              fontSize: 12,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
-                          child: const Text('Edit'),
+                          child: const Text(
+                            'Edit',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 6),
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () async {
-                            if (onDelete != null) {
-                              await onDelete!();
-                            }
+                            if (onDelete != null) await onDelete!();
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red[500],
                             foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            padding:
+                                const EdgeInsets.symmetric(vertical: 6),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
                             textStyle: GoogleFonts.inter(
-                              fontSize: 13,
+                              fontSize: 12,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
-                          child: const Text('Delete'),
+                          child: const Text(
+                            'Delete',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ],
               )
-
-            else if (joined)
-              // SUDAH JOIN → OPEN COMMUNITY
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: onTap,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey[300],
-                    foregroundColor: Colors.grey[800],
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    elevation: 2,
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 10,
-                      horizontal: 12,
-                    ),
-                    textStyle: GoogleFonts.inter(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                  child: const Text(
-                    'OPEN COMMUNITY',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              )
             else
-              // BELUM JOIN → JOIN NOW
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () async {
+                  onPressed: joined ? onTap : () async {
                     if (onJoin != null) await onJoin!();
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFC1D752),
-                    foregroundColor: const Color(0xFF082459),
+                    backgroundColor:
+                        joined ? Colors.grey[300] : const Color(0xFFC1D752),
+                    foregroundColor:
+                        joined ? Colors.grey[800] : const Color(0xFF082459),
+                    padding: const EdgeInsets.symmetric(vertical: 8),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                     elevation: 2,
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 10,
-                      horizontal: 12,
-                    ),
                     textStyle: GoogleFonts.inter(
-                      fontSize: 14,
+                      fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      letterSpacing: 0.5,
                     ),
                   ),
-                  child: const Text(
-                    'JOIN NOW',
+                  child: Text(
+                    joined ? 'OPEN COMMUNITY' : 'JOIN NOW',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
