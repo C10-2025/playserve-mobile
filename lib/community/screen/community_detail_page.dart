@@ -921,6 +921,11 @@ class _ReplyBoxState extends State<_ReplyBox> {
 
   @override
   Widget build(BuildContext context) {
+    final w = MediaQuery.of(context).size.width;
+    final isMobile = w < 420;
+
+    double s(double v) => isMobile ? v * 0.9 : v;
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -933,16 +938,30 @@ class _ReplyBoxState extends State<_ReplyBox> {
           top: BorderSide(color: Colors.grey.shade300),
         ),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: EdgeInsets.symmetric(
+        horizontal: s(14),
+        vertical: s(10),
+      ),
       child: Row(
         children: [
+          // ================= TEXT FIELD =================
           Expanded(
             child: TextField(
               controller: _controller,
+              style: GoogleFonts.inter(
+                fontSize: s(13), // 🔥 kecilin font
+                color: const Color(0xFF111827),
+              ),
               decoration: InputDecoration(
                 hintText: 'Write a reply...',
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                hintStyle: GoogleFonts.inter(
+                  fontSize: s(13), // 🔥 hint juga kecil
+                  color: Colors.grey.shade500,
+                ),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: s(14),
+                  vertical: s(10), // 🔥 kecilin padding
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(999),
                   borderSide: BorderSide(color: Colors.grey.shade300),
@@ -951,35 +970,43 @@ class _ReplyBoxState extends State<_ReplyBox> {
                   borderRadius: BorderRadius.circular(999),
                   borderSide: const BorderSide(
                     color: Color(0xFF2563EB),
-                    width: 1.5,
+                    width: 1.2,
                   ),
                 ),
               ),
               onSubmitted: (_) => _send(),
             ),
           ),
-          const SizedBox(width: 8),
+
+          SizedBox(width: s(8)),
+
+          // ================= BUTTON =================
           SizedBox(
-            width: 80,
-            height: 40,
+            width: s(72),
+            height: s(36), // 🔥 lebih pendek
             child: ElevatedButton(
               onPressed: _submitting ? null : _send,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF2563EB),
                 foregroundColor: Colors.white,
-                padding: EdgeInsets.zero,
+                padding: EdgeInsets.zero, // 🔥 buang padding default
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(999),
                 ),
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                visualDensity: VisualDensity.compact,
                 elevation: 2,
+                textStyle: GoogleFonts.inter(
+                  fontSize: s(13), // 🔥 kecilin font
+                  fontWeight: FontWeight.w700,
+                ),
               ),
               child: _submitting
-                  ? const SizedBox(
-                      height: 16,
-                      width: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                  ? SizedBox(
+                      height: s(14),
+                      width: s(14),
+                      child: const CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
                     )
                   : const Text('Reply'),
             ),

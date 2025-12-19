@@ -589,6 +589,7 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
 
   @override
   Widget build(BuildContext context) {
+    final w = MediaQuery.of(context).size.width;
     final isAdmin = _isAdminFlag;
 
     return Scaffold(
@@ -614,6 +615,7 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                   const SizedBox(height: 12),
                 ],
 
+    
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
                   child: Column(
@@ -623,11 +625,14 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                         'FIND YOUR COMMUNITY',
                         textAlign: TextAlign.center,
                         style: GoogleFonts.inter(
-                          fontSize: kIsWeb ? 42 : 30,
+
+                          fontSize: w < 420 ? 24 : 30,
+                          letterSpacing: w < 420 ? 1.4 : 2.0,
+
                           fontWeight: FontWeight.w900,
                           color: Colors.white,
                           height: 1.3,
-                          letterSpacing: 2.0,
+
                           shadows: [
                             Shadow(
                               offset: const Offset(0, 0),
@@ -817,11 +822,11 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                                     child: GridView.builder(
                                       physics: const AlwaysScrollableScrollPhysics(),
                                       itemCount: communities.length,
-                                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                        crossAxisCount: 2,
+                                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: w >= 900 ? 3 : 2,
                                         mainAxisSpacing: 12,
                                         crossAxisSpacing: 12,
-                                        childAspectRatio: 0.82,
+                                        childAspectRatio: w < 420 ? 0.74 : 0.80,
                                       ),
                                       itemBuilder: (context, index) {
                                         final c = communities[index];
@@ -845,6 +850,7 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                                         );
                                       },
                                     ),
+
                                   );
                                 },
                               ),

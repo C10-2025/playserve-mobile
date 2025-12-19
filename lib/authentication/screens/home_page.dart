@@ -5,6 +5,7 @@ import 'package:playserve_mobile/booking/models/playing_field.dart';
 import 'package:playserve_mobile/booking/screens/field_detail_screen.dart';
 import 'package:playserve_mobile/booking/widgets/booking_field_card.dart';
 import 'package:playserve_mobile/booking/services/booking_service.dart';
+import 'package:playserve_mobile/community/screen/discover_communities_page.dart';
 import 'package:playserve_mobile/booking/config.dart';
 import 'package:playserve_mobile/global_theme.dart';
 import 'package:playserve_mobile/main_navbar.dart';
@@ -128,27 +129,45 @@ class _HomePageState extends State<HomePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // --- Feature Buttons ---
-                      const Row(
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           _FeatureButton(
                             imagePath: 'assets/image/match.png',
                             label: 'Match',
+                            onTap: () {
+                              // TODO: ke halaman match
+                            },
                           ),
                           _FeatureButton(
                             imagePath: 'assets/image/booking.png',
                             label: 'Booking',
+                            onTap: () {
+                              // TODO: ke halaman booking
+                            },
                           ),
                           _FeatureButton(
                             imagePath: 'assets/image/review.png',
                             label: 'Review',
+                            onTap: () {
+                              // TODO: ke halaman review
+                            },
                           ),
                           _FeatureButton(
                             imagePath: 'assets/image/community.png',
                             label: 'Community',
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const DiscoverCommunitiesPage(),
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),
+
 
                       // --- 2. Container Hijau DIHAPUS ---
                       const SizedBox(height: 40),
@@ -220,35 +239,54 @@ class _HomePageState extends State<HomePage> {
 class _FeatureButton extends StatelessWidget {
   final String imagePath;
   final String label;
+  final VoidCallback onTap;
 
-  const _FeatureButton({required this.imagePath, required this.label});
+  const _FeatureButton({
+    required this.imagePath,
+    required this.label,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          height: 70,
-          width: 70,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            height: 65,
+            width: 65,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                )
+              ]
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Image.asset(
+                imagePath, 
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) => const Icon(Icons.error, color: Colors.grey),
+              ),
+            ),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: Image.asset(imagePath, fit: BoxFit.contain),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+              fontSize: 12,
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: GoogleFonts.inter(
-            color: Colors.white,
-            fontWeight: FontWeight.w500,
-            fontSize: 13,
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
