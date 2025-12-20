@@ -163,7 +163,7 @@ class ReviewCard extends StatelessWidget {
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 4),
                           child: Text(
-                            "${"★" * r.rating}${"☆" * (5 - r.rating)} — ${r.username}: ${r.comment}",
+                             "★" * r.rating + "☆" * (5 - r.rating) + " — ${r.username}${r.comment.trim().isNotEmpty ? ': ${r.comment}' : ''}",
                             style: const TextStyle(
                               fontSize: 12,
                               color: Color(0xFF1A2B4C),

@@ -15,11 +15,13 @@ class ReviewPage extends StatelessWidget {
     final bool isAdmin = request.jsonData["is_admin"] == true;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFF0A1F63),
 
       appBar: AppBar(
+        automaticallyImplyLeading: false, // Navigate only with navbar
         backgroundColor: const Color(0xFF0A1F63),
         elevation: 0,
+        centerTitle: true,
         title: const Text(
           "Court Reviews",
           style: TextStyle(
@@ -27,10 +29,23 @@ class ReviewPage extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        centerTitle: true,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(6),
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 8),
+            height: 3,
+            width: 120,
+            decoration: BoxDecoration(
+              color: const Color(0xFFB0D235), // green accent
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+        ),
       ),
 
-      body: const ReviewList(),
+      body: SafeArea(
+        child: const ReviewList(), // ReviewList widget
+      ),
 
       bottomNavigationBar: isAdmin
           ? const MainNavbarAdmin(currentIndex: 3)
