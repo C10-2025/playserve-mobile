@@ -51,7 +51,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     try {
       final response = await request.get(
-        "http://127.0.0.1:8000/auth/get_user/",
+        "https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/auth/get_user/",
       );
 
       if (response["status"] == true) {
@@ -78,7 +78,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     setState(() => _isLoading = true);
 
     final response = await request.postJson(
-      'http://127.0.0.1:8000/auth/edit_profile/',
+      'https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/auth/edit_profile/',
       jsonEncode({
         "instagram": _instagramController.text.trim(),
         "lokasi": _selectedLocation,
@@ -265,7 +265,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             onPressed: () async {
                               setState(() => _isLoggingOut = true);
                               await request.get(
-                                'http://127.0.0.1:8000/auth/logout/',
+                                'https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/auth/logout/',
                               );
                               final prefs =
                                   await SharedPreferences.getInstance();

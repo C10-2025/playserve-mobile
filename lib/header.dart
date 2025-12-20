@@ -28,7 +28,7 @@ class _ProfileHeaderState extends State<ProfileHeader> {
     final request = context.read<CookieRequest>();
 
     try {
-      final response = await request.get("http://127.0.0.1:8000/auth/get_user/");
+      final response = await request.get("https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/auth/get_user/");
 
       if (response["status"] == true) {
         setState(() {

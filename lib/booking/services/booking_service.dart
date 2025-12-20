@@ -8,7 +8,7 @@ import '../models/playing_field.dart';
 import '../models/paginated_fields_response.dart';
 
 class BookingService {
-  BookingService(this.request, {this.baseUrl = 'http://localhost:8000'});
+  BookingService(this.request, {this.baseUrl = 'https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id'});
   final CookieRequest request;
   final String baseUrl;
 

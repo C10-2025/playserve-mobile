@@ -31,35 +31,21 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
   final TextEditingController _createNameController = TextEditingController();
   final TextEditingController _createDescController = TextEditingController();
 
-  bool _isAdminFlag = false;
 
-  String get _baseUrl => kIsWeb ? 'http://127.0.0.1:8000' : 'http://10.0.2.2:8000';
+  static const String apiBase = 'https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id';
+  String get _baseUrl => apiBase;
+
+  bool get _isAdminFlag {
+  final request = context.read<CookieRequest>();
+  return request.jsonData["is_admin"] == true;
+}
+
+
 
   @override
   void initState() {
     super.initState();
     _futureCommunities = _fetchCommunities();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadAdminFlag();
-    });
-  }
-
-  Future<void> _loadAdminFlag() async {
-    final request = context.read<CookieRequest>();
-    try {
-      final resp = await request.get('$_baseUrl/auth/check_admin_status/');
-      if (!mounted) return;
-      setState(() {
-        _isAdminFlag = (resp is Map && resp['is_admin'] == true);
-      });
-    } catch (e) {
-      debugPrint('Failed to load admin status: $e');
-      if (!mounted) return;
-      setState(() {
-        _isAdminFlag = false;
-      });
-    }
   }
 
   @override
@@ -72,7 +58,7 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
 
   Widget _buildBottomNav() {
     return _isAdminFlag
-        ? const MainNavbarAdmin(currentIndex: 2)
+        ? const MainNavbarAdmin(currentIndex: 4)
         : const MainNavbar(currentIndex: 1);
   }
 
@@ -603,6 +589,7 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
 
   @override
   Widget build(BuildContext context) {
+    final w = MediaQuery.of(context).size.width;
     final isAdmin = _isAdminFlag;
 
     return Scaffold(
@@ -628,6 +615,7 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                   const SizedBox(height: 12),
                 ],
 
+    
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
                   child: Column(
@@ -637,11 +625,14 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                         'FIND YOUR COMMUNITY',
                         textAlign: TextAlign.center,
                         style: GoogleFonts.inter(
-                          fontSize: kIsWeb ? 42 : 30,
+
+                          fontSize: w < 420 ? 24 : 30,
+                          letterSpacing: w < 420 ? 1.4 : 2.0,
+
                           fontWeight: FontWeight.w900,
                           color: Colors.white,
                           height: 1.3,
-                          letterSpacing: 2.0,
+
                           shadows: [
                             Shadow(
                               offset: const Offset(0, 0),
@@ -831,11 +822,11 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                                     child: GridView.builder(
                                       physics: const AlwaysScrollableScrollPhysics(),
                                       itemCount: communities.length,
-                                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                        crossAxisCount: 2,
+                                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: w >= 900 ? 3 : 2,
                                         mainAxisSpacing: 12,
                                         crossAxisSpacing: 12,
-                                        childAspectRatio: 0.82,
+                                        childAspectRatio: w < 420 ? 0.74 : 0.80,
                                       ),
                                       itemBuilder: (context, index) {
                                         final c = communities[index];
@@ -859,6 +850,7 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                                         );
                                       },
                                     ),
+
                                   );
                                 },
                               ),

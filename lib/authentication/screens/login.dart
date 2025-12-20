@@ -125,7 +125,7 @@ class _LoginPageState extends State<LoginPage> {
                                 setState(() => _isLoading = true);
 
                                 final response = await request.login(
-                                  "http://127.0.0.1:8000/auth/login/",
+                                  "https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/auth/login/",
                                   {
                                     'username': username,
                                     'password': password,
@@ -136,7 +136,7 @@ class _LoginPageState extends State<LoginPage> {
 
                                 if (request.loggedIn) {
                                   final adminCheck = await request.get(
-                                    "http://127.0.0.1:8000/auth/check_admin_status/",
+                                    "https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/auth/check_admin_status/",
                                   );
 
                                   if (context.mounted) {

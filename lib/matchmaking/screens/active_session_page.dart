@@ -32,7 +32,7 @@ class _ActiveSessionPageState extends State<ActiveSessionPage> {
     try {
       // Fetch active session info
       final res = await request.get(
-        "http://127.0.0.1:8000/matchmaking/api/active-session/",
+        "https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/matchmaking/api/active-session/",
       );
 
       if (res["has_session"] != true) {
@@ -50,7 +50,7 @@ class _ActiveSessionPageState extends State<ActiveSessionPage> {
 
       // Fetch profil lengkap opponent
       final oppJson = await request.get(
-        "http://127.0.0.1:8000/matchmaking/api/opponent/$oppId/",
+        "https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/matchmaking/api/opponent/$oppId/",
       );
 
       opponent = PlayerModel.fromJson(oppJson);
@@ -67,7 +67,7 @@ class _ActiveSessionPageState extends State<ActiveSessionPage> {
     final request = context.read<CookieRequest>();
 
     final result = await request.postJson(
-      "http://127.0.0.1:8000/matchmaking/action/finish-session/",
+      "https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/matchmaking/action/finish-session/",
       jsonEncode({
         "session_id": int.parse(sessionJson!["session_id"].toString()),
         "action": action,
