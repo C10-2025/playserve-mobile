@@ -107,7 +107,8 @@ class ViewCommentsModal extends StatelessWidget {
                                   const SizedBox(height: 4),
                                   Text('${"★" * r.rating}${"☆" * (5 - r.rating)}', style: const TextStyle(color: Colors.amber, fontSize: 14)),
                                   const SizedBox(height: 6),
-                                  Text(r.comment, style: const TextStyle(fontSize: 13, color: Color(0xFF1A2B4C))),
+                                  // comment empty?
+                                  Text( (r.comment.trim().isNotEmpty ? r.comment : ""), style: const TextStyle(fontSize: 13, color: Color(0xFF1A2B4C))),
                                   const SizedBox(height: 8),
                                   if (isAdmin)
                                     SizedBox(

@@ -101,13 +101,11 @@ class _AddReviewModalState extends State<AddReviewModal> {
 
                     const SizedBox(height: 8),
 
+                    // Now can add commentless reviews
                     TextFormField(
                       controller: _commentController,
                       minLines: 3,
                       maxLines: 6,
-                      validator: (v) => (v == null || v.trim().isEmpty)
-                          ? 'Please enter a comment'
-                          : null,
                       decoration: const InputDecoration(
                         hintText: 'Write your comment...',
                         hintStyle: TextStyle(color: Color(0xFF1A2B4C)),   // <-- BLACK HINT

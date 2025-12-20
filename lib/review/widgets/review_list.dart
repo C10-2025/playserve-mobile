@@ -165,7 +165,6 @@ class _ReviewListState extends State<ReviewList> {
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
-    // MAGIC, entah kenapa bisa padahal di login g ditambah apa2 ke json, tapi ini kerja DON'T TOUCH
     final bool isAdmin = request.jsonData['is_admin'] == true;
 
     if (_loading) return const Center(child: CircularProgressIndicator());
@@ -183,35 +182,81 @@ class _ReviewListState extends State<ReviewList> {
             // Search + sort row (compact for mobile)
             Row(
               children: [
+                // SEARCH BAR
                 Expanded(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    height: 44,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.06),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
-                    child: TextField(
-                      onChanged: (v) => setState(() => _searchQuery = v),
-                      style: const TextStyle(color: Colors.white),
-                      decoration: const InputDecoration(
-                        hintText: 'Search by name, city, address',
-                        hintStyle: TextStyle(color: Colors.white70),
-                        border: InputBorder.none,
-                        icon: Icon(Icons.search, color: Colors.white70),
-                      ),
+                    child: Row(
+                      children: [
+                        // LEFT ICON
+                        const Icon(
+                          Icons.search,
+                          size: 20,
+                          color: Color(0xFF6B7280),
+                        ),
+
+                        const SizedBox(width: 8),
+
+                        // TEXT FIELD 
+                        Expanded(
+                          child: Center(
+                            child: TextField(
+                              onChanged: (v) => setState(() => _searchQuery = v),
+                              style: const TextStyle(
+                                color: Color(0xFF111827),
+                                fontSize: 14,
+                              ),
+                              decoration: const InputDecoration(
+                                hintText: 'Search by name, city, address',
+                                hintStyle: TextStyle(
+                                  color: Color(0xFF9CA3AF),
+                                  fontSize: 14,
+                                ),
+                                border: InputBorder.none,
+                                isDense: true,
+                                contentPadding: EdgeInsets.zero, 
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
+
                 const SizedBox(width: 10),
+
+                // ⬇️ SORT DROPDOWN
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                  height: 44,
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.06),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                   child: DropdownButton<String>(
                     value: _sortOption,
                     underline: const SizedBox(),
+                    icon: const Icon(Icons.expand_more),
                     items: const [
                       DropdownMenuItem(value: 'none', child: Text('Default')),
                       DropdownMenuItem(value: 'avg_desc', child: Text('Rating ↓')),
@@ -225,7 +270,6 @@ class _ReviewListState extends State<ReviewList> {
                 ),
               ],
             ),
-
             const SizedBox(height: 12),
 
             // List area
