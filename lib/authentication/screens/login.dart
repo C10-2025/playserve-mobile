@@ -29,7 +29,7 @@ class _LoginPageState extends State<LoginPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         // PENTING: Agar gambar tidak terdorong naik saat keyboard muncul
-        resizeToAvoidBottomInset: false, 
+        resizeToAvoidBottomInset: false,
         body: Stack(
           children: [
             // --- LAYER 1: GAMBAR BACKGROUND BAWAH ---
@@ -42,7 +42,8 @@ class _LoginPageState extends State<LoginPage> {
                 width: screenWidth, // Paksa lebar sesuai layar
                 child: Image.asset(
                   'assets/image/background.png',
-                  fit: BoxFit.fitWidth, // Memastikan gambar melebar mentok kiri-kanan
+                  fit: BoxFit
+                      .fitWidth, // Memastikan gambar melebar mentok kiri-kanan
                   alignment: Alignment.bottomCenter,
                 ),
               ),
@@ -55,19 +56,19 @@ class _LoginPageState extends State<LoginPage> {
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(horizontal: 24.0),
                   // Physics ini membuat scroll terasa natural
-                  physics: const BouncingScrollPhysics(), 
+                  physics: const BouncingScrollPhysics(),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       // Jarak dari atas (bisa disesuaikan)
-                      const SizedBox(height: 10), 
-                      
+                      const SizedBox(height: 10),
+
                       Image.asset(
                         'assets/image/logo2.png',
                         width: 180,
                         fit: BoxFit.contain,
                       ),
-                      
+
                       Image.asset(
                         'assets/image/login.png',
                         width: 260,
@@ -110,13 +111,17 @@ class _LoginPageState extends State<LoginPage> {
                           : LimeButton(
                               text: "LOG IN",
                               onPressed: () async {
-                                String username = _usernameController.text.trim();
-                                String password = _passwordController.text.trim();
+                                String username = _usernameController.text
+                                    .trim();
+                                String password = _passwordController.text
+                                    .trim();
 
                                 if (username.isEmpty || password.isEmpty) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
-                                      content: Text("Please fill in all fields."),
+                                      content: Text(
+                                        "Please fill in all fields.",
+                                      ),
                                     ),
                                   );
                                   return;
@@ -125,25 +130,23 @@ class _LoginPageState extends State<LoginPage> {
                                 setState(() => _isLoading = true);
 
                                 final response = await request.login(
-                                  "https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/auth/login/",
-                                  {
-                                    'username': username,
-                                    'password': password,
-                                  },
+                                  "http://127.0.0.1:8000/auth/login/",
+                                  {'username': username, 'password': password},
                                 );
 
                                 setState(() => _isLoading = false);
 
                                 if (request.loggedIn) {
                                   final adminCheck = await request.get(
-                                    "https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/auth/check_admin_status/",
+                                    "http://127.0.0.1:8000/auth/check_admin_status/",
                                   );
 
                                   if (context.mounted) {
-                                    final bool isAdmin = adminCheck["is_admin"] ?? false;
-                                    // Now redundant with main check_admin refresh, but keep it as 
+                                    final bool isAdmin =
+                                        adminCheck["is_admin"] ?? false;
+                                    // Now redundant with main check_admin refresh, but keep it as
                                     // redundancy
-                                    //request.jsonData["is_admin"] = isAdmin; 
+                                    //request.jsonData["is_admin"] = isAdmin;
 
                                     Navigator.pushReplacement(
                                       context,
@@ -176,13 +179,16 @@ class _LoginPageState extends State<LoginPage> {
                                       builder: (context) => AlertDialog(
                                         backgroundColor: Colors.white,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(12),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
                                         ),
                                         title: const Text(
                                           'Login Failed',
                                           style: TextStyle(
-                                              color: blue1,
-                                              fontWeight: FontWeight.bold),
+                                            color: blue1,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
                                         content: Text(
                                           response['message'] ??
@@ -221,10 +227,10 @@ class _LoginPageState extends State<LoginPage> {
                           );
                         },
                       ),
-                      
+
                       // Tambahkan jarak di bawah agar konten tidak tertutup gambar
                       // saat di-scroll mentok bawah
-                      const SizedBox(height: 120), 
+                      const SizedBox(height: 120),
                     ],
                   ),
                 ),

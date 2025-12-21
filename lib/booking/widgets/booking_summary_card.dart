@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:playserve_mobile/booking/models/booking.dart';
+import 'package:playserve_mobile/booking/services/booking_service.dart';
 import 'package:playserve_mobile/booking/theme.dart';
+import 'package:provider/provider.dart';
+import '../config.dart';
+import '../screens/field_detail_screen.dart';
 
 class BookingSummaryCard extends StatelessWidget {
   const BookingSummaryCard({super.key, required this.booking});
@@ -9,56 +14,97 @@ class BookingSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final badge = _statusBadge(booking.status);
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-      decoration: BookingDecorations.card,
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  booking.field.name,
-                  style: BookingTextStyles.cardTitle,
+    return InkWell(
+      onTap: () async {
+        // Show loading
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => const Center(child: CircularProgressIndicator()),
+        );
+
+        try {
+          final service = BookingService(
+            context.read<CookieRequest>(),
+            baseUrl: kBaseUrl,
+          );
+          final field = await service.fetchField(booking.field.id);
+
+          if (context.mounted) {
+            Navigator.pop(context); // Close loading
+            if (field != null) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => FieldDetailScreen(field: field),
                 ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: badge.background,
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: Text(
-                  badge.label,
-                  style: BookingTextStyles.cardSubtitle.copyWith(
-                    color: badge.textColor,
-                    fontWeight: FontWeight.w700,
+              );
+            } else {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('Court not found')));
+            }
+          }
+        } catch (e) {
+          if (context.mounted) {
+            Navigator.pop(context); // Close loading
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text('Error: $e')));
+          }
+        }
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+        decoration: BookingDecorations.card,
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    booking.field.name,
+                    style: BookingTextStyles.cardTitle,
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            '${booking.bookingDate} · ${booking.startTime} - ${booking.endTime}',
-            style: BookingTextStyles.cardSubtitle,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'City: ${booking.field.city}',
-            style: BookingTextStyles.cardSubtitle,
-          ),
-          const SizedBox(height: 10),
-          Text(
-            'Total: Rp ${booking.totalPrice.toInt()}',
-            style: BookingTextStyles.price.copyWith(fontSize: 18),
-          ),
-        ],
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: badge.background,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    badge.label,
+                    style: BookingTextStyles.cardSubtitle.copyWith(
+                      color: badge.textColor,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '${booking.bookingDate} · ${booking.startTime} - ${booking.endTime}',
+              style: BookingTextStyles.cardSubtitle,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'City: ${booking.field.city}',
+              style: BookingTextStyles.cardSubtitle,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Total: Rp ${booking.totalPrice.toInt()}',
+              style: BookingTextStyles.price.copyWith(fontSize: 18),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -109,7 +109,7 @@ class _LoginPageState extends State<LoginPage> {
                             setState(() => _isLoading = true);
 
                             final response = await request.login(
-                              "https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/auth/login/",
+                              "http://127.0.0.1:8000/auth/login/",
                               {'username': username, 'password': password},
                             );
 

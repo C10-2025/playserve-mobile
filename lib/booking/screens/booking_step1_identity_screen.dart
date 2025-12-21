@@ -185,6 +185,19 @@ class _BookingStep1IdentityScreenState
       ).showSnackBar(const SnackBar(content: Text('Name and phone required')));
       return;
     }
+
+    final phoneRegex = RegExp(r'^(0|\+62)\d{9,14}$');
+    if (!phoneRegex.hasMatch(_phone.text.trim())) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Invalid phone number format. Must start with 0 or +62 and be 10-15 digits.',
+          ),
+        ),
+      );
+      return;
+    }
+
     widget.draft.bookerName = _name.text.trim();
     widget.draft.bookerPhone = _phone.text.trim();
     widget.draft.bookerEmail = _email.text.trim();
