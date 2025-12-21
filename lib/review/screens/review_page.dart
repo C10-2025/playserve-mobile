@@ -22,9 +22,9 @@ class ReviewPage extends StatelessWidget {
         backgroundColor: const Color(0xFF0A1F63),
         elevation: 0,
         centerTitle: true,
-        title: const Text(
-          "Court Reviews",
-          style: TextStyle(
+        title: Text(
+          isAdmin ? "Review Management" : "Court Reviews",
+          style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
