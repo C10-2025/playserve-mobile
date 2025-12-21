@@ -74,7 +74,7 @@ class _BookingStep3PaymentScreenState extends State<BookingStep3PaymentScreen> {
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  'I agree to the terms and 24h cancellation policy.',
+                                  'I agree to the terms.',
                                   style: BookingTextStyles.cardSubtitle
                                       .copyWith(color: BookingColors.textLight),
                                 ),
