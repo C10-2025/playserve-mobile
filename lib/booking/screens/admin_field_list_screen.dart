@@ -57,8 +57,10 @@ class _AdminFieldListScreenState extends State<AdminFieldListScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Court Management',
-                    style: BookingTextStyles.display.copyWith(fontSize: 28)),
+                Text(
+                  'Court Management',
+                  style: BookingTextStyles.display.copyWith(fontSize: 28),
+                ),
                 const SizedBox(height: 20),
                 FutureBuilder<List<PlayingField>>(
                   future: future,
@@ -67,40 +69,91 @@ class _AdminFieldListScreenState extends State<AdminFieldListScreen> {
                       return const Padding(
                         padding: EdgeInsets.symmetric(vertical: 40),
                         child: Center(
-                            child: CircularProgressIndicator(color: BookingColors.lime)),
+                          child: CircularProgressIndicator(
+                            color: BookingColors.lime,
+                          ),
+                        ),
                       );
                     }
                     if (snapshot.hasError) {
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 20),
-                        child: Text('Error: ${snapshot.error}',
-                            style: BookingTextStyles.bodyLight),
+                        child: Text(
+                          'Error: ${snapshot.error}',
+                          style: BookingTextStyles.bodyLight,
+                        ),
                       );
                     }
                     final fields = snapshot.data ?? [];
                     if (fields.isEmpty) {
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 20),
-                        child: Text('No courts yet', style: BookingTextStyles.bodyLight),
+                        child: Text(
+                          'No courts yet',
+                          style: BookingTextStyles.bodyLight,
+                        ),
                       );
                     }
                     return Column(
                       children: fields
-                          .map((f) => Padding(
-                                padding: const EdgeInsets.only(bottom: 12),
-                                child: AdminFieldTile(
-                                  field: f,
-                                  onTap: () async {
-                                    await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => AdminFieldFormScreen(field: f),
+                          .map(
+                            (f) => Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: AdminFieldTile(
+                                field: f,
+                                onTap: () async {
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          AdminFieldFormScreen(field: f),
+                                    ),
+                                  );
+                                  _refresh();
+                                },
+                                onDelete: () async {
+                                  final confirmed = await showDialog<bool>(
+                                    context: context,
+                                    builder: (ctx) => AlertDialog(
+                                      title: const Text('Delete Court'),
+                                      content: Text(
+                                        'Are you sure you want to delete "${f.name}"?',
                                       ),
-                                    );
-                                    _refresh();
-                                  },
-                                ),
-                              ))
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(ctx, false),
+                                          child: const Text('Cancel'),
+                                        ),
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(ctx, true),
+                                          child: const Text(
+                                            'Delete',
+                                            style: TextStyle(color: Colors.red),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                  if (confirmed == true) {
+                                    try {
+                                      await service.adminDeleteField(f.id);
+                                      _refresh();
+                                    } catch (e) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text('Delete failed: $e'),
+                                        ),
+                                      );
+                                    }
+                                  }
+                                },
+                              ),
+                            ),
+                          )
                           .toList(),
                     );
                   },
