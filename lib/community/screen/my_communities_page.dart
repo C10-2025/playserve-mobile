@@ -10,7 +10,7 @@ import '../models/community.dart';
 import 'community_detail_page.dart';
 import 'discover_communities_page.dart';
 import 'package:playserve_mobile/main_navbar.dart';
-import 'package:playserve_mobile/main_navbar_admin.dart'; 
+import 'package:playserve_mobile/main_navbar_admin.dart';
 import 'package:playserve_mobile/header.dart';
 
 class MyCommunitiesPage extends StatefulWidget {
@@ -28,26 +28,24 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
 
   final String _subtitle = 'JOINED';
 
-  static const String apiBase = 'https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id';
+  static const String apiBase =
+      'https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id';
   String get _baseUrl => apiBase;
 
   bool get _isAdminFlag {
-  final request = context.read<CookieRequest>();
-  return request.jsonData["is_admin"] == true;
-}
-
-
+    final request = context.read<CookieRequest>();
+    return request.jsonData["is_admin"] == true;
+  }
 
   @override
   void initState() {
     super.initState();
     _myCommunities = _fetchMyCommunities();
-
   }
 
   Widget _buildBottomNav() {
     return _isAdminFlag
-        ? const MainNavbarAdmin(currentIndex: 4) 
+        ? const MainNavbarAdmin(currentIndex: 4)
         : const MainNavbar(currentIndex: 1);
   }
 
@@ -120,7 +118,8 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
 
                 if (resp is Map) {
                   final code = resp['code'];
-                  final message = resp['message'] as String? ??
+                  final message =
+                      resp['message'] as String? ??
                       'Community created successfully.';
 
                   if (code == 'duplicate_name') {
@@ -243,14 +242,17 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
                   children: [
                     Expanded(
                       child: Container(
-                        height: MediaQuery.of(context).size.width < 420 ? 38 : 46,
+                        height: MediaQuery.of(context).size.width < 420
+                            ? 38
+                            : 46,
                         decoration: BoxDecoration(
                           color: const Color(0xFFD1D5DB),
                           borderRadius: BorderRadius.circular(14),
                         ),
                         child: TextButton(
-                          onPressed:
-                              isSubmitting ? null : () => Navigator.pop(ctx),
+                          onPressed: isSubmitting
+                              ? null
+                              : () => Navigator.pop(ctx),
                           child: Text(
                             'Cancel',
                             style: GoogleFonts.inter(
@@ -265,7 +267,9 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Container(
-                        height: MediaQuery.of(context).size.width < 420 ? 38 : 46,
+                        height: MediaQuery.of(context).size.width < 420
+                            ? 38
+                            : 46,
                         decoration: BoxDecoration(
                           color: const Color(0xFFC1D752),
                           borderRadius: BorderRadius.circular(14),
@@ -355,14 +359,14 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
     );
   }
 
-    @override
+  @override
   Widget build(BuildContext context) {
-    final isAdmin = _isAdminFlag; 
+    final isAdmin = _isAdminFlag;
     final subtitleText = _isAdminFlag ? 'CREATED BY ME' : _subtitle;
 
     return Scaffold(
       backgroundColor: const Color(0xFF1E3A8A),
-      bottomNavigationBar: _buildBottomNav(), 
+      bottomNavigationBar: _buildBottomNav(),
       body: Stack(
         children: [
           Positioned.fill(
@@ -488,17 +492,20 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
                                           );
                                         },
                                         style: ElevatedButton.styleFrom(
-                                          backgroundColor:
-                                              const Color(0xFFC1D752),
-                                          foregroundColor:
-                                              const Color(0xFF082459),
+                                          backgroundColor: const Color(
+                                            0xFFC1D752,
+                                          ),
+                                          foregroundColor: const Color(
+                                            0xFF082459,
+                                          ),
                                           padding: const EdgeInsets.symmetric(
                                             horizontal: 32,
                                             vertical: 12,
                                           ),
                                           shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
                                           ),
                                           elevation: 4,
                                         ),
@@ -533,11 +540,11 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
                                     itemCount: communities.length,
                                     gridDelegate:
                                         SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: crossAxisCount,
-                                      mainAxisSpacing: 12,
-                                      crossAxisSpacing: 12,
-                                      childAspectRatio: 0.82,
-                                    ),
+                                          crossAxisCount: crossAxisCount,
+                                          mainAxisSpacing: 12,
+                                          crossAxisSpacing: 12,
+                                          childAspectRatio: 0.82,
+                                        ),
                                     itemBuilder: (context, index) {
                                       final community = communities[index];
                                       return _buildCommunityCard(
@@ -562,7 +569,6 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
       ),
     );
   }
-
 
   Widget _buildCommunityCard(BuildContext context, Community community) {
     return Container(
@@ -596,10 +602,7 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
               const SizedBox(height: 4),
               Text(
                 '${community.membersCount} members',
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  color: Colors.grey,
-                ),
+                style: GoogleFonts.inter(fontSize: 14, color: Colors.grey),
               ),
               if (community.description.isNotEmpty) ...[
                 const SizedBox(height: 8),
@@ -607,10 +610,7 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
                   community.description,
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    color: Colors.black87,
-                  ),
+                  style: GoogleFonts.inter(fontSize: 14, color: Colors.black87),
                 ),
               ],
             ],
@@ -623,9 +623,8 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => CommunityDetailPage(
-                      communityId: community.id,
-                    ),
+                    builder: (_) =>
+                        CommunityDetailPage(communityId: community.id),
                   ),
                 );
               },

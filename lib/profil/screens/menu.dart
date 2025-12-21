@@ -42,17 +42,17 @@ class MyHomePage extends StatelessWidget {
               const SizedBox(height: 16),
               const Text(
                 "You are now logged in successfully.",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                ),
+                style: TextStyle(color: Colors.white, fontSize: 16),
               ),
               const SizedBox(height: 40),
 
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
-                  icon: const Icon(Icons.sports_tennis, color: Color(0xFFB8D243)),
+                  icon: const Icon(
+                    Icons.sports_tennis,
+                    color: Color(0xFFB8D243),
+                  ),
                   label: const Text(
                     "Go to Booking",
                     style: TextStyle(
@@ -70,8 +70,10 @@ class MyHomePage extends StatelessWidget {
                   },
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: Color(0xFFB8D243)),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 14,
+                    ),
                   ),
                 ),
               ),
@@ -80,7 +82,7 @@ class MyHomePage extends StatelessWidget {
               // Tombol logout
               ElevatedButton(
                 onPressed: () async {
-                  await request.logout("https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/auth/logout");
+                  await request.logout("http://127.0.0.1:8000/auth/logout");
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -93,8 +95,10 @@ class MyHomePage extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFB8D243),
                   foregroundColor: const Color(0xFF0C1446),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 14,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),

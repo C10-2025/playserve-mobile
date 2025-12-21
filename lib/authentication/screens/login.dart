@@ -22,45 +22,36 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
-    // Mengambil lebar layar HP agar gambar dipaksa full width
     final double screenWidth = MediaQuery.of(context).size.width;
 
     return GradientBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        // PENTING: Agar gambar tidak terdorong naik saat keyboard muncul
         resizeToAvoidBottomInset: false,
         body: Stack(
           children: [
-            // --- LAYER 1: GAMBAR BACKGROUND BAWAH ---
-            // Posisi di paling bawah stack agar berada di belakang
             Positioned(
               bottom: 0,
               left: 0,
               right: 0,
               child: SizedBox(
-                width: screenWidth, // Paksa lebar sesuai layar
+                width: screenWidth,
                 child: Image.asset(
                   'assets/image/background.png',
-                  fit: BoxFit
-                      .fitWidth, // Memastikan gambar melebar mentok kiri-kanan
+                  fit: BoxFit.fitWidth,
                   alignment: Alignment.bottomCenter,
                 ),
               ),
             ),
 
-            // --- LAYER 2: KONTEN LOGIN ---
-            // Menggunakan SafeArea & Center agar form ada di tengah
             SafeArea(
               child: Center(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  // Physics ini membuat scroll terasa natural
                   physics: const BouncingScrollPhysics(),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Jarak dari atas (bisa disesuaikan)
                       const SizedBox(height: 10),
 
                       Image.asset(
@@ -87,7 +78,6 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       const SizedBox(height: 40),
 
-                      // Input Fields
                       RoundedInputField(
                         controller: _usernameController,
                         hintText: 'Username',
@@ -105,7 +95,6 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       const SizedBox(height: 30),
 
-                      // Buttons
                       _isLoading
                           ? const CircularProgressIndicator(color: limegreen)
                           : LimeButton(
@@ -144,9 +133,6 @@ class _LoginPageState extends State<LoginPage> {
                                   if (context.mounted) {
                                     final bool isAdmin =
                                         adminCheck["is_admin"] ?? false;
-                                    // Now redundant with main check_admin refresh, but keep it as
-                                    // redundancy
-                                    //request.jsonData["is_admin"] = isAdmin;
 
                                     Navigator.pushReplacement(
                                       context,
@@ -228,8 +214,6 @@ class _LoginPageState extends State<LoginPage> {
                         },
                       ),
 
-                      // Tambahkan jarak di bawah agar konten tidak tertutup gambar
-                      // saat di-scroll mentok bawah
                       const SizedBox(height: 120),
                     ],
                   ),

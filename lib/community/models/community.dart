@@ -5,8 +5,8 @@ class Community {
   final int membersCount;
   final bool isJoined;
 
-  final bool isCreator;          
-  final String? creatorUsername; 
+  final bool isCreator;
+  final String? creatorUsername;
 
   Community({
     required this.id,

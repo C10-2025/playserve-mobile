@@ -32,7 +32,7 @@ class _ActiveSessionPageState extends State<ActiveSessionPage> {
     try {
       // Fetch active session info
       final res = await request.get(
-        "https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/matchmaking/api/active-session/",
+        "http://127.0.0.1:8000/matchmaking/api/active-session/",
       );
 
       if (res["has_session"] != true) {
@@ -50,7 +50,7 @@ class _ActiveSessionPageState extends State<ActiveSessionPage> {
 
       // Fetch profil lengkap opponent
       final oppJson = await request.get(
-        "https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/matchmaking/api/opponent/$oppId/",
+        "http://127.0.0.1:8000/matchmaking/api/opponent/$oppId/",
       );
 
       opponent = PlayerModel.fromJson(oppJson);
@@ -67,7 +67,7 @@ class _ActiveSessionPageState extends State<ActiveSessionPage> {
     final request = context.read<CookieRequest>();
 
     final result = await request.postJson(
-      "https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/matchmaking/action/finish-session/",
+      "http://127.0.0.1:8000/matchmaking/action/finish-session/",
       jsonEncode({
         "session_id": int.parse(sessionJson!["session_id"].toString()),
         "action": action,
@@ -85,13 +85,13 @@ class _ActiveSessionPageState extends State<ActiveSessionPage> {
         (route) => false,
       );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Match updated.")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Match updated.")));
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed: ${result['error']}")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Failed: ${result['error']}")));
     }
   }
 
@@ -100,9 +100,7 @@ class _ActiveSessionPageState extends State<ActiveSessionPage> {
     if (isLoading || opponent == null) {
       return const Scaffold(
         backgroundColor: Color(0xFF042A76),
-        body: Center(
-          child: CircularProgressIndicator(color: Colors.white),
-        ),
+        body: Center(child: CircularProgressIndicator(color: Colors.white)),
       );
     }
 
@@ -115,10 +113,7 @@ class _ActiveSessionPageState extends State<ActiveSessionPage> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF042A76),
-              Color(0xFF0A4AA3),
-            ],
+            colors: [Color(0xFF042A76), Color(0xFF0A4AA3)],
           ),
         ),
 
@@ -223,10 +218,9 @@ class _OpponentCard extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-
             // ---------------- AVATAR + BADGE ----------------
             Stack(
-              clipBehavior: Clip.none,     // <<< FIX PENTING
+              clipBehavior: Clip.none, // <<< FIX PENTING
               children: [
                 Container(
                   width: 88,
@@ -273,9 +267,7 @@ class _OpponentCard extends StatelessWidget {
 
             const SizedBox(height: 4),
 
-            ClickableInstagramText(
-              username: player.instagram,
-            ),
+            ClickableInstagramText(username: player.instagram),
 
             const SizedBox(height: 28),
 

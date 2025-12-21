@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
@@ -16,11 +17,17 @@ class EditProfileScreen extends StatefulWidget {
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final TextEditingController _instagramController = TextEditingController();
+  final FocusNode _instaFocusNode = FocusNode();
+  final FocusNode _locationFocusNode = FocusNode();
+  Timer? _pollingTimer;
   String? _selectedLocation;
   String _selectedAvatar = "image/avatar1.svg";
   bool _isLoading = false;
   bool _isLoggingOut = false;
   bool _showAvatarOptions = false;
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   final List<Map<String, String>> _avatarOptions = const [
     {"png": "assets/image/avatar1.png", "svg": "image/avatar1.svg"},
@@ -44,6 +51,50 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void initState() {
     super.initState();
     _loadProfile();
+    _startPolling();
+  }
+
+  @override
+  void dispose() {
+    _pollingTimer?.cancel();
+    _instaFocusNode.dispose();
+    _locationFocusNode.dispose();
+    super.dispose();
+  }
+
+  void _startPolling() {
+    _pollingTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      _syncProfileSilently();
+    });
+  }
+
+  Future<void> _syncProfileSilently() async {
+    final request = context.read<CookieRequest>();
+    try {
+      final response = await request.get(
+        "http://127.0.0.1:8000/auth/get_user/",
+      );
+
+      if (response["status"] == true) {
+        if (!mounted) return;
+        setState(() {
+          _username = response["username"];
+          if (!_instaFocusNode.hasFocus) {
+            _instagramController.text = response["instagram"] ?? "";
+          }
+
+          if (!_locationFocusNode.hasFocus) {
+            _selectedLocation = response["lokasi"] ?? "Jakarta";
+          }
+
+          if (!_showAvatarOptions) {
+            _selectedAvatar = response["avatar"] ?? "image/avatar1.svg";
+          }
+        });
+      }
+    } catch (e) {
+      debugPrint("Silent sync failed: $e");
+    }
   }
 
   Future<void> _loadProfile() async {
@@ -51,7 +102,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     try {
       final response = await request.get(
-        "https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/auth/get_user/",
+        "http://127.0.0.1:8000/auth/get_user/",
       );
 
       if (response["status"] == true) {
@@ -75,17 +126,56 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Future<void> _saveProfile(CookieRequest request) async {
+    String newPass = _passwordController.text;
+    String confirmPass = _confirmPasswordController.text;
+    final instagram = _instagramController.text.trim();
+
+    if (instagram.isNotEmpty) {
+      if (instagram.startsWith('@')) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("No need for @ at the beginning.")),
+        );
+        return;
+      }
+      if (!RegExp(r'^[a-zA-Z0-9._]+$').hasMatch(instagram)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Enter a valid Instagram username.")),
+        );
+        return;
+      }
+    }
+
+    if (newPass.isNotEmpty) {
+      if (newPass.length < 8) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("New password must be at least 8 characters."),
+          ),
+        );
+        return;
+      }
+      if (newPass != confirmPass) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Passwords do not match.")),
+        );
+        return;
+      }
+    }
+
     setState(() => _isLoading = true);
 
     final response = await request.postJson(
-      'https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/auth/edit_profile/',
+      'http://127.0.0.1:8000/auth/edit_profile/',
       jsonEncode({
         "instagram": _instagramController.text.trim(),
         "lokasi": _selectedLocation,
         "avatar": _selectedAvatar,
+        "new_password": newPass,
+        "confirm_password": confirmPass,
       }),
     );
-
+    _passwordController.clear();
+    _confirmPasswordController.clear();
     setState(() => _isLoading = false);
 
     if (response["status"] == true) {
@@ -94,12 +184,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       await prefs.setString('lokasi', response["lokasi"]);
       await prefs.setString('avatar', response["avatar"]);
 
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Colors.green,
           content: Text(response["message"]),
         ),
       );
+
+      Navigator.pop(context, true);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -187,10 +280,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                     TextField(
                       controller: _instagramController,
+                      focusNode: _instaFocusNode,
                       style: const TextStyle(color: Colors.black),
                       decoration: InputDecoration(
                         labelText: "Instagram",
-                        hintText: "@yourhandle",
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(
@@ -203,6 +296,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                     DropdownButtonFormField<String>(
                       value: _selectedLocation,
+                      focusNode: _locationFocusNode,
                       decoration: InputDecoration(
                         labelText: "Location",
                         labelStyle: GoogleFonts.inter(color: blue1),
@@ -224,6 +318,36 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
 
                     const SizedBox(height: 28),
+
+                    TextField(
+                      controller: _passwordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: "New Password (Optional)",
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        labelStyle: GoogleFonts.inter(color: blue1),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    TextField(
+                      controller: _confirmPasswordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: "Confirm New Password",
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        labelStyle: GoogleFonts.inter(color: blue1),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
 
                     _isLoading
                         ? const CircularProgressIndicator(
@@ -265,7 +389,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             onPressed: () async {
                               setState(() => _isLoggingOut = true);
                               await request.get(
-                                'https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/auth/logout/',
+                                'http://127.0.0.1:8000/auth/logout/',
                               );
                               final prefs =
                                   await SharedPreferences.getInstance();

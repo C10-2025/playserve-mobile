@@ -13,7 +13,7 @@ class DeleteProfilePage extends StatefulWidget {
 
 class _DeleteProfilePageState extends State<DeleteProfilePage> {
   bool isLoading = true;
-  
+
   List<Map<String, String>> users = [];
   List<Map<String, String>> filteredUsers = [];
   String searchQuery = '';
@@ -34,7 +34,7 @@ class _DeleteProfilePageState extends State<DeleteProfilePage> {
 
     try {
       final response = await request.get(
-        'https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/auth/get_all_users/',
+        'http://127.0.0.1:8000/auth/get_all_users/',
       );
 
       debugPrint("📡 RAW RESPONSE: $response");
@@ -44,7 +44,7 @@ class _DeleteProfilePageState extends State<DeleteProfilePage> {
         List<Map<String, String>> cleanList = [];
         for (var item in rawList) {
           if (item == null) continue;
-          
+
           cleanList.add({
             "username": item['username']?.toString() ?? "Unknown",
             "instagram": item['instagram']?.toString() ?? "",
@@ -92,32 +92,29 @@ class _DeleteProfilePageState extends State<DeleteProfilePage> {
 
     try {
       final response = await request.post(
-        'https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/auth/admin_delete_user/',
-        {
-          "username": username,
-        },
+        'http://127.0.0.1:8000/auth/admin_delete_user/',
+        {"username": username},
       );
       if (response['status'] == true) {
-         if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("User $username deleted successfully")),
-            );
-         }
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("User $username deleted successfully")),
+          );
+        }
       } else {
-         fetchUsers();
-         if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(response['message'] ?? "Failed to delete")),
-            );
-         }
+        fetchUsers();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(response['message'] ?? "Failed to delete")),
+          );
+        }
       }
-
     } catch (e) {
       fetchUsers();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Delete failed: $e")),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Delete failed: $e")));
       }
     }
   }
@@ -156,7 +153,10 @@ class _DeleteProfilePageState extends State<DeleteProfilePage> {
                     hintText: "Search users...",
                     hintStyle: TextStyle(color: Color.fromARGB(179, 0, 0, 0)),
                     border: InputBorder.none,
-                    suffixIcon: Icon(Icons.search, color: Color.fromARGB(179, 0, 0, 0)),
+                    suffixIcon: Icon(
+                      Icons.search,
+                      color: Color.fromARGB(179, 0, 0, 0),
+                    ),
                   ),
                 ),
               ),
@@ -164,15 +164,22 @@ class _DeleteProfilePageState extends State<DeleteProfilePage> {
 
               Expanded(
                 child: isLoading
-                    ? const Center(child: CircularProgressIndicator(color: Colors.white))
+                    ? const Center(
+                        child: CircularProgressIndicator(color: Colors.white),
+                      )
                     : filteredUsers.isEmpty
-                        ? const Center(child: Text("No users found", style: TextStyle(color: Colors.white)))
-                        : ListView.builder(
-                            itemCount: filteredUsers.length,
-                            itemBuilder: (context, index) {
-                              return _buildUserCard(filteredUsers[index]);
-                            },
-                          ),
+                    ? const Center(
+                        child: Text(
+                          "No users found",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: filteredUsers.length,
+                        itemBuilder: (context, index) {
+                          return _buildUserCard(filteredUsers[index]);
+                        },
+                      ),
               ),
             ],
           ),
@@ -204,15 +211,19 @@ class _DeleteProfilePageState extends State<DeleteProfilePage> {
             radius: 28,
             backgroundColor: const Color(0xFFB8D243),
             child: ClipOval(
-               child: Image.asset(
-                 'assets/$avatarPath',
-                 fit: BoxFit.cover,
-                 width: 56,
-                 height: 56,
-                 errorBuilder: (context, error, stackTrace) {
-                   return const Icon(Icons.person, size: 30, color: Colors.white);
-                 },
-               ),
+              child: Image.asset(
+                'assets/$avatarPath',
+                fit: BoxFit.cover,
+                width: 56,
+                height: 56,
+                errorBuilder: (context, error, stackTrace) {
+                  return const Icon(
+                    Icons.person,
+                    size: 30,
+                    color: Colors.white,
+                  );
+                },
+              ),
             ),
           ),
           const SizedBox(width: 16),

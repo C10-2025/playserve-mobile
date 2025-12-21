@@ -11,6 +11,9 @@ import 'package:playserve_mobile/global_theme.dart';
 import 'package:playserve_mobile/main_navbar.dart';
 import 'package:playserve_mobile/header.dart';
 import 'package:provider/provider.dart';
+import 'package:playserve_mobile/matchmaking/screens/dashboard_page.dart';
+import 'package:playserve_mobile/review/screens/review_page.dart';
+import 'package:playserve_mobile/booking/screens/field_list_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -30,20 +33,23 @@ class _HomePageState extends State<HomePage> {
     _loadRecommendedFields();
   }
 
+  Future<void> _refreshData() async {
+    setState(() {
+      _isLoadingFields = true;
+    });
+    await _loadRecommendedFields();
+    setState(() {});
+  }
+
   Future<void> _loadRecommendedFields() async {
     try {
       final request = context.read<CookieRequest>();
       final service = BookingService(request, baseUrl: kBaseUrl);
 
-      final response = await service.fetchFieldsPaginated(
-        page: 1,
-        pageSize: 3, // Only fetch first 3 fields
-      );
+      final response = await service.fetchFieldsPaginated(page: 1, pageSize: 3);
 
       setState(() {
-        _recommendedFields = response.fields
-            .take(3)
-            .toList(); // Ensure only 3 fields
+        _recommendedFields = response.fields.take(3).toList();
         _isLoadingFields = false;
         _error = null;
       });
@@ -61,172 +67,177 @@ class _HomePageState extends State<HomePage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Padding khusus header profile agar rapi
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-                  child: ProfileHeader(),
-                ),
+          child: RefreshIndicator(
+            color: limegreen,
+            onRefresh: _refreshData,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+                    child: ProfileHeader(),
+                  ),
 
-                // --- 1. HEADER SECTION (UBAH JADI STACK ALA ADMIN) ---
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    // Layer Belakang: Gambar Full Width + Opacity
-                    Opacity(
-                      opacity: 0.6,
-                      child: Image.asset(
-                        'assets/image/background.png',
-                        width: double.infinity,
-                        fit: BoxFit.fitWidth,
-                        errorBuilder: (context, error, stackTrace) {
-                          return const SizedBox(height: 150);
-                        },
-                      ),
-                    ),
-
-                    // Layer Depan: Teks Judul
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 20),
-                      child: Column(
-                        children: [
-                          Text(
-                            "FIND YOUR RIVAL.",
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.inter(
-                              fontSize: 28,
-                              fontWeight: FontWeight.w900,
-                              height: 1.0,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          Text(
-                            "ACE THE COURT.", // Warna Hijau agar mirip Admin
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.inter(
-                              fontSize: 28,
-                              fontWeight: FontWeight.w900,
-                              height: 1.0,
-                              color: limegreen,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 28),
-
-                // Content Wrapper
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  Stack(
+                    alignment: Alignment.center,
                     children: [
-                      // --- Feature Buttons ---
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _FeatureButton(
-                            imagePath: 'assets/image/match.png',
-                            label: 'Match',
-                            onTap: () {
-                              // TODO: ke halaman match
-                            },
-                          ),
-                          _FeatureButton(
-                            imagePath: 'assets/image/booking.png',
-                            label: 'Booking',
-                            onTap: () {
-                              // TODO: ke halaman booking
-                            },
-                          ),
-                          _FeatureButton(
-                            imagePath: 'assets/image/review.png',
-                            label: 'Review',
-                            onTap: () {
-                              // TODO: ke halaman review
-                            },
-                          ),
-                          _FeatureButton(
-                            imagePath: 'assets/image/community.png',
-                            label: 'Community',
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const DiscoverCommunitiesPage(),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-
-
-                      // --- 2. Container Hijau DIHAPUS ---
-                      const SizedBox(height: 40),
-
-                      // --- 3. Recommended Courts (TANPA PANAH) ---
-                      Text(
-                        "Recommended Courts",
-                        style: GoogleFonts.inter(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 18, // Sedikit diperbesar agar lebih jelas
+                      Opacity(
+                        opacity: 0.6,
+                        child: Image.asset(
+                          'assets/image/background.png',
+                          width: double.infinity,
+                          fit: BoxFit.fitWidth,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const SizedBox(height: 150);
+                          },
                         ),
                       ),
-                      
-                      const SizedBox(height: 16),
 
-                      // Recommended Courts Cards (Logic Tetap Sama)
-                      if (_isLoadingFields)
-                        const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 20),
-                          child: Center(
-                            child: CircularProgressIndicator(color: Colors.white),
-                          ),
-                        )
-                      else if (_error != null)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 20),
-                          child: Center(
-                            child: Text(
-                              'Failed to load courts',
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 20),
+                        child: Column(
+                          children: [
+                            Text(
+                              "FIND YOUR RIVAL.",
+                              textAlign: TextAlign.center,
                               style: GoogleFonts.inter(
-                                color: Colors.white70,
-                                fontSize: 14,
+                                fontSize: 28,
+                                fontWeight: FontWeight.w900,
+                                height: 1.0,
+                                color: Colors.white,
                               ),
                             ),
+                            const SizedBox(height: 5),
+                            Text(
+                              "ACE THE COURT.",
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.inter(
+                                fontSize: 28,
+                                fontWeight: FontWeight.w900,
+                                height: 1.0,
+                                color: limegreen,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 28),
+
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _FeatureButton(
+                              imagePath: 'assets/image/match.png',
+                              label: 'Match',
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const FieldListScreen(),
+                                  ),
+                                );
+                              },
+                            ),
+                            _FeatureButton(
+                              imagePath: 'assets/image/booking.png',
+                              label: 'Booking',
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const DashboardPage(),
+                                  ),
+                                );
+                              },
+                            ),
+                            _FeatureButton(
+                              imagePath: 'assets/image/review.png',
+                              label: 'Review',
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const ReviewPage(),
+                                  ),
+                                );
+                              },
+                            ),
+                            _FeatureButton(
+                              imagePath: 'assets/image/community.png',
+                              label: 'Community',
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) =>
+                                        const DiscoverCommunitiesPage(),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 40),
+                        Text(
+                          "Recommended Courts",
+                          style: GoogleFonts.inter(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 18,
                           ),
-                        )
-                      else
-                        for (int i = 0; i < _recommendedFields.length; i++)
-                          Container(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            child: BookingFieldCard(
-                              field: _recommendedFields[i],
-                              onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => FieldDetailScreen(
-                                    field: _recommendedFields[i],
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        if (_isLoadingFields)
+                          const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 20),
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
+                            ),
+                          )
+                        else if (_error != null)
+                          const Center(
+                            child: Text(
+                              "Failed to load courts",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          )
+                        else
+                          for (int i = 0; i < _recommendedFields.length; i++)
+                            Container(
+                              margin: const EdgeInsets.only(bottom: 12),
+                              child: BookingFieldCard(
+                                field: _recommendedFields[i],
+                                onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => FieldDetailScreen(
+                                      field: _recommendedFields[i],
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-
-                      const SizedBox(height: 80),
-                    ],
+                        const SizedBox(height: 80),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -264,15 +275,16 @@ class _FeatureButton extends StatelessWidget {
                   color: Colors.black.withOpacity(0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 4),
-                )
-              ]
+                ),
+              ],
             ),
             child: Padding(
               padding: const EdgeInsets.all(12),
               child: Image.asset(
-                imagePath, 
+                imagePath,
                 fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) => const Icon(Icons.error, color: Colors.grey),
+                errorBuilder: (context, error, stackTrace) =>
+                    const Icon(Icons.error, color: Colors.grey),
               ),
             ),
           ),

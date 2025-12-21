@@ -20,7 +20,8 @@ class DiscoverCommunitiesPage extends StatefulWidget {
   const DiscoverCommunitiesPage({super.key});
 
   @override
-  State<DiscoverCommunitiesPage> createState() => _DiscoverCommunitiesPageState();
+  State<DiscoverCommunitiesPage> createState() =>
+      _DiscoverCommunitiesPageState();
 }
 
 class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
@@ -31,16 +32,14 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
   final TextEditingController _createNameController = TextEditingController();
   final TextEditingController _createDescController = TextEditingController();
 
-
-  static const String apiBase = 'https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id';
+  static const String apiBase =
+      'https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id';
   String get _baseUrl => apiBase;
 
   bool get _isAdminFlag {
-  final request = context.read<CookieRequest>();
-  return request.jsonData["is_admin"] == true;
-}
-
-
+    final request = context.read<CookieRequest>();
+    return request.jsonData["is_admin"] == true;
+  }
 
   @override
   void initState() {
@@ -101,12 +100,15 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                 if (resp is Map) {
                   final String? code = resp['code'] as String?;
                   final String message =
-                      (resp['message'] as String?) ?? 'Community updated successfully.';
+                      (resp['message'] as String?) ??
+                      'Community updated successfully.';
 
                   if (code == 'duplicate_name') {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Community name already exists. Please use a different name.'),
+                        content: Text(
+                          'Community name already exists. Please use a different name.',
+                        ),
                         backgroundColor: Colors.red,
                       ),
                     );
@@ -142,7 +144,9 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
             }
 
             return AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
               title: Text(
                 'Edit Community',
                 style: GoogleFonts.inter(
@@ -169,9 +173,17 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                       controller: nameController,
                       decoration: InputDecoration(
                         hintText: 'Enter community name',
-                        hintStyle: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF9CA3AF)),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                        hintStyle: GoogleFonts.inter(
+                          fontSize: 13,
+                          color: const Color(0xFF9CA3AF),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -189,18 +201,31 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                       maxLines: 4,
                       decoration: InputDecoration(
                         hintText: 'Describe the community...',
-                        hintStyle: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF9CA3AF)),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                        hintStyle: GoogleFonts.inter(
+                          fontSize: 13,
+                          color: const Color(0xFF9CA3AF),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-              actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              actionsPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 8,
+              ),
               actions: [
                 TextButton(
-                  onPressed: isSubmitting ? null : () => Navigator.of(ctx).pop(),
+                  onPressed: isSubmitting
+                      ? null
+                      : () => Navigator.of(ctx).pop(),
                   child: Text(
                     'Cancel',
                     style: GoogleFonts.inter(
@@ -214,8 +239,13 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFC1D752),
                     foregroundColor: const Color(0xFF082459),
-                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 10,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                   child: isSubmitting
                       ? const SizedBox(
@@ -223,7 +253,10 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                           width: 16,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : Text('Save Changes', style: GoogleFonts.inter(fontWeight: FontWeight.w700)),
+                      : Text(
+                          'Save Changes',
+                          style: GoogleFonts.inter(fontWeight: FontWeight.w700),
+                        ),
                 ),
               ],
             );
@@ -239,7 +272,9 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
       barrierDismissible: false,
       builder: (ctx) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
           title: Text(
             'Delete Community',
             style: GoogleFonts.inter(
@@ -250,7 +285,11 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
           ),
           content: Text(
             'Are you sure you want to delete "${community.name}"?',
-            style: GoogleFonts.inter(fontSize: 15, color: const Color(0xFF374151), height: 1.4),
+            style: GoogleFonts.inter(
+              fontSize: 15,
+              color: const Color(0xFF374151),
+              height: 1.4,
+            ),
           ),
           actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
           actions: [
@@ -263,7 +302,9 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                       onPressed: () => Navigator.of(ctx).pop(false),
                       style: TextButton.styleFrom(
                         backgroundColor: const Color(0xFFD1D5DB),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
                       ),
                       child: Text(
                         'Cancel',
@@ -285,12 +326,17 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red[500],
                         foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
                         elevation: 2,
                       ),
                       child: Text(
                         'Delete',
-                        style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700),
+                        style: GoogleFonts.inter(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
                   ),
@@ -335,11 +381,14 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
 
   Future<List<Community>> _fetchCommunities() async {
     final request = context.read<CookieRequest>();
-    final url = '$_baseUrl/community/api/list/?q=${Uri.encodeQueryComponent(_searchQuery)}';
+    final url =
+        '$_baseUrl/community/api/list/?q=${Uri.encodeQueryComponent(_searchQuery)}';
     final response = await request.get(url);
     final list = response as List<dynamic>;
 
-    return list.map((raw) => Community.fromJson(raw as Map<String, dynamic>)).toList();
+    return list
+        .map((raw) => Community.fromJson(raw as Map<String, dynamic>))
+        .toList();
   }
 
   Future<void> _refresh() async {
@@ -364,7 +413,9 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              status == 'joined' ? 'You have joined $name.' : 'Already a member of $name.',
+              status == 'joined'
+                  ? 'You have joined $name.'
+                  : 'Already a member of $name.',
             ),
           ),
         );
@@ -378,7 +429,9 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to join community. Please try again.')),
+        const SnackBar(
+          content: Text('Failed to join community. Please try again.'),
+        ),
       );
     }
   }
@@ -421,12 +474,16 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
 
                 if (resp is Map) {
                   final code = resp['code'];
-                  final message = resp['message'] as String? ?? 'Community created successfully.';
+                  final message =
+                      resp['message'] as String? ??
+                      'Community created successfully.';
 
                   if (code == 'duplicate_name') {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Community name already exists. Please use a different name.'),
+                        content: Text(
+                          'Community name already exists. Please use a different name.',
+                        ),
                         backgroundColor: Colors.red,
                       ),
                     );
@@ -462,7 +519,9 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
             }
 
             return AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
               title: Text(
                 'Create New Community',
                 style: GoogleFonts.inter(
@@ -489,9 +548,17 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                       controller: _createNameController,
                       decoration: InputDecoration(
                         hintText: 'Enter community name',
-                        hintStyle: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF9CA3AF)),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                        hintStyle: GoogleFonts.inter(
+                          fontSize: 13,
+                          color: const Color(0xFF9CA3AF),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -509,9 +576,17 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                       maxLines: 4,
                       decoration: InputDecoration(
                         hintText: 'Describe the community...',
-                        hintStyle: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF9CA3AF)),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                        hintStyle: GoogleFonts.inter(
+                          fontSize: 13,
+                          color: const Color(0xFF9CA3AF),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                       ),
                     ),
                   ],
@@ -529,9 +604,13 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                           borderRadius: BorderRadius.circular(14),
                         ),
                         child: TextButton(
-                          onPressed: isSubmitting ? null : () => Navigator.of(ctx).pop(),
+                          onPressed: isSubmitting
+                              ? null
+                              : () => Navigator.of(ctx).pop(),
                           style: TextButton.styleFrom(
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
                           ),
                           child: Text(
                             'Cancel',
@@ -555,7 +634,9 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                         child: TextButton(
                           onPressed: isSubmitting ? null : handleSubmit,
                           style: TextButton.styleFrom(
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
                           ),
                           child: isSubmitting
                               ? const SizedBox(
@@ -594,7 +675,7 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
 
     return Scaffold(
       backgroundColor: const Color(0xFF1E3A8A),
-      bottomNavigationBar: _buildBottomNav(), 
+      bottomNavigationBar: _buildBottomNav(),
       body: Stack(
         children: [
           Positioned.fill(
@@ -615,9 +696,11 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                   const SizedBox(height: 12),
                 ],
 
-    
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 24,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -625,7 +708,6 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                         'FIND YOUR COMMUNITY',
                         textAlign: TextAlign.center,
                         style: GoogleFonts.inter(
-
                           fontSize: w < 420 ? 24 : 30,
                           letterSpacing: w < 420 ? 1.4 : 2.0,
 
@@ -653,7 +735,9 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                                 onPressed: () {
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (_) => const MyCommunitiesPage()),
+                                    MaterialPageRoute(
+                                      builder: (_) => const MyCommunitiesPage(),
+                                    ),
                                   );
                                 },
                                 style: ElevatedButton.styleFrom(
@@ -710,7 +794,10 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                         borderRadius: BorderRadius.all(Radius.circular(24)),
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 16,
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
@@ -729,9 +816,13 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                             Align(
                               alignment: Alignment.center,
                               child: ConstrainedBox(
-                                constraints: BoxConstraints(maxWidth: kIsWeb ? 480 : 280),
+                                constraints: BoxConstraints(
+                                  maxWidth: kIsWeb ? 480 : 280,
+                                ),
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(999),
@@ -753,7 +844,8 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                                             fontSize: 14,
                                           ),
                                           decoration: InputDecoration(
-                                            hintText: 'Search for a community...',
+                                            hintText:
+                                                'Search for a community...',
                                             hintStyle: GoogleFonts.inter(
                                               color: const Color(0xFF6B7280),
                                               fontSize: 14,
@@ -768,12 +860,15 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                                       ),
                                       GestureDetector(
                                         onTap: () {
-                                          _searchQuery = _searchController.text.trim();
+                                          _searchQuery = _searchController.text
+                                              .trim();
                                           _refresh();
                                           FocusScope.of(context).unfocus();
                                         },
                                         child: Padding(
-                                          padding: const EdgeInsets.only(right: 4),
+                                          padding: const EdgeInsets.only(
+                                            right: 4,
+                                          ),
                                           child: Image.asset(
                                             'assets/image/search.png',
                                             width: 18,
@@ -792,8 +887,11 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                               child: FutureBuilder<List<Community>>(
                                 future: _futureCommunities,
                                 builder: (context, snapshot) {
-                                  if (snapshot.connectionState == ConnectionState.waiting) {
-                                    return const Center(child: CircularProgressIndicator());
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const Center(
+                                      child: CircularProgressIndicator(),
+                                    );
                                   }
 
                                   if (snapshot.hasError) {
@@ -801,7 +899,10 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                                       child: Text(
                                         'Error loading communities.\n${snapshot.error}',
                                         textAlign: TextAlign.center,
-                                        style: GoogleFonts.inter(color: Colors.white, fontSize: 14),
+                                        style: GoogleFonts.inter(
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                        ),
                                       ),
                                     );
                                   }
@@ -812,7 +913,10 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                                     return Center(
                                       child: Text(
                                         'No communities found.',
-                                        style: GoogleFonts.inter(color: Colors.white70, fontSize: 14),
+                                        style: GoogleFonts.inter(
+                                          color: Colors.white70,
+                                          fontSize: 14,
+                                        ),
                                       ),
                                     );
                                   }
@@ -820,17 +924,22 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                                   return RefreshIndicator(
                                     onRefresh: _refresh,
                                     child: GridView.builder(
-                                      physics: const AlwaysScrollableScrollPhysics(),
+                                      physics:
+                                          const AlwaysScrollableScrollPhysics(),
                                       itemCount: communities.length,
-                                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                        crossAxisCount: w >= 900 ? 3 : 2,
-                                        mainAxisSpacing: 12,
-                                        crossAxisSpacing: 12,
-                                        childAspectRatio: w < 420 ? 0.74 : 0.80,
-                                      ),
+                                      gridDelegate:
+                                          SliverGridDelegateWithFixedCrossAxisCount(
+                                            crossAxisCount: w >= 900 ? 3 : 2,
+                                            mainAxisSpacing: 12,
+                                            crossAxisSpacing: 12,
+                                            childAspectRatio: w < 420
+                                                ? 0.74
+                                                : 0.80,
+                                          ),
                                       itemBuilder: (context, index) {
                                         final c = communities[index];
-                                        final canOpen = c.isJoined || c.isCreator;
+                                        final canOpen =
+                                            c.isJoined || c.isCreator;
 
                                         return CommunityCard(
                                           community: c,
@@ -840,17 +949,20 @@ class _DiscoverCommunitiesPageState extends State<DiscoverCommunitiesPage> {
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (_) => CommunityDetailPage(communityId: c.id),
+                                                builder: (_) =>
+                                                    CommunityDetailPage(
+                                                      communityId: c.id,
+                                                    ),
                                               ),
                                             );
                                           },
                                           onJoin: () => _joinCommunity(c),
-                                          onEdit: () => _openEditCommunityDialog(c),
+                                          onEdit: () =>
+                                              _openEditCommunityDialog(c),
                                           onDelete: () => _deleteCommunity(c),
                                         );
                                       },
                                     ),
-
                                   );
                                 },
                               ),

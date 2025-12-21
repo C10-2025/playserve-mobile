@@ -28,7 +28,9 @@ class _ProfileHeaderState extends State<ProfileHeader> {
     final request = context.read<CookieRequest>();
 
     try {
-      final response = await request.get("https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/auth/get_user/");
+      final response = await request.get(
+        "http://127.0.0.1:8000/auth/get_user/",
+      );
 
       if (response["status"] == true) {
         setState(() {
@@ -59,11 +61,17 @@ class _ProfileHeaderState extends State<ProfileHeader> {
     return Row(
       children: [
         GestureDetector(
-          onTap: () {
-            Navigator.push(
+          onTap: () async {
+            final result = await Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const EditProfileScreen()),
+              MaterialPageRoute(
+                builder: (context) => const EditProfileScreen(),
+              ),
             );
+
+            if (result == true) {
+              _loadUserData();
+            }
           },
           child: CircleAvatar(
             radius: 26,

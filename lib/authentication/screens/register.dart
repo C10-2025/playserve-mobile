@@ -94,6 +94,26 @@ class _RegisterStep1PageState extends State<RegisterStep1Page> {
                             return;
                           }
 
+                          if (password1.length < 8) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  "Password must be at least 8 characters long.",
+                                ),
+                              ),
+                            );
+                            return;
+                          }
+
+                          if (password1 != password2) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Passwords do not match."),
+                              ),
+                            );
+                            return;
+                          }
+
                           setState(() => _isLoading = true);
 
                           final response = await request.postJson(
