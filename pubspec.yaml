@@ -23,10 +23,16 @@ dependencies:
   image_picker: ^1.0.7
 
 dev_dependencies:
+  flutter_launcher_icons: ^0.13.1
   flutter_test:
     sdk: flutter
 
   flutter_lints: ^5.0.0
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/image/thumbnail.png"
 
 flutter:
   uses-material-design: true

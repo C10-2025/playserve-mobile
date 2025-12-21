@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
@@ -21,7 +20,7 @@ class BookingStep3PaymentScreen extends StatefulWidget {
 }
 
 class _BookingStep3PaymentScreenState extends State<BookingStep3PaymentScreen> {
-  File? proof;
+  XFile? proof;
   bool agreed = false;
   bool saving = false;
   String? errorMsg;
@@ -349,7 +348,7 @@ class _BookingStep3PaymentScreenState extends State<BookingStep3PaymentScreen> {
                   source: ImageSource.gallery,
                 );
                 if (picked != null) {
-                  setState(() => proof = File(picked.path));
+                  setState(() => proof = picked);
                 }
               },
             ),
@@ -357,7 +356,7 @@ class _BookingStep3PaymentScreenState extends State<BookingStep3PaymentScreen> {
           if (proof != null) ...[
             const SizedBox(height: 8),
             Text(
-              'Selected: ${proof!.path.split('/').last}',
+              'Selected: ${proof!.name}',
               style: BookingTextStyles.cardSubtitle,
             ),
           ],

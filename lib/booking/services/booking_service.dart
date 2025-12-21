@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import '../models/availability.dart';
 import '../models/booking.dart';
@@ -151,7 +151,7 @@ class BookingService {
 
   Future<void> uploadPaymentProof({
     required int bookingId,
-    required File file,
+    required XFile file,
   }) async {
     final uri = Uri.parse(
       '$baseUrl/booking/api/bookings/$bookingId/upload-proof/',
@@ -166,8 +166,9 @@ class BookingService {
     if (csrf != null && csrf.isNotEmpty) {
       req.headers['X-CSRFToken'] = csrf;
     }
+    final bytes = await file.readAsBytes();
     req.files.add(
-      await http.MultipartFile.fromPath('payment_proof', file.path),
+      http.MultipartFile.fromBytes('payment_proof', bytes, filename: file.name),
     );
     final streamed = await req.send();
     final resp = await http.Response.fromStream(streamed);
