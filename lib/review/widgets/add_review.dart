@@ -55,7 +55,7 @@ class _AddReviewModalState extends State<AddReviewModal> {
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF1A2B4C),   // <-- BLACK TEXT
+                  color: Color(0xFF1A2B4C),
                 ),
               ),
               const SizedBox(height: 12),
@@ -70,7 +70,7 @@ class _AddReviewModalState extends State<AddReviewModal> {
                           'Rating:',
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF1A2B4C),   // <-- BLACK TEXT
+                            color: Color(0xFF1A2B4C),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -79,7 +79,7 @@ class _AddReviewModalState extends State<AddReviewModal> {
                           value: _rating,
                           dropdownColor: Colors.white,
                           style: const TextStyle(
-                            color: Color(0xFF1A2B4C),  // <-- BLACK TEXT
+                            color: Color(0xFF1A2B4C),  
                             fontWeight: FontWeight.w600,
                           ),
                           items: List.generate(
@@ -89,7 +89,7 @@ class _AddReviewModalState extends State<AddReviewModal> {
                               child: Text(
                                 '${i + 1}',
                                 style: const TextStyle(
-                                  color: Color(0xFF1A2B4C), // <-- BLACK
+                                  color: Color(0xFF1A2B4C), 
                                 ),
                               ),
                             ),
@@ -107,12 +107,12 @@ class _AddReviewModalState extends State<AddReviewModal> {
                       minLines: 3,
                       maxLines: 6,
                       decoration: const InputDecoration(
-                        hintText: 'Write your comment...',
-                        hintStyle: TextStyle(color: Color(0xFF1A2B4C)),   // <-- BLACK HINT
+                        hintText: 'Write your comments here... (Optional)',
+                        hintStyle: TextStyle(color: Color(0xFF1A2B4C)),   
                         border: OutlineInputBorder(),
                       ),
                       style: const TextStyle(
-                        color: Color(0xFF1A2B4C),  // <-- BLACK INPUT TEXT
+                        color: Color(0xFF1A2B4C),  
                       ),
                     ),
 
@@ -129,7 +129,7 @@ class _AddReviewModalState extends State<AddReviewModal> {
                                     backgroundColor: const Color(0xFFB0D235),
                                     foregroundColor: const Color(0xFF1A2B4C),
                                     textStyle: const TextStyle(
-                                      fontWeight: FontWeight.bold, // <-- BOLD BUTTON TEXT
+                                      fontWeight: FontWeight.bold, // BUTTON TEXT
                                     ),
                                   ),
                                   child: const Text('Submit'),
