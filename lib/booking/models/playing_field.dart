@@ -9,6 +9,8 @@ class PlayingField {
   final String? closingTime;
   final String? imageUrl;
   final List<dynamic>? amenities;
+  final bool hasLights;
+  final bool hasBackboard;
   final String? ownerName;
   final String? ownerContact;
   final String? ownerBankAccount;
@@ -25,6 +27,8 @@ class PlayingField {
     required this.closingTime,
     required this.imageUrl,
     required this.amenities,
+    required this.hasLights,
+    required this.hasBackboard,
     required this.ownerName,
     required this.ownerContact,
     required this.ownerBankAccount,
@@ -42,7 +46,11 @@ class PlayingField {
       openingTime: json["opening_time"],
       closingTime: json["closing_time"],
       imageUrl: json["image_url"] ?? json["court_image"],
-      amenities: json["amenities"] is List ? List<dynamic>.from(json["amenities"]) : null,
+      amenities: json["amenities"] is List
+          ? List<dynamic>.from(json["amenities"])
+          : null,
+      hasLights: json["has_lights"] ?? false,
+      hasBackboard: json["has_backboard"] ?? false,
       ownerName: json["owner_name"],
       ownerContact: json["owner_contact"] ?? json["owner_phone"],
       ownerBankAccount: json["owner_bank_account"] ?? json["owner_bank_name"],
@@ -51,17 +59,17 @@ class PlayingField {
   }
 
   Map<String, dynamic> toJson() => {
-        "name": name,
-        "address": address,
-        "city": city,
-        "court_surface": courtSurface,
-        "price_per_hour": pricePerHour,
-        "opening_time": openingTime,
-        "closing_time": closingTime,
-        "description": "",
-        "amenities": amenities ?? [],
-        "owner_name": ownerName ?? "",
-        "owner_contact": ownerContact ?? "",
-        "owner_bank_account": ownerBankAccount ?? "",
-      };
+    "name": name,
+    "address": address,
+    "city": city,
+    "court_surface": courtSurface,
+    "price_per_hour": pricePerHour,
+    "opening_time": openingTime,
+    "closing_time": closingTime,
+    "description": "",
+    "amenities": amenities ?? [],
+    "owner_name": ownerName ?? "",
+    "owner_contact": ownerContact ?? "",
+    "owner_bank_account": ownerBankAccount ?? "",
+  };
 }

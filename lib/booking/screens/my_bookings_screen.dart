@@ -119,7 +119,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
       ),
       bottomNavigationBar: const MainNavbar(currentIndex: 3),
     );
-    }
+  }
 
   Widget _statsRow(Map<String, int> stats) {
     Widget box(String label, int value, Color color) => Container(
@@ -173,14 +173,25 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
   }
 
   Map<String, int> _buildStats(List<Booking> bookings) {
-    int confirmed = 0, pending = 0, completed = 0;
+    int upcoming = 0, pending = 0, completed = 0;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
     for (final b in bookings) {
       final status = b.status.toUpperCase();
-      if (status == 'CONFIRMED') confirmed++;
+      final bookingDate = DateTime.parse(b.bookingDate);
+
+      // Upcoming: date >= today and status CONFIRMED or PENDING_PAYMENT
+      if (bookingDate.isAtSameMomentAs(today) || bookingDate.isAfter(today)) {
+        if (status == 'CONFIRMED' || status == 'PENDING_PAYMENT') {
+          upcoming++;
+        }
+      }
+
       if (status.startsWith('PENDING')) pending++;
       if (status == 'COMPLETED') completed++;
     }
-    return {'confirmed': confirmed, 'pending': pending, 'completed': completed};
+    return {'confirmed': upcoming, 'pending': pending, 'completed': completed};
   }
 
   Widget _emptyState(BuildContext context) {

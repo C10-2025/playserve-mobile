@@ -8,7 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../models/post.dart';
 import 'package:playserve_mobile/main_navbar.dart';
-import 'package:playserve_mobile/main_navbar_admin.dart'; 
+import 'package:playserve_mobile/main_navbar_admin.dart';
 import 'package:playserve_mobile/header.dart';
 
 class CommunityDetailPage extends StatefulWidget {
@@ -26,26 +26,23 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
   String? _description;
   int _membersCount = 0;
   List<PostModel> _posts = [];
-  
 
   final _titleController = TextEditingController();
   final _contentController = TextEditingController();
 
-  static const String apiBase = 'https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id';
+  static const String apiBase =
+      'https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id';
   String get _baseUrl => apiBase;
 
   bool get _isAdminFlag {
-  final request = context.read<CookieRequest>();
-  return request.jsonData["is_admin"] == true;
-}
-
-
+    final request = context.read<CookieRequest>();
+    return request.jsonData["is_admin"] == true;
+  }
 
   @override
   void initState() {
     super.initState();
     _futureLoad = _loadCommunity();
-
   }
 
   Future<void> _loadCommunity() async {
@@ -83,7 +80,8 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
     }
 
     final request = context.read<CookieRequest>();
-    final url = '$_baseUrl/community/api/community/${widget.communityId}/posts/';
+    final url =
+        '$_baseUrl/community/api/community/${widget.communityId}/posts/';
 
     final result = await request.postJson(
       url,
@@ -91,9 +89,9 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
     );
 
     if (result is Map && result['error'] != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result['error'].toString())),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(result['error'].toString())));
       return;
     }
 
@@ -115,9 +113,9 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
     );
 
     if (result is Map && result['error'] != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result['error'].toString())),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(result['error'].toString())));
       return;
     }
 
@@ -138,9 +136,9 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
         message = resp['message'] as String;
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
 
       await _loadCommunity();
     } catch (_) {
@@ -160,8 +158,9 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
       barrierDismissible: false,
       builder: (ctx) {
         return AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           title: Text(
             'Delete Post',
             style: GoogleFonts.inter(
@@ -249,9 +248,9 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
         message = resp['message'] as String;
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
 
       await _loadCommunity();
     } catch (_) {
@@ -271,8 +270,9 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
       barrierDismissible: false,
       builder: (ctx) {
         return AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           title: Text(
             'Delete Reply',
             style: GoogleFonts.inter(
@@ -348,8 +348,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
 
   Widget _buildBottomNav() {
     return _isAdminFlag
-        ? const MainNavbarAdmin(
-            currentIndex: 4) 
+        ? const MainNavbarAdmin(currentIndex: 4)
         : const MainNavbar(currentIndex: 1);
   }
 
@@ -407,10 +406,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
               Text(
                 '$_membersCount member${_membersCount == 1 ? '' : 's'}',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
-                  color: Colors.white70,
-                  fontSize: 13,
-                ),
+                style: GoogleFonts.inter(color: Colors.white70, fontSize: 13),
               ),
               const SizedBox(height: 12),
               if (_description != null && _description!.trim().isNotEmpty)
@@ -641,9 +637,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
             width: double.infinity,
             decoration: BoxDecoration(
               color: const Color(0xFFF9FAFB),
-              border: Border(
-                top: BorderSide(color: Colors.grey.shade200),
-              ),
+              border: Border(top: BorderSide(color: Colors.grey.shade200)),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: post.replies.isEmpty
@@ -744,9 +738,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                     }).toList(),
                   ),
           ),
-          _ReplyBox(
-            onSubmit: (text) => _createReply(post, text),
-          ),
+          _ReplyBox(onSubmit: (text) => _createReply(post, text)),
         ],
       ),
     );
@@ -813,19 +805,20 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                                       _buildTopSection(),
                                       Center(
                                         child: Container(
-                                          margin:
-                                              const EdgeInsets.only(top: 8),
+                                          margin: const EdgeInsets.only(top: 8),
                                           padding: const EdgeInsets.symmetric(
                                             horizontal: 24,
                                             vertical: 32,
                                           ),
                                           decoration: BoxDecoration(
                                             color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(20),
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
                                             border: Border.all(
-                                              color: Colors.grey
-                                                  .withOpacity(0.3),
+                                              color: Colors.grey.withOpacity(
+                                                0.3,
+                                              ),
                                             ),
                                             boxShadow: const [
                                               BoxShadow(
@@ -851,8 +844,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                                               Text(
                                                 'No posts yet — share your thoughts using the form above.',
                                                 style: GoogleFonts.inter(
-                                                  color:
-                                                      Colors.grey.shade600,
+                                                  color: Colors.grey.shade600,
                                                 ),
                                                 textAlign: TextAlign.center,
                                               ),
@@ -934,14 +926,9 @@ class _ReplyBoxState extends State<_ReplyBox> {
           bottomLeft: Radius.circular(18),
           bottomRight: Radius.circular(18),
         ),
-        border: Border(
-          top: BorderSide(color: Colors.grey.shade300),
-        ),
+        border: Border(top: BorderSide(color: Colors.grey.shade300)),
       ),
-      padding: EdgeInsets.symmetric(
-        horizontal: s(14),
-        vertical: s(10),
-      ),
+      padding: EdgeInsets.symmetric(horizontal: s(14), vertical: s(10)),
       child: Row(
         children: [
           // ================= TEXT FIELD =================

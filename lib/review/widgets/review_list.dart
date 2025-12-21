@@ -28,7 +28,8 @@ class _ReviewListState extends State<ReviewList> {
   String _searchQuery = '';
 
   // urls
-  static const String apiBase = 'https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id';
+  static const String apiBase =
+      'https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id';
   static const String _fieldsUrl = '$apiBase/booking/json/';
   static const String _reviewsUrl = '$apiBase/review/json/';
 
@@ -55,15 +56,23 @@ class _ReviewListState extends State<ReviewList> {
       final fieldsData = resp[0];
       final reviewsData = resp[1];
 
-      final parsedFields = (fieldsData is String) ? json.decode(fieldsData) : fieldsData;
-      final parsedReviews = (reviewsData is String) ? json.decode(reviewsData) : reviewsData;
+      final parsedFields = (fieldsData is String)
+          ? json.decode(fieldsData)
+          : fieldsData;
+      final parsedReviews = (reviewsData is String)
+          ? json.decode(reviewsData)
+          : reviewsData;
 
       _fields = parsedFields
-          .map<PlayingField>((d) => PlayingField.fromJson(Map<String, dynamic>.from(d)))
+          .map<PlayingField>(
+            (d) => PlayingField.fromJson(Map<String, dynamic>.from(d)),
+          )
           .toList();
 
       _reviews = parsedReviews
-          .map<ReviewItemNew>((d) => ReviewItemNew.fromJson(Map<String, dynamic>.from(d)))
+          .map<ReviewItemNew>(
+            (d) => ReviewItemNew.fromJson(Map<String, dynamic>.from(d)),
+          )
           .toList();
 
       _applySorting();
@@ -83,7 +92,9 @@ class _ReviewListState extends State<ReviewList> {
       final parsed = (resp is String) ? json.decode(resp) : resp;
       setState(() {
         _reviews = parsed
-            .map<ReviewItemNew>((d) => ReviewItemNew.fromJson(Map<String, dynamic>.from(d)))
+            .map<ReviewItemNew>(
+              (d) => ReviewItemNew.fromJson(Map<String, dynamic>.from(d)),
+            )
             .toList();
       });
       _applySorting();
@@ -151,13 +162,19 @@ class _ReviewListState extends State<ReviewList> {
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to submit review: ${response['message'] ?? ''}')),
+            SnackBar(
+              content: Text(
+                'Failed to submit review: ${response['message'] ?? ''}',
+              ),
+            ),
           );
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     }
   }
@@ -176,7 +193,10 @@ class _ReviewListState extends State<ReviewList> {
     return RefreshIndicator(
       onRefresh: _fetchAll,
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 12),
+        padding: EdgeInsets.symmetric(
+          horizontal: horizontalPadding,
+          vertical: 12,
+        ),
         child: Column(
           children: [
             // Search + sort row (compact for mobile)
@@ -209,11 +229,12 @@ class _ReviewListState extends State<ReviewList> {
 
                         const SizedBox(width: 8),
 
-                        // TEXT FIELD 
+                        // TEXT FIELD
                         Expanded(
                           child: Center(
                             child: TextField(
-                              onChanged: (v) => setState(() => _searchQuery = v),
+                              onChanged: (v) =>
+                                  setState(() => _searchQuery = v),
                               style: const TextStyle(
                                 color: Color(0xFF111827),
                                 fontSize: 14,
@@ -226,7 +247,7 @@ class _ReviewListState extends State<ReviewList> {
                                 ),
                                 border: InputBorder.none,
                                 isDense: true,
-                                contentPadding: EdgeInsets.zero, 
+                                contentPadding: EdgeInsets.zero,
                               ),
                             ),
                           ),
@@ -259,8 +280,14 @@ class _ReviewListState extends State<ReviewList> {
                     icon: const Icon(Icons.expand_more),
                     items: const [
                       DropdownMenuItem(value: 'none', child: Text('Default')),
-                      DropdownMenuItem(value: 'avg_desc', child: Text('Rating ↓')),
-                      DropdownMenuItem(value: 'avg_asc', child: Text('Rating ↑')),
+                      DropdownMenuItem(
+                        value: 'avg_desc',
+                        child: Text('Rating ↓'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'avg_asc',
+                        child: Text('Rating ↑'),
+                      ),
                     ],
                     onChanged: (v) => setState(() {
                       _sortOption = v ?? 'none';
@@ -275,7 +302,12 @@ class _ReviewListState extends State<ReviewList> {
             // List area
             Expanded(
               child: _filteredFields.isEmpty
-                  ? const Center(child: Text('No courts found.', style: TextStyle(color: Colors.white)))
+                  ? const Center(
+                      child: Text(
+                        'No courts found.',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    )
                   : ListView.builder(
                       padding: const EdgeInsets.only(bottom: 80),
                       itemCount: _filteredFields.length,

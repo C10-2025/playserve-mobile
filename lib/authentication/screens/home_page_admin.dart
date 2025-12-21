@@ -7,7 +7,7 @@ import 'package:playserve_mobile/community/screen/discover_communities_page.dart
 import 'package:playserve_mobile/review/screens/review_page.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:playserve_mobile/global_theme.dart'; 
+import 'package:playserve_mobile/global_theme.dart';
 import 'package:playserve_mobile/main_navbar_admin.dart';
 import 'package:playserve_mobile/profil/screens/delete_profile.dart';
 import 'package:playserve_mobile/authentication/screens/login.dart';
@@ -26,7 +26,7 @@ class _HomePageAdminState extends State<HomePageAdmin> {
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
 
-    return GradientBackground( 
+    return GradientBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: SafeArea(
@@ -44,8 +44,8 @@ class _HomePageAdminState extends State<HomePageAdmin> {
                       opacity: 0.6,
                       child: Image.asset(
                         'assets/image/background.png',
-                        width: double.infinity, 
-                        fit: BoxFit.fitWidth, 
+                        width: double.infinity,
+                        fit: BoxFit.fitWidth,
                         errorBuilder: (context, error, stackTrace) {
                           return const SizedBox(height: 150);
                         },
@@ -59,7 +59,7 @@ class _HomePageAdminState extends State<HomePageAdmin> {
                           Text(
                             "COURTSIDE",
                             style: GoogleFonts.inter(
-                              fontSize: 32, 
+                              fontSize: 32,
                               fontWeight: FontWeight.w900,
                               color: Colors.white,
                               height: 1.0,
@@ -96,8 +96,11 @@ class _HomePageAdminState extends State<HomePageAdmin> {
                             label: 'Users',
                             onTap: () {
                               Navigator.push(
-                                context, 
-                                MaterialPageRoute(builder: (context) => const DeleteProfilePage())
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const DeleteProfilePage(),
+                                ),
                               );
                             },
                           ),
@@ -106,8 +109,11 @@ class _HomePageAdminState extends State<HomePageAdmin> {
                             label: 'Booking',
                             onTap: () {
                               Navigator.push(
-                                context, 
-                                MaterialPageRoute(builder: (context) => const AdminFieldListScreen())
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const AdminFieldListScreen(),
+                                ),
                               );
                             },
                           ),
@@ -116,8 +122,10 @@ class _HomePageAdminState extends State<HomePageAdmin> {
                             label: 'Review',
                             onTap: () {
                               Navigator.push(
-                                context, 
-                                MaterialPageRoute(builder: (context) => const ReviewPage())
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const ReviewPage(),
+                                ),
                               );
                             },
                           ),
@@ -126,8 +134,11 @@ class _HomePageAdminState extends State<HomePageAdmin> {
                             label: 'Community',
                             onTap: () {
                               Navigator.push(
-                                context, 
-                                MaterialPageRoute(builder: (context) => const DiscoverCommunitiesPage())
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const DiscoverCommunitiesPage(),
+                                ),
                               );
                             },
                           ),
@@ -151,7 +162,10 @@ class _HomePageAdminState extends State<HomePageAdmin> {
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => const AdminPendingBookingsScreen()),
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const AdminPendingBookingsScreen(),
+                                ),
                               );
                             },
                             icon: const Icon(
@@ -183,16 +197,19 @@ class _HomePageAdminState extends State<HomePageAdmin> {
                               ),
                               onPressed: () async {
                                 setState(() => _isLoggingOut = true);
-                                
+
                                 // 1. Panggil API Logout Django
                                 try {
-                                  await request.get('https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/auth/logout/');
+                                  await request.get(
+                                    'https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/auth/logout/',
+                                  );
                                 } catch (e) {
                                   debugPrint("Logout API error: $e");
                                 }
 
                                 // 2. Bersihkan Shared Preferences
-                                final prefs = await SharedPreferences.getInstance();
+                                final prefs =
+                                    await SharedPreferences.getInstance();
                                 await prefs.clear();
 
                                 // 3. Navigasi kembali ke Login Page
@@ -200,14 +217,15 @@ class _HomePageAdminState extends State<HomePageAdmin> {
                                   Navigator.pushAndRemoveUntil(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (_) => const LoginPage()),
+                                      builder: (_) => const LoginPage(),
+                                    ),
                                     (route) => false,
                                   );
                                 }
                               },
                               child: const Text("LOGOUT"),
                             ),
-                      
+
                       const SizedBox(height: 40),
                     ],
                   ),
@@ -250,15 +268,16 @@ class _FeatureButton extends StatelessWidget {
                   color: Colors.black.withOpacity(0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 4),
-                )
-              ]
+                ),
+              ],
             ),
             child: Padding(
               padding: const EdgeInsets.all(12),
               child: Image.asset(
-                imagePath, 
+                imagePath,
                 fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) => const Icon(Icons.error, color: Colors.grey),
+                errorBuilder: (context, error, stackTrace) =>
+                    const Icon(Icons.error, color: Colors.grey),
               ),
             ),
           ),

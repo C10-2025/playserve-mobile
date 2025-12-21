@@ -31,28 +31,24 @@ class MainNavbar extends StatelessWidget {
               context,
               index: 1,
               icon: LucideIcons.messageSquare,
-              // page: const CommunityPage(),
               page: const DiscoverCommunitiesPage(),
             ),
             _buildNavItem(
               context,
               index: 2,
-              icon:
-                  LucideIcons.radar, // 🔁 Ganti 'tennis' (belum ada di 0.2.57)
-              // page: const MatchPage(),
+              icon: LucideIcons.radar,
               page: const DashboardPage(),
             ),
             _buildNavItem(
               context,
               index: 3,
-              icon: LucideIcons.calendar, // 🔁 Ganti 'calendarEdit'
+              icon: LucideIcons.calendar,
               page: const FieldListScreen(),
             ),
             _buildNavItem(
               context,
               index: 4,
               icon: LucideIcons.star,
-              // page: const FavoritesPage(),
               page: const ReviewPage(),
             ),
           ],

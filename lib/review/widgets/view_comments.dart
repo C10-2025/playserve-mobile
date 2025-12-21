@@ -27,10 +27,18 @@ class ViewCommentsModal extends StatelessWidget {
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('Delete Comment'),
-        content: const Text('Are you sure you want to delete this comment permanently?'),
+        content: const Text(
+          'Are you sure you want to delete this comment permanently?',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Delete', style: TextStyle(color: Colors.red))),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
         ],
       ),
     );
@@ -38,12 +46,16 @@ class ViewCommentsModal extends StatelessWidget {
     if (confirm != true) return;
 
     final request = context.read<CookieRequest>();
-    const url = 'https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/review/delete-review-flutter/';
+    const url =
+        'https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/review/delete-review-flutter/';
 
     try {
       final response = await request.post(
         url,
-        jsonEncode({'username': review.username, 'field_name': review.fieldName}),
+        jsonEncode({
+          'username': review.username,
+          'field_name': review.fieldName,
+        }),
       );
 
       if (!context.mounted) return;
@@ -53,12 +65,18 @@ class ViewCommentsModal extends StatelessWidget {
         onRefresh();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to delete comment: ${response['message'] ?? ''}')),
+          SnackBar(
+            content: Text(
+              'Failed to delete comment: ${response['message'] ?? ''}',
+            ),
+          ),
         );
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     }
   }
@@ -70,7 +88,10 @@ class ViewCommentsModal extends StatelessWidget {
 
     return Stack(
       children: [
-        GestureDetector(onTap: () => Navigator.pop(context), child: Container(color: Colors.black.withOpacity(0.4))),
+        GestureDetector(
+          onTap: () => Navigator.pop(context),
+          child: Container(color: Colors.black.withOpacity(0.4)),
+        ),
         Center(
           child: Material(
             color: Colors.transparent,
@@ -82,49 +103,108 @@ class ViewCommentsModal extends StatelessWidget {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: const Color(0xFFD6E8C5), width: 2),
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.16), blurRadius: 18)],
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.16),
+                    blurRadius: 18,
+                  ),
+                ],
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Align(alignment: Alignment.topRight, child: IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context))),
-                  Text('Comments for $courtName', style: const TextStyle(fontSize: 16, color: Color(0xFF1A2B4C))),
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ),
+                  Text(
+                    'Comments for $courtName',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Color(0xFF1A2B4C),
+                    ),
+                  ),
                   const SizedBox(height: 6),
-                  Text('$address • Rp ${pricePerHour.toStringAsFixed(0)}', style: const TextStyle(fontSize: 12, color: Color(0xFF445566))),
+                  Text(
+                    '$address • Rp ${pricePerHour.toStringAsFixed(0)}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF445566),
+                    ),
+                  ),
                   const SizedBox(height: 12),
                   Expanded(
                     child: reviews.isNotEmpty
                         ? ListView.separated(
                             itemCount: reviews.length,
-                            separatorBuilder: (_, __) => const SizedBox(height: 8),
+                            separatorBuilder: (_, __) =>
+                                const SizedBox(height: 8),
                             itemBuilder: (context, i) {
                               final r = reviews[i];
                               return Container(
                                 padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(color: const Color(0xFFF7F7F7), borderRadius: BorderRadius.circular(10)),
-                                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                  Text(r.username, style: const TextStyle(fontSize: 13, color: Color(0xFF1A2B4C))),
-                                  const SizedBox(height: 4),
-                                  Text('${"★" * r.rating}${"☆" * (5 - r.rating)}', style: const TextStyle(color: Colors.amber, fontSize: 14)),
-                                  const SizedBox(height: 6),
-                                  // comment empty?
-                                  Text( (r.comment.trim().isNotEmpty ? r.comment : ""), style: const TextStyle(fontSize: 13, color: Color(0xFF1A2B4C))),
-                                  const SizedBox(height: 8),
-                                  if (isAdmin)
-                                    SizedBox(
-                                      width: double.infinity,
-                                      child: ElevatedButton(
-                                        onPressed: () => _deleteReview(context, r),
-                                        style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
-                                        child: const Text('Delete Comment'),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF7F7F7),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      r.username,
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        color: Color(0xFF1A2B4C),
                                       ),
                                     ),
-                                ]),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      '${"★" * r.rating}${"☆" * (5 - r.rating)}',
+                                      style: const TextStyle(
+                                        color: Colors.amber,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    // comment empty?
+                                    Text(
+                                      (r.comment.trim().isNotEmpty
+                                          ? r.comment
+                                          : ""),
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        color: Color(0xFF1A2B4C),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    if (isAdmin)
+                                      SizedBox(
+                                        width: double.infinity,
+                                        child: ElevatedButton(
+                                          onPressed: () =>
+                                              _deleteReview(context, r),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.red,
+                                            foregroundColor: Colors.white,
+                                          ),
+                                          child: const Text('Delete Comment'),
+                                        ),
+                                      ),
+                                  ],
+                                ),
                               );
                             },
                           )
-                        : const Center(child: Text('No comments yet for this field.', style: TextStyle(color: Colors.grey))),
-                  )
+                        : const Center(
+                            child: Text(
+                              'No comments yet for this field.',
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                  ),
                 ],
               ),
             ),

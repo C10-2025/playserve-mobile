@@ -26,20 +26,18 @@ class MatchmakingService {
   Future<Map<String, dynamic>> createRequest(int receiverId) async {
     return await request.postJson(
       "https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/matchmaking/action/create-request/",
-      jsonEncode({
-        "receiver_id": receiverId,
-      }),
+      jsonEncode({"receiver_id": receiverId}),
     );
   }
 
   // Accept atau reject request
-  Future<Map<String, dynamic>> handleRequest(int requestId, String action) async {
+  Future<Map<String, dynamic>> handleRequest(
+    int requestId,
+    String action,
+  ) async {
     return await request.postJson(
       "https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/matchmaking/action/handle-request/",
-      jsonEncode({
-        "request_id": requestId,
-        "action": action,
-      }),
+      jsonEncode({"request_id": requestId, "action": action}),
     );
   }
 
@@ -51,13 +49,13 @@ class MatchmakingService {
   }
 
   // Selesaikan pertandingan
-  Future<Map<String, dynamic>> finishSession(int sessionId, String action) async {
+  Future<Map<String, dynamic>> finishSession(
+    int sessionId,
+    String action,
+  ) async {
     return await request.postJson(
       "https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/matchmaking/action/finish-session/",
-      jsonEncode({
-        "session_id": sessionId,
-        "action": action,
-      }),
+      jsonEncode({"session_id": sessionId, "action": action}),
     );
   }
 }

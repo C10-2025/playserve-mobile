@@ -8,7 +8,10 @@ import '../models/playing_field.dart';
 import '../models/paginated_fields_response.dart';
 
 class BookingService {
-  BookingService(this.request, {this.baseUrl = 'https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id'});
+  BookingService(
+    this.request, {
+    this.baseUrl = 'https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id',
+  });
   final CookieRequest request;
   final String baseUrl;
 
@@ -74,7 +77,9 @@ class BookingService {
         ? '?${queryParams.entries.map((e) => '${e.key}=${Uri.encodeComponent(e.value)}').join('&')}'
         : '';
 
-    final response = await request.get('$baseUrl/booking/api/fields/$queryString');
+    final response = await request.get(
+      '$baseUrl/booking/api/fields/$queryString',
+    );
     return PaginatedFieldsResponse.fromJson(response as Map<String, dynamic>);
   }
 
@@ -133,6 +138,15 @@ class BookingService {
         ? response['data']
         : response;
     return List<Booking>.from((data as List).map((e) => Booking.fromJson(e)));
+  }
+
+  Future<PlayingField?> fetchField(int id) async {
+    final fields = await fetchFields();
+    try {
+      return fields.firstWhere((field) => field.id == id);
+    } catch (e) {
+      return null;
+    }
   }
 
   Future<void> uploadPaymentProof({

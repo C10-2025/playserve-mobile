@@ -25,7 +25,8 @@ class _FieldListScreenState extends State<FieldListScreen> {
   double? _priceMax;
   bool _hasLights = false;
   bool _hasBackboard = false;
-  String _sortOption = 'default'; // default, price_low, name
+  String _sortOption = 'default'; // default, price_low, price_high, name
+  int _totalItems = 0;
 
   // Pagination state
   List<PlayingField> _fields = [];
@@ -89,6 +90,7 @@ class _FieldListScreenState extends State<FieldListScreen> {
         }
         _currentPage = response.currentPage;
         _hasNextPage = response.hasNext;
+        _totalItems = response.totalItems;
         _isLoading = false;
         _isLoadingMore = false;
         _error = null;
@@ -180,6 +182,24 @@ class _FieldListScreenState extends State<FieldListScreen> {
                           const SizedBox(height: 24),
                           // Search and Filter UI
                           _buildFilters(),
+
+                          const SizedBox(height: 16),
+
+                          // Result Count
+                          if (!_isLoading && _error == null)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                              ),
+                              child: Text(
+                                '$_totalItems courts found',
+                                style: BookingTextStyles.body.copyWith(
+                                  color: Colors.white70,
+                                  fontSize: 14,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
 
                           const SizedBox(height: 24),
 
@@ -358,7 +378,11 @@ class _FieldListScreenState extends State<FieldListScreen> {
                     ),
                     DropdownMenuItem(
                       value: 'price_low',
-                      child: Text('Price: Low'),
+                      child: Text('Price: Low to High'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'price_high',
+                      child: Text('Price: High to Low'),
                     ),
                     DropdownMenuItem(value: 'name', child: Text('Name: A-Z')),
                   ],

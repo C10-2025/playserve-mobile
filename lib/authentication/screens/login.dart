@@ -22,52 +22,44 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
-    // Mengambil lebar layar HP agar gambar dipaksa full width
     final double screenWidth = MediaQuery.of(context).size.width;
 
     return GradientBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        // PENTING: Agar gambar tidak terdorong naik saat keyboard muncul
-        resizeToAvoidBottomInset: false, 
+        resizeToAvoidBottomInset: false,
         body: Stack(
           children: [
-            // --- LAYER 1: GAMBAR BACKGROUND BAWAH ---
-            // Posisi di paling bawah stack agar berada di belakang
             Positioned(
               bottom: 0,
               left: 0,
               right: 0,
               child: SizedBox(
-                width: screenWidth, // Paksa lebar sesuai layar
+                width: screenWidth,
                 child: Image.asset(
                   'assets/image/background.png',
-                  fit: BoxFit.fitWidth, // Memastikan gambar melebar mentok kiri-kanan
+                  fit: BoxFit.fitWidth,
                   alignment: Alignment.bottomCenter,
                 ),
               ),
             ),
 
-            // --- LAYER 2: KONTEN LOGIN ---
-            // Menggunakan SafeArea & Center agar form ada di tengah
             SafeArea(
               child: Center(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  // Physics ini membuat scroll terasa natural
-                  physics: const BouncingScrollPhysics(), 
+                  physics: const BouncingScrollPhysics(),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Jarak dari atas (bisa disesuaikan)
-                      const SizedBox(height: 10), 
-                      
+                      const SizedBox(height: 10),
+
                       Image.asset(
                         'assets/image/logo2.png',
                         width: 180,
                         fit: BoxFit.contain,
                       ),
-                      
+
                       Image.asset(
                         'assets/image/login.png',
                         width: 260,
@@ -86,7 +78,6 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       const SizedBox(height: 40),
 
-                      // Input Fields
                       RoundedInputField(
                         controller: _usernameController,
                         hintText: 'Username',
@@ -104,19 +95,22 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       const SizedBox(height: 30),
 
-                      // Buttons
                       _isLoading
                           ? const CircularProgressIndicator(color: limegreen)
                           : LimeButton(
                               text: "LOG IN",
                               onPressed: () async {
-                                String username = _usernameController.text.trim();
-                                String password = _passwordController.text.trim();
+                                String username = _usernameController.text
+                                    .trim();
+                                String password = _passwordController.text
+                                    .trim();
 
                                 if (username.isEmpty || password.isEmpty) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
-                                      content: Text("Please fill in all fields."),
+                                      content: Text(
+                                        "Please fill in all fields.",
+                                      ),
                                     ),
                                   );
                                   return;
@@ -126,10 +120,7 @@ class _LoginPageState extends State<LoginPage> {
 
                                 final response = await request.login(
                                   "https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/auth/login/",
-                                  {
-                                    'username': username,
-                                    'password': password,
-                                  },
+                                  {'username': username, 'password': password},
                                 );
 
                                 setState(() => _isLoading = false);
@@ -140,10 +131,8 @@ class _LoginPageState extends State<LoginPage> {
                                   );
 
                                   if (context.mounted) {
-                                    final bool isAdmin = adminCheck["is_admin"] ?? false;
-                                    // Now redundant with main check_admin refresh, but keep it as 
-                                    // redundancy
-                                    //request.jsonData["is_admin"] = isAdmin; 
+                                    final bool isAdmin =
+                                        adminCheck["is_admin"] ?? false;
 
                                     Navigator.pushReplacement(
                                       context,
@@ -176,13 +165,16 @@ class _LoginPageState extends State<LoginPage> {
                                       builder: (context) => AlertDialog(
                                         backgroundColor: Colors.white,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(12),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
                                         ),
                                         title: const Text(
                                           'Login Failed',
                                           style: TextStyle(
-                                              color: blue1,
-                                              fontWeight: FontWeight.bold),
+                                            color: blue1,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
                                         content: Text(
                                           response['message'] ??
@@ -221,10 +213,8 @@ class _LoginPageState extends State<LoginPage> {
                           );
                         },
                       ),
-                      
-                      // Tambahkan jarak di bawah agar konten tidak tertutup gambar
-                      // saat di-scroll mentok bawah
-                      const SizedBox(height: 120), 
+
+                      const SizedBox(height: 120),
                     ],
                   ),
                 ),

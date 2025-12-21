@@ -37,7 +37,7 @@ class PlayServeApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Provider<CookieRequest>.value(
-      value: cookieRequest, // global CookieRequest instance 
+      value: cookieRequest, // global CookieRequest instance
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'PlayServe',

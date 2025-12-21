@@ -41,10 +41,10 @@ class _RegisterStep1PageState extends State<RegisterStep1Page> {
                 Text(
                   "Create your account",
                   style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 30),
 
@@ -88,7 +88,28 @@ class _RegisterStep1PageState extends State<RegisterStep1Page> {
                               password2.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                  content: Text("All fields must be filled.")),
+                                content: Text("All fields must be filled."),
+                              ),
+                            );
+                            return;
+                          }
+
+                          if (password1.length < 8) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  "Password must be at least 8 characters long.",
+                                ),
+                              ),
+                            );
+                            return;
+                          }
+
+                          if (password1 != password2) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Passwords do not match."),
+                              ),
                             );
                             return;
                           }
@@ -202,20 +223,20 @@ class _RegisterStep2PageState extends State<RegisterStep2Page> {
                 Text(
                   "Complete Your Profile",
                   style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 30),
 
                 Text(
                   "Choose Your Avatar",
                   style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                        color: limegreen,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    color: limegreen,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 12),
 
@@ -259,8 +280,10 @@ class _RegisterStep2PageState extends State<RegisterStep2Page> {
                     ),
                   ),
                   items: _kotaOptions
-                      .map((kota) =>
-                          DropdownMenuItem(value: kota, child: Text(kota)))
+                      .map(
+                        (kota) =>
+                            DropdownMenuItem(value: kota, child: Text(kota)),
+                      )
                       .toList(),
                   onChanged: (val) => setState(() => _selectedLocation = val),
                 ),
@@ -282,7 +305,8 @@ class _RegisterStep2PageState extends State<RegisterStep2Page> {
                           if (_selectedLocation == null) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                  content: Text("Please select a location.")),
+                                content: Text("Please select a location."),
+                              ),
                             );
                             return;
                           }
@@ -293,8 +317,7 @@ class _RegisterStep2PageState extends State<RegisterStep2Page> {
                             jsonEncode({
                               "username": widget.username,
                               "lokasi": _selectedLocation!,
-                              "instagram":
-                                  _instagramController.text.trim(),
+                              "instagram": _instagramController.text.trim(),
                               "avatar": _selectedAvatar,
                             }),
                           );
@@ -304,20 +327,23 @@ class _RegisterStep2PageState extends State<RegisterStep2Page> {
                           if (response["status"] == "success") {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content:
-                                    Text("Welcome, ${response['username']}!"),
+                                content: Text(
+                                  "Welcome, ${response['username']}!",
+                                ),
                               ),
                             );
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                  builder: (_) => const LoginPage()),
+                                builder: (_) => const LoginPage(),
+                              ),
                             );
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text(response["message"] ??
-                                    "Step 2 failed."),
+                                content: Text(
+                                  response["message"] ?? "Step 2 failed.",
+                                ),
                               ),
                             );
                           }

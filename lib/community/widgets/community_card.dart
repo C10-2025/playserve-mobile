@@ -42,8 +42,12 @@ class CommunityCard extends StatelessWidget {
                   if (onJoin != null) await onJoin!();
                 },
           style: ElevatedButton.styleFrom(
-            backgroundColor: joined ? Colors.grey[300] : const Color(0xFFC1D752),
-            foregroundColor: joined ? Colors.grey[800] : const Color(0xFF082459),
+            backgroundColor: joined
+                ? Colors.grey[300]
+                : const Color(0xFFC1D752),
+            foregroundColor: joined
+                ? Colors.grey[800]
+                : const Color(0xFF082459),
             padding: EdgeInsets.zero,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
@@ -162,10 +166,7 @@ class CommunityCard extends StatelessWidget {
     // Badge kecil: You are the creator (dipindah di bawah Created by)
     Widget buildCreatorBadge() {
       return Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: s(10),
-          vertical: s(4),
-        ),
+        padding: EdgeInsets.symmetric(horizontal: s(10), vertical: s(4)),
         decoration: BoxDecoration(
           color: const Color(0xFFC1D752),
           borderRadius: BorderRadius.circular(999),
@@ -265,10 +266,7 @@ class CommunityCard extends StatelessWidget {
             SizedBox(height: s(10)),
 
             // ================= BOTTOM ACTIONS =================
-            if (isCreator)
-              buildCreatorActions()
-            else
-              buildJoinOrOpenButton(),
+            if (isCreator) buildCreatorActions() else buildJoinOrOpenButton(),
           ],
         ),
       ),

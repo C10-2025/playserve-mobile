@@ -29,10 +29,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if (isLoggedIn) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (context) =>
-              const HomePage(),
-        ),
+        MaterialPageRoute(builder: (context) => const HomePage()),
       );
     } else {
       Navigator.pushReplacement(
@@ -46,8 +43,9 @@ class _SplashScreenState extends State<SplashScreen> {
     final request = context.read<CookieRequest>();
 
     try {
-      final response =
-          await request.get('https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/auth/check_login/');
+      final response = await request.get(
+        'https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/auth/check_login/',
+      );
       return response['is_logged_in'] == true;
     } catch (e) {
       final prefs = await SharedPreferences.getInstance();
