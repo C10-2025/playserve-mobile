@@ -103,13 +103,11 @@ class BookingFieldCard extends StatelessWidget {
 
   Widget _buildImage() {
     final badges = <Widget>[];
-    final amenities =
-        field.amenities?.map((e) => e.toString().toLowerCase()).toList() ?? [];
-    if (amenities.any((a) => a.contains('light'))) {
-      badges.add(const _FeatureBadge(label: 'Lights'));
+    if (field.hasLights) {
+      badges.add(const _LightsBadge());
     }
-    if (amenities.any((a) => a.contains('board') || a.contains('wall'))) {
-      badges.add(const _FeatureBadge(label: 'Backboard'));
+    if (field.hasBackboard) {
+      badges.add(const _BackboardBadge());
     }
 
     return ClipRRect(
@@ -157,22 +155,48 @@ class BookingFieldCard extends StatelessWidget {
   }
 }
 
-class _FeatureBadge extends StatelessWidget {
-  const _FeatureBadge({required this.label});
-  final String label;
+class _LightsBadge extends StatelessWidget {
+  const _LightsBadge();
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(999)),
-      child: Text(
-        label,
-        style: BookingTextStyles.cardSubtitle.copyWith(
-          color: BookingColors.navbarBlue,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.yellow[600],
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: const Text(
+        '💡 Lights',
+        style: TextStyle(
+          color: Colors.black,
           fontWeight: FontWeight.w700,
-          fontSize: 11,
+          fontSize: 12,
+        ),
+      ),
+    );
+  }
+}
+
+class _BackboardBadge extends StatelessWidget {
+  const _BackboardBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFE4E6), // Light rose/pink
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: const Text(
+        '🏓 Backboard',
+        style: TextStyle(
+          color: Colors.black87,
+          fontWeight: FontWeight.w700,
+          fontSize: 12,
         ),
       ),
     );
