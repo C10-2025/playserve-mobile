@@ -82,7 +82,9 @@ class MyHomePage extends StatelessWidget {
               // Tombol logout
               ElevatedButton(
                 onPressed: () async {
-                  await request.logout("http://127.0.0.1:8000/auth/logout");
+                  await request.logout(
+                    "https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/auth/logout",
+                  );
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(

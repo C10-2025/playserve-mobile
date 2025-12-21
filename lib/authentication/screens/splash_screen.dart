@@ -44,7 +44,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
     try {
       final response = await request.get(
-        'http://127.0.0.1:8000/auth/check_login/',
+        'https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/auth/check_login/',
       );
       return response['is_logged_in'] == true;
     } catch (e) {

@@ -34,7 +34,7 @@ class _DeleteProfilePageState extends State<DeleteProfilePage> {
 
     try {
       final response = await request.get(
-        'http://127.0.0.1:8000/auth/get_all_users/',
+        'https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/auth/get_all_users/',
       );
 
       debugPrint("📡 RAW RESPONSE: $response");
@@ -92,7 +92,7 @@ class _DeleteProfilePageState extends State<DeleteProfilePage> {
 
     try {
       final response = await request.post(
-        'http://127.0.0.1:8000/auth/admin_delete_user/',
+        'https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/auth/admin_delete_user/',
         {"username": username},
       );
       if (response['status'] == true) {

@@ -201,7 +201,7 @@ class _HomePageAdminState extends State<HomePageAdmin> {
                                 // 1. Panggil API Logout Django
                                 try {
                                   await request.get(
-                                    'http://127.0.0.1:8000/auth/logout/',
+                                    'https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/auth/logout/',
                                   );
                                 } catch (e) {
                                   debugPrint("Logout API error: $e");

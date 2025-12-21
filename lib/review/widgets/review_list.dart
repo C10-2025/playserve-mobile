@@ -28,7 +28,8 @@ class _ReviewListState extends State<ReviewList> {
   String _searchQuery = '';
 
   // urls
-  static const String apiBase = 'http://127.0.0.1:8000';
+  static const String apiBase =
+      'https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id';
   static const String _fieldsUrl = '$apiBase/booking/json/';
   static const String _reviewsUrl = '$apiBase/review/json/';
 

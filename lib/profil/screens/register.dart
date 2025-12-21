@@ -116,7 +116,7 @@ class _RegisterStep1PageState extends State<RegisterStep1Page> {
                               setState(() => _isLoading = true);
 
                               final response = await request.postJson(
-                                "http://127.0.0.1:8000/auth/register/step1/",
+                                "https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/auth/register/step1/",
                                 jsonEncode({
                                   "username": username,
                                   "password1": password1,
@@ -337,7 +337,7 @@ class _RegisterStep2PageState extends State<RegisterStep2Page> {
 
                               setState(() => _isLoading = true);
                               final response = await request.postJson(
-                                "http://127.0.0.1:8000/auth/register/step2/",
+                                "https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/auth/register/step2/",
                                 jsonEncode({
                                   "username": widget.username,
                                   "lokasi": _selectedLocation!,

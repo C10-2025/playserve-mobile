@@ -17,7 +17,7 @@ void main() async {
   // admin dari cookieRequest global seperti Review)
   try {
     final adminResp = await cookieRequest.get(
-      "http://127.0.0.1:8000/auth/check_admin_status/",
+      "https://jonathan-yitskhaq-playserve.pbp.cs.ui.ac.id/auth/check_admin_status/",
     );
 
     cookieRequest.jsonData["is_admin"] = adminResp["is_admin"] ?? false;
